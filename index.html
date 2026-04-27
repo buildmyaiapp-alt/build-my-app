@@ -588,26 +588,35 @@
     /* ── AGENDA ANIMATIONS ── */
     .agenda-anim{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 
-    /* BUILD: code phone */
-    .build-phone{width:76px;height:124px;background:#0c1428;border-radius:12px;border:3px solid rgba(255,255,255,.25);padding:8px 7px;position:relative;box-shadow:0 8px 24px rgba(0,0,0,.5);}
-    .build-screen{width:100%;height:100%;background:#0a1020;border-radius:6px;padding:6px;overflow:hidden;}
-    .build-line{height:4px;border-radius:2px;margin-bottom:6px;width:0;animation:buildLine 4s ease-in-out infinite;}
-    .bl1{background:#61dafb;animation-delay:0s;}
-    .bl2{background:#ff5c00;animation-delay:.5s;}
-    .bl3{background:#fff176;animation-delay:1s;}
-    .bl4{background:#61dafb;animation-delay:1.5s;}
-    .bl5{background:#ff5c00;animation-delay:2s;}
-    .bl6{background:rgba(255,255,255,.3);animation-delay:2.5s;}
-    @keyframes buildLine{0%{width:0;opacity:0;}15%{opacity:1;}40%{width:85%;}80%{width:85%;opacity:1;}95%{opacity:0;}100%{width:0;opacity:0;}}
-    .build-cursor{width:2px;height:8px;background:#61dafb;position:absolute;bottom:14px;left:18px;animation:curBlink .7s step-end infinite;}
+    /* ── BUILD: VS Code style editor ── */
+    .code-editor{width:168px;background:#1e1e1e;border-radius:10px;overflow:hidden;box-shadow:0 12px 32px rgba(0,0,0,.7);font-family:'Courier New',monospace;}
+    .ce-bar{background:#2d2d2d;padding:6px 8px;display:flex;align-items:center;gap:4px;}
+    .ce-dot{width:7px;height:7px;border-radius:50%;}
+    .ced1{background:#ff5f57;} .ced2{background:#febc2e;} .ced3{background:#28c840;}
+    .ce-filename{color:#999;font-size:8px;margin-left:8px;letter-spacing:.3px;}
+    .ce-body{padding:8px 6px 10px;}
+    .ce-row{display:flex;gap:6px;align-items:center;margin-bottom:5px;min-height:11px;}
+    .ce-ln{color:#4a4a4a;font-size:7.5px;width:10px;text-align:right;flex-shrink:0;user-select:none;}
+    .ce-code{font-size:8px;white-space:nowrap;overflow:hidden;clip-path:inset(0 100% 0 0);animation:codeReveal 6s ease-in-out infinite;}
+    .cc1{color:#c586c0;animation-delay:.2s;}
+    .cc2{color:#9cdcfe;animation-delay:.9s;}
+    .cc3{color:#ce9178;animation-delay:1.6s;}
+    .cc4{color:#4ec9b0;animation-delay:2.3s;}
+    .cc5{color:#dcdcaa;animation-delay:3.0s;}
+    .cc6{color:#6a9955;animation-delay:3.7s;}
+    @keyframes codeReveal{
+      0%{clip-path:inset(0 100% 0 0);opacity:0;}
+      4%{opacity:1;}
+      22%{clip-path:inset(0 0% 0 0);}
+      72%{clip-path:inset(0 0% 0 0);opacity:1;}
+      85%{opacity:0;}
+      100%{clip-path:inset(0 100% 0 0);opacity:0;}
+    }
+    .ce-cursor{width:1.5px;height:9px;background:#fff;display:inline-block;vertical-align:middle;margin-left:1px;animation:curBlink .7s step-end infinite;}
     @keyframes curBlink{0%,100%{opacity:1;}50%{opacity:0;}}
-    .build-spark{position:absolute;border-radius:50%;animation:sparkF 2.2s ease-in-out infinite;}
-    .bs1{width:8px;height:8px;background:#ff5c00;top:18%;right:18%;animation-delay:0s;}
-    .bs2{width:6px;height:6px;background:#fff176;top:58%;left:12%;animation-delay:.8s;}
-    .bs3{width:5px;height:5px;background:#61dafb;bottom:22%;right:22%;animation-delay:1.6s;}
-    @keyframes sparkF{0%,100%{transform:translateY(0) scale(1);opacity:.7;}50%{transform:translateY(-12px) scale(1.3);opacity:1;}}
+    .ce-status{background:#0078d4;padding:2px 8px;font-size:7px;color:#fff;display:flex;gap:8px;font-family:monospace;}
 
-    /* PAYMENT: phone with notifications */
+    /* ── PAYMENT: phone with notifications ── */
     .pay-phone{width:84px;height:130px;background:#fff;border-radius:14px;border:3px solid rgba(255,255,255,.5);overflow:hidden;position:relative;box-shadow:0 8px 24px rgba(0,0,0,.35);}
     .pay-notif{position:absolute;left:0;right:0;top:0;background:#fff;border-bottom:1px solid #eee;padding:5px 7px;transform:translateY(-100%);animation:notifDrop 3.5s ease-in-out infinite;}
     .pay-notif-2{animation-delay:1.75s;}
@@ -627,22 +636,31 @@
     .mf3{font-size:16px;left:42%;bottom:10%;animation-delay:2s;}
     @keyframes moneyRise{0%{transform:translateY(0) rotate(-10deg);opacity:0;}20%{opacity:1;}100%{transform:translateY(-65px) rotate(15deg);opacity:0;}}
 
-    /* LAUNCH: playstore upload */
-    .launch-wrap{text-align:center;position:relative;z-index:1;}
-    .launch-icon{width:58px;height:58px;border-radius:14px;background:linear-gradient(135deg,#ff5c00,#f5a623);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 10px;animation:launchBounce 2s ease-in-out infinite;box-shadow:0 8px 20px rgba(0,0,0,.35);}
-    @keyframes launchBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
-    .launch-bar-bg{width:90px;height:7px;background:rgba(255,255,255,.2);border-radius:4px;margin:0 auto 6px;overflow:hidden;}
-    .launch-bar{height:100%;background:#27ae60;border-radius:4px;width:0;animation:fillBar 2.5s ease-in-out infinite;}
-    @keyframes fillBar{0%{width:0%;}60%{width:100%;}85%{width:100%;}95%{opacity:0;}100%{width:0%;opacity:1;}}
-    .launch-label{font-size:9px;font-weight:800;color:rgba(255,255,255,.9);letter-spacing:.5px;animation:labelSwap 2.5s ease-in-out infinite;}
-    @keyframes labelSwap{0%,10%{opacity:0;}15%,60%{opacity:1;}75%,100%{opacity:0;}}
-    .launch-star{position:absolute;background:#fff;border-radius:50%;animation:twinkle 2s ease-in-out infinite;}
-    .ls1{width:5px;height:5px;top:15%;left:12%;animation-delay:0s;}
-    .ls2{width:4px;height:4px;top:25%;right:15%;animation-delay:.6s;}
-    .ls3{width:3px;height:3px;bottom:28%;left:20%;animation-delay:1.2s;}
-    .ls4{width:4px;height:4px;bottom:20%;right:18%;animation-delay:1.8s;}
-    @keyframes twinkle{0%,100%{opacity:.2;transform:scale(1);}50%{opacity:1;transform:scale(1.6);}}
-    .playstore-badge{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.6);border-radius:5px;padding:3px 7px;font-size:8px;color:#fff;font-weight:700;display:flex;align-items:center;gap:3px;}
+    /* ── LAUNCH: Google Play Store card ── */
+    .ps-card{width:168px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 10px 28px rgba(0,0,0,.45);}
+    .ps-topbar{background:#fff;padding:5px 8px;display:flex;align-items:center;gap:6px;border-bottom:1px solid #eee;}
+    .ps-app-icon{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#ff5c00,#f5a623);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+    .ps-info{flex:1;min-width:0;}
+    .ps-appname{font-size:8.5px;font-weight:800;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .ps-dev{font-size:7px;color:#01875f;font-weight:600;margin-top:1px;}
+    .ps-rating{display:flex;align-items:center;gap:2px;margin-top:2px;}
+    .ps-stars{color:#f5a623;font-size:8px;letter-spacing:0;}
+    .ps-rnum{font-size:7px;color:#555;font-weight:600;}
+    .ps-screenshots{display:flex;gap:4px;padding:6px 8px;}
+    .ps-thumb{width:44px;height:36px;border-radius:4px;flex-shrink:0;overflow:hidden;border:1px solid #eee;}
+    .ps-thumb-1{background:linear-gradient(135deg,#0d1b6e 0%,#1565c0 100%);}
+    .ps-thumb-2{background:linear-gradient(135deg,#1565c0 0%,#0288d1 100%);}
+    .ps-thumb-3{background:linear-gradient(135deg,#ff5c00 0%,#f5a623 100%);}
+    .ps-bottom{padding:0 8px 8px;}
+    .ps-progress-wrap{height:3px;background:#eee;border-radius:2px;margin-bottom:5px;overflow:hidden;}
+    .ps-progress{height:100%;background:#01875f;border-radius:2px;width:0;animation:psProgress 3.5s ease-in-out infinite;}
+    @keyframes psProgress{0%{width:0%;}55%{width:100%;}80%{width:100%;}85%{opacity:0;}90%,100%{width:0%;opacity:1;}}
+    .ps-btn-row{display:flex;gap:5px;}
+    .ps-btn-install{flex:1;background:#01875f;color:#fff;font-size:7.5px;font-weight:800;text-align:center;padding:5px;border-radius:4px;letter-spacing:.4px;animation:btnSwap 3.5s ease-in-out infinite;}
+    @keyframes btnSwap{0%,50%{content:"INSTALL";background:#01875f;}60%,100%{background:#1a73e8;}}
+    .ps-btn-wish{background:#e8f0fe;color:#1a73e8;font-size:7.5px;font-weight:800;padding:5px 8px;border-radius:4px;}
+    .ps-installed-badge{font-size:7px;color:#01875f;font-weight:700;text-align:center;margin-top:3px;animation:badgeAppear 3.5s ease-in-out infinite;opacity:0;}
+    @keyframes badgeAppear{0%,55%{opacity:0;}65%,90%{opacity:1;}100%{opacity:0;}}
 
     /* ── RESPONSIVE ── */
     @media(max-width:768px){
@@ -1148,23 +1166,25 @@
     <div class="agenda-grid">
       <div class="agenda-card">
         <div class="agenda-img" style="background:#0c1428;">
-          <!-- BUILD ANIMATION -->
-          <div class="agenda-anim">
-            <div class="build-phone">
-              <div class="build-screen">
-                <div class="build-line bl1"></div>
-                <div class="build-line bl2"></div>
-                <div class="build-line bl3"></div>
-                <div class="build-line bl4"></div>
-                <div class="build-line bl5"></div>
-                <div class="build-line bl6"></div>
+          <!-- BUILD ANIMATION: VS Code editor -->
+          <div class="agenda-anim" style="background:#1e1e1e;">
+            <div class="code-editor">
+              <div class="ce-bar">
+                <div class="ce-dot ced1"></div>
+                <div class="ce-dot ced2"></div>
+                <div class="ce-dot ced3"></div>
+                <div class="ce-filename">app.js — AI Builder</div>
               </div>
-              <div class="build-cursor"></div>
+              <div class="ce-body">
+                <div class="ce-row"><div class="ce-ln">1</div><div class="ce-code cc1">const app = AI.create({</div></div>
+                <div class="ce-row"><div class="ce-ln">2</div><div class="ce-code cc2">&nbsp;&nbsp;name: "MyDreamApp",</div></div>
+                <div class="ce-row"><div class="ce-ln">3</div><div class="ce-code cc3">&nbsp;&nbsp;type: "business",</div></div>
+                <div class="ce-row"><div class="ce-ln">4</div><div class="ce-code cc4">&nbsp;&nbsp;features: [pay, book],</div></div>
+                <div class="ce-row"><div class="ce-ln">5</div><div class="ce-code cc5">});</div></div>
+                <div class="ce-row"><div class="ce-ln">6</div><div class="ce-code cc6">// ✅ App built in 30min<span class="ce-cursor"></span></div></div>
+              </div>
+              <div class="ce-status"><span>⚡ AI</span><span>JavaScript</span><span>✓ Ready</span></div>
             </div>
-            <div class="build-spark bs1"></div>
-            <div class="build-spark bs2"></div>
-            <div class="build-spark bs3"></div>
-            <div style="position:absolute;top:10px;right:10px;background:#ff5c00;color:#fff;font-size:9px;font-weight:800;padding:3px 8px;border-radius:4px;letter-spacing:1px;">AI ✦</div>
           </div>
           <div class="agenda-day-badge">☀️ Part 01</div>
           <div class="agenda-day-title">Build</div>
@@ -1214,18 +1234,34 @@
       </div>
       <div class="agenda-card">
         <div class="agenda-img" style="background:linear-gradient(135deg,#1a237e,#283593);">
-          <!-- LAUNCH ANIMATION -->
-          <div class="agenda-anim">
-            <div class="launch-star ls1"></div>
-            <div class="launch-star ls2"></div>
-            <div class="launch-star ls3"></div>
-            <div class="launch-star ls4"></div>
-            <div class="launch-wrap">
-              <div class="launch-icon">📱</div>
-              <div class="launch-bar-bg"><div class="launch-bar"></div></div>
-              <div class="launch-label">UPLOADING TO PLAY STORE...</div>
+          <!-- LAUNCH ANIMATION: Play Store card -->
+          <div class="agenda-anim" style="background:linear-gradient(135deg,#1a237e,#283593);">
+            <div class="ps-card">
+              <div class="ps-topbar">
+                <div class="ps-app-icon">📱</div>
+                <div class="ps-info">
+                  <div class="ps-appname">Ai Dream App</div>
+                  <div class="ps-dev">AI Dream App Studio</div>
+                  <div class="ps-rating">
+                    <div class="ps-stars">★★★★★</div>
+                    <div class="ps-rnum">4.9 (2.1K)</div>
+                  </div>
+                </div>
+              </div>
+              <div class="ps-screenshots">
+                <div class="ps-thumb ps-thumb-1"></div>
+                <div class="ps-thumb ps-thumb-2"></div>
+                <div class="ps-thumb ps-thumb-3"></div>
+              </div>
+              <div class="ps-bottom">
+                <div class="ps-progress-wrap"><div class="ps-progress"></div></div>
+                <div class="ps-btn-row">
+                  <div class="ps-btn-install">INSTALL</div>
+                  <div class="ps-btn-wish">♡</div>
+                </div>
+                <div class="ps-installed-badge">✅ Published on Play Store!</div>
+              </div>
             </div>
-            <div class="playstore-badge">▶ Google Play</div>
           </div>
           <div class="agenda-day-badge">☀️ Part 03</div>
           <div class="agenda-day-title">Launch & Scale</div>
