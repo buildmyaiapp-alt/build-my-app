@@ -585,6 +585,65 @@
     .red-dnarrows{display:flex;justify-content:center;gap:100px;margin:24px 0 0;}
     .red-dnarrow{width:42px;height:42px;border-radius:50%;border:2px solid var(--red);display:flex;align-items:center;justify-content:center;color:var(--red);font-size:16px;font-weight:900;}
 
+    /* ── AGENDA ANIMATIONS ── */
+    .agenda-anim{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+
+    /* BUILD: code phone */
+    .build-phone{width:76px;height:124px;background:#0c1428;border-radius:12px;border:3px solid rgba(255,255,255,.25);padding:8px 7px;position:relative;box-shadow:0 8px 24px rgba(0,0,0,.5);}
+    .build-screen{width:100%;height:100%;background:#0a1020;border-radius:6px;padding:6px;overflow:hidden;}
+    .build-line{height:4px;border-radius:2px;margin-bottom:6px;width:0;animation:buildLine 4s ease-in-out infinite;}
+    .bl1{background:#61dafb;animation-delay:0s;}
+    .bl2{background:#ff5c00;animation-delay:.5s;}
+    .bl3{background:#fff176;animation-delay:1s;}
+    .bl4{background:#61dafb;animation-delay:1.5s;}
+    .bl5{background:#ff5c00;animation-delay:2s;}
+    .bl6{background:rgba(255,255,255,.3);animation-delay:2.5s;}
+    @keyframes buildLine{0%{width:0;opacity:0;}15%{opacity:1;}40%{width:85%;}80%{width:85%;opacity:1;}95%{opacity:0;}100%{width:0;opacity:0;}}
+    .build-cursor{width:2px;height:8px;background:#61dafb;position:absolute;bottom:14px;left:18px;animation:curBlink .7s step-end infinite;}
+    @keyframes curBlink{0%,100%{opacity:1;}50%{opacity:0;}}
+    .build-spark{position:absolute;border-radius:50%;animation:sparkF 2.2s ease-in-out infinite;}
+    .bs1{width:8px;height:8px;background:#ff5c00;top:18%;right:18%;animation-delay:0s;}
+    .bs2{width:6px;height:6px;background:#fff176;top:58%;left:12%;animation-delay:.8s;}
+    .bs3{width:5px;height:5px;background:#61dafb;bottom:22%;right:22%;animation-delay:1.6s;}
+    @keyframes sparkF{0%,100%{transform:translateY(0) scale(1);opacity:.7;}50%{transform:translateY(-12px) scale(1.3);opacity:1;}}
+
+    /* PAYMENT: phone with notifications */
+    .pay-phone{width:84px;height:130px;background:#fff;border-radius:14px;border:3px solid rgba(255,255,255,.5);overflow:hidden;position:relative;box-shadow:0 8px 24px rgba(0,0,0,.35);}
+    .pay-notif{position:absolute;left:0;right:0;top:0;background:#fff;border-bottom:1px solid #eee;padding:5px 7px;transform:translateY(-100%);animation:notifDrop 3.5s ease-in-out infinite;}
+    .pay-notif-2{animation-delay:1.75s;}
+    @keyframes notifDrop{0%{transform:translateY(-100%);opacity:0;}10%{transform:translateY(0);opacity:1;}70%{transform:translateY(0);opacity:1;}85%{transform:translateY(-100%);opacity:0;}100%{transform:translateY(-100%);opacity:0;}}
+    .pay-n-title{font-size:7px;font-weight:800;color:#27ae60;}
+    .pay-n-amt{font-size:10px;font-weight:900;color:#111;}
+    .pay-n-from{font-size:6px;color:#999;}
+    .pay-body{padding:10px 7px;text-align:center;margin-top:34px;}
+    .pay-icon-big{font-size:22px;margin-bottom:4px;}
+    .pay-amt-big{font-size:12px;font-weight:900;color:#111;margin-bottom:6px;}
+    .pay-check{width:22px;height:22px;border-radius:50%;background:#27ae60;color:#fff;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;margin:0 auto 4px;animation:checkPulse 1.5s ease-in-out infinite;}
+    @keyframes checkPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(39,174,96,.4);}50%{transform:scale(1.15);box-shadow:0 0 0 6px rgba(39,174,96,0);}}
+    .pay-ok{font-size:7px;font-weight:800;color:#27ae60;letter-spacing:.5px;}
+    .money-float{position:absolute;font-weight:900;color:#27ae60;animation:moneyRise 2.8s ease-out infinite;opacity:0;}
+    .mf1{font-size:14px;left:8%;bottom:15%;animation-delay:0s;}
+    .mf2{font-size:12px;right:8%;bottom:25%;animation-delay:1s;}
+    .mf3{font-size:16px;left:42%;bottom:10%;animation-delay:2s;}
+    @keyframes moneyRise{0%{transform:translateY(0) rotate(-10deg);opacity:0;}20%{opacity:1;}100%{transform:translateY(-65px) rotate(15deg);opacity:0;}}
+
+    /* LAUNCH: playstore upload */
+    .launch-wrap{text-align:center;position:relative;z-index:1;}
+    .launch-icon{width:58px;height:58px;border-radius:14px;background:linear-gradient(135deg,#ff5c00,#f5a623);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 10px;animation:launchBounce 2s ease-in-out infinite;box-shadow:0 8px 20px rgba(0,0,0,.35);}
+    @keyframes launchBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+    .launch-bar-bg{width:90px;height:7px;background:rgba(255,255,255,.2);border-radius:4px;margin:0 auto 6px;overflow:hidden;}
+    .launch-bar{height:100%;background:#27ae60;border-radius:4px;width:0;animation:fillBar 2.5s ease-in-out infinite;}
+    @keyframes fillBar{0%{width:0%;}60%{width:100%;}85%{width:100%;}95%{opacity:0;}100%{width:0%;opacity:1;}}
+    .launch-label{font-size:9px;font-weight:800;color:rgba(255,255,255,.9);letter-spacing:.5px;animation:labelSwap 2.5s ease-in-out infinite;}
+    @keyframes labelSwap{0%,10%{opacity:0;}15%,60%{opacity:1;}75%,100%{opacity:0;}}
+    .launch-star{position:absolute;background:#fff;border-radius:50%;animation:twinkle 2s ease-in-out infinite;}
+    .ls1{width:5px;height:5px;top:15%;left:12%;animation-delay:0s;}
+    .ls2{width:4px;height:4px;top:25%;right:15%;animation-delay:.6s;}
+    .ls3{width:3px;height:3px;bottom:28%;left:20%;animation-delay:1.2s;}
+    .ls4{width:4px;height:4px;bottom:20%;right:18%;animation-delay:1.8s;}
+    @keyframes twinkle{0%,100%{opacity:.2;transform:scale(1);}50%{opacity:1;transform:scale(1.6);}}
+    .playstore-badge{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.6);border-radius:5px;padding:3px 7px;font-size:8px;color:#fff;font-weight:700;display:flex;align-items:center;gap:3px;}
+
     /* ── RESPONSIVE ── */
     @media(max-width:768px){
       .hero-2col{grid-template-columns:1fr;gap:16px;}
@@ -1088,8 +1147,25 @@
     <div class="sec-divider"></div>
     <div class="agenda-grid">
       <div class="agenda-card">
-        <div class="agenda-img" style="background:linear-gradient(135deg,#0d1b6e,#1565c0);">
-          <img src="palash-casual.jpg" alt="Palash" style="width:100%;height:100%;object-fit:cover;object-position:center 65%;position:absolute;opacity:.6;"/>
+        <div class="agenda-img" style="background:#0c1428;">
+          <!-- BUILD ANIMATION -->
+          <div class="agenda-anim">
+            <div class="build-phone">
+              <div class="build-screen">
+                <div class="build-line bl1"></div>
+                <div class="build-line bl2"></div>
+                <div class="build-line bl3"></div>
+                <div class="build-line bl4"></div>
+                <div class="build-line bl5"></div>
+                <div class="build-line bl6"></div>
+              </div>
+              <div class="build-cursor"></div>
+            </div>
+            <div class="build-spark bs1"></div>
+            <div class="build-spark bs2"></div>
+            <div class="build-spark bs3"></div>
+            <div style="position:absolute;top:10px;right:10px;background:#ff5c00;color:#fff;font-size:9px;font-weight:800;padding:3px 8px;border-radius:4px;letter-spacing:1px;">AI ✦</div>
+          </div>
           <div class="agenda-day-badge">☀️ Part 01</div>
           <div class="agenda-day-title">Build</div>
         </div>
@@ -1101,8 +1177,31 @@
         </div>
       </div>
       <div class="agenda-card">
-        <div class="agenda-img" style="background:linear-gradient(135deg,#1565c0,#0288d1);">
-          <img src="palash-casual.jpg" alt="Palash" style="width:100%;height:100%;object-fit:cover;object-position:center 65%;position:absolute;opacity:.6;"/>
+        <div class="agenda-img" style="background:linear-gradient(135deg,#e8f8f0,#c8f0d8);">
+          <!-- PAYMENT ANIMATION -->
+          <div class="agenda-anim">
+            <div class="pay-phone">
+              <div class="pay-notif">
+                <div class="pay-n-title">✅ Payment Received!</div>
+                <div class="pay-n-amt">₹30,000</div>
+                <div class="pay-n-from">Razorpay · AI Dream App</div>
+              </div>
+              <div class="pay-notif pay-notif-2">
+                <div class="pay-n-title">✅ Payment Received!</div>
+                <div class="pay-n-amt">₹15,000</div>
+                <div class="pay-n-from">Razorpay · AI Dream App</div>
+              </div>
+              <div class="pay-body">
+                <div class="pay-icon-big">💳</div>
+                <div class="pay-amt-big">₹30,000</div>
+                <div class="pay-check">✓</div>
+                <div class="pay-ok">PAYMENT SUCCESS</div>
+              </div>
+            </div>
+            <div class="money-float mf1">₹</div>
+            <div class="money-float mf2">💰</div>
+            <div class="money-float mf3">₹</div>
+          </div>
           <div class="agenda-day-badge">☀️ Part 02</div>
           <div class="agenda-day-title">Add Features & Payments</div>
         </div>
@@ -1114,8 +1213,20 @@
         </div>
       </div>
       <div class="agenda-card">
-        <div class="agenda-img" style="background:linear-gradient(135deg,#0288d1,#00acc1);">
-          <img src="palash-casual.jpg" alt="Palash" style="width:100%;height:100%;object-fit:cover;object-position:center 65%;position:absolute;opacity:.6;"/>
+        <div class="agenda-img" style="background:linear-gradient(135deg,#1a237e,#283593);">
+          <!-- LAUNCH ANIMATION -->
+          <div class="agenda-anim">
+            <div class="launch-star ls1"></div>
+            <div class="launch-star ls2"></div>
+            <div class="launch-star ls3"></div>
+            <div class="launch-star ls4"></div>
+            <div class="launch-wrap">
+              <div class="launch-icon">📱</div>
+              <div class="launch-bar-bg"><div class="launch-bar"></div></div>
+              <div class="launch-label">UPLOADING TO PLAY STORE...</div>
+            </div>
+            <div class="playstore-badge">▶ Google Play</div>
+          </div>
           <div class="agenda-day-badge">☀️ Part 03</div>
           <div class="agenda-day-title">Launch & Scale</div>
         </div>
