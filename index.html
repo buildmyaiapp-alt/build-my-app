@@ -504,6 +504,87 @@
     }
     footer a{color:var(--blue);}
 
+    /* ── SVG PIPE SYSTEM ── */
+    .pipe-svg-wrap{max-width:1000px;margin:30px auto 0;overflow-x:auto;}
+    .pipe-svg-wrap svg{min-width:600px;}
+    .pipe-labels{
+      display:flex;justify-content:space-around;
+      max-width:1000px;margin:16px auto 0;padding:0 20px;
+    }
+    .pipe-label-item{text-align:center;flex:1;padding:0 4px;}
+    .pipe-num-big{font-size:30px;font-weight:700;opacity:.85;margin-bottom:4px;}
+    .pipe-label-title{font-size:13px;font-weight:800;margin-bottom:4px;line-height:1.3;}
+    .pipe-label-desc{font-size:11px;color:#777;line-height:1.5;}
+
+    /* ── PHONES PROOF SECTION ── */
+    .phones-proof{padding:70px 20px;background:var(--lightbg);}
+    .phones-proof-inner{max-width:960px;margin:0 auto;text-align:center;}
+    .handwritten-annot{
+      font-family:'Caveat',cursive;
+      font-size:clamp(22px,3vw,30px);font-weight:700;
+      line-height:1.4;
+      max-width:560px;margin:0 auto 24px;
+    }
+    .phones-row{
+      display:flex;justify-content:center;align-items:center;
+      gap:40px;margin:24px 0;flex-wrap:wrap;
+    }
+    .phone-device{
+      width:188px;background:#1c1c1e;
+      border-radius:34px;padding:10px;
+      box-shadow:0 24px 60px rgba(0,0,0,.35);
+      flex-shrink:0;
+    }
+    .phone-device.tilted{
+      transform:perspective(700px) rotateY(-15deg) rotateX(4deg);
+      box-shadow:18px 18px 50px rgba(0,0,0,.4);
+    }
+    .phone-screen{background:#fff;border-radius:26px;overflow:hidden;height:340px;}
+    .ph-topbar{
+      background:#fff;padding:7px 12px 4px;
+      display:flex;justify-content:space-between;align-items:center;
+      font-size:10px;font-weight:700;color:#111;
+      border-bottom:1px solid #f0f0f0;
+    }
+    .ph-gmailbar{
+      padding:5px 10px;font-size:9px;color:#444;font-weight:600;
+      border-bottom:1px solid #eee;display:flex;align-items:center;gap:4px;
+    }
+    .ph-gmailbar .xbtn{margin-left:auto;color:#aaa;font-size:11px;}
+    .ph-filterrow{
+      padding:4px 10px;display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid #eee;
+    }
+    .ph-ftag{
+      background:#f1f3f4;border-radius:10px;
+      padding:2px 7px;font-size:8px;font-weight:600;color:#555;
+    }
+    .ph-sort{padding:3px 10px;font-size:8px;color:#777;border-bottom:1px solid #eee;}
+    .ph-scroll-wrap{overflow:hidden;height:268px;}
+    .ph-scroll-inner{animation:emailScrollUp 14s linear infinite;}
+    @keyframes emailScrollUp{
+      0%{transform:translateY(0);}
+      100%{transform:translateY(-50%);}
+    }
+    .ph-email{
+      padding:7px 10px;border-bottom:1px solid #f0f0f0;
+      display:flex;gap:7px;align-items:flex-start;
+    }
+    .ph-av{
+      width:26px;height:26px;border-radius:50%;background:#4285f4;
+      display:flex;align-items:center;justify-content:center;
+      font-size:11px;color:#fff;font-weight:700;flex-shrink:0;margin-top:1px;
+    }
+    .ph-eb{flex:1;min-width:0;}
+    .ph-er{display:flex;justify-content:space-between;align-items:center;}
+    .ph-ename{font-size:9.5px;font-weight:700;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px;}
+    .ph-edate{font-size:8px;color:#999;flex-shrink:0;margin-left:4px;}
+    .ph-esubj{font-size:8.5px;color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+    .ph-eamt{font-size:8.5px;font-weight:700;color:#333;margin-top:1px;}
+    .ph-inbox{display:inline-block;background:#d3e4ff;color:#1a73e8;font-size:7px;font-weight:700;padding:1px 4px;border-radius:2px;margin-left:4px;}
+    .ph-pdf{display:inline-flex;align-items:center;gap:2px;background:#fce8e6;color:#d93025;font-size:7.5px;font-weight:700;padding:2px 5px;border-radius:2px;margin-top:3px;}
+    .red-dnarrows{display:flex;justify-content:center;gap:100px;margin:24px 0 0;}
+    .red-dnarrow{width:42px;height:42px;border-radius:50%;border:2px solid var(--red);display:flex;align-items:center;justify-content:center;color:var(--red);font-size:16px;font-weight:900;}
+
     /* ── RESPONSIVE ── */
     @media(max-width:768px){
       .hero-2col{grid-template-columns:1fr;gap:16px;}
@@ -515,12 +596,12 @@
       .about-box{grid-template-columns:1fr;text-align:center;padding:32px 20px;}
       .about-photo-circle{margin:0 auto;}
       .about-divider{margin:0 auto 20px;}
-      .funnel-pipes{flex-wrap:wrap;gap:16px;}
-      .pipe-connector{display:none;}
-      .pipe-item{max-width:120px;}
+      .pipe-labels{flex-wrap:wrap;}
+      .pipe-label-item{min-width:80px;}
       .vt-grid{grid-template-columns:1fr;}
       .sticky{padding:8px 12px;}
       .pt-row{grid-template-columns:1fr 1fr 1fr;}
+      .phone-device.tilted{transform:none;}
     }
   </style>
 </head>
@@ -685,41 +766,122 @@
     <h2 class="sec-title">After Helping <span class="hl">500+ Students</span> Build Apps — The Only System<br/><span class="ul">You'll Ever Need</span> To Build Any App Rapidly!</h2>
     <div class="sec-divider"></div>
     <p style="text-align:center;font-size:18px;font-weight:800;color:#333;margin-top:24px;">AI App Building System</p>
-    <div class="funnel-wrap">
-      <div class="funnel-pipes">
-        <div class="pipe-item">
-          <div class="pipe-circle c1">💬</div>
-          <div class="pipe-num">01</div>
-          <div class="pipe-label">Describe Idea</div>
-          <div class="pipe-desc">Tell AI what app you want in Hindi or English</div>
+    <!-- SVG PIPE SYSTEM -->
+    <div class="pipe-svg-wrap">
+      <svg viewBox="0 0 1100 340" width="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="pg1" gradientUnits="userSpaceOnUse" x1="110" y1="285" x2="330" y2="75">
+            <stop offset="0%" stop-color="#e6c800"/><stop offset="100%" stop-color="#f58000"/>
+          </linearGradient>
+          <linearGradient id="pg2" gradientUnits="userSpaceOnUse" x1="330" y1="75" x2="550" y2="225">
+            <stop offset="0%" stop-color="#f58000"/><stop offset="100%" stop-color="#e03838"/>
+          </linearGradient>
+          <linearGradient id="pg3" gradientUnits="userSpaceOnUse" x1="550" y1="225" x2="770" y2="75">
+            <stop offset="0%" stop-color="#e03838"/><stop offset="100%" stop-color="#d038b0"/>
+          </linearGradient>
+          <linearGradient id="pg4" gradientUnits="userSpaceOnUse" x1="770" y1="75" x2="990" y2="225">
+            <stop offset="0%" stop-color="#d038b0"/><stop offset="100%" stop-color="#7838c0"/>
+          </linearGradient>
+          <!-- Shadow gradients (darker versions) -->
+          <linearGradient id="ps1" gradientUnits="userSpaceOnUse" x1="110" y1="285" x2="330" y2="75">
+            <stop offset="0%" stop-color="#a08800"/><stop offset="100%" stop-color="#b05500"/>
+          </linearGradient>
+          <linearGradient id="ps2" gradientUnits="userSpaceOnUse" x1="330" y1="75" x2="550" y2="225">
+            <stop offset="0%" stop-color="#b05500"/><stop offset="100%" stop-color="#a01818"/>
+          </linearGradient>
+          <linearGradient id="ps3" gradientUnits="userSpaceOnUse" x1="550" y1="225" x2="770" y2="75">
+            <stop offset="0%" stop-color="#a01818"/><stop offset="100%" stop-color="#980880"/>
+          </linearGradient>
+          <linearGradient id="ps4" gradientUnits="userSpaceOnUse" x1="770" y1="75" x2="990" y2="225">
+            <stop offset="0%" stop-color="#980880"/><stop offset="100%" stop-color="#480890"/>
+          </linearGradient>
+        </defs>
+
+        <!-- ── PIPE PATHS (4 layers each: shadow → main → rings → highlight) ── -->
+
+        <!-- PIPE 01→02 (yellow→orange) -->
+        <path d="M 110,285 L 220,285 L 220,75 L 330,75" stroke="url(#ps1)" stroke-width="32" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 110,285 L 220,285 L 220,75 L 330,75" stroke="url(#pg1)" stroke-width="24" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 110,285 L 220,285 L 220,75 L 330,75" stroke="rgba(0,0,0,.18)" stroke-width="24" fill="none" stroke-dasharray="4 30" stroke-linecap="butt" stroke-linejoin="round"/>
+        <path d="M 110,285 L 220,285 L 220,75 L 330,75" stroke="rgba(255,255,255,.3)" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <!-- PIPE 02→03 (orange→red) -->
+        <path d="M 330,75 L 440,75 L 440,225 L 550,225" stroke="url(#ps2)" stroke-width="32" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 330,75 L 440,75 L 440,225 L 550,225" stroke="url(#pg2)" stroke-width="24" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 330,75 L 440,75 L 440,225 L 550,225" stroke="rgba(0,0,0,.18)" stroke-width="24" fill="none" stroke-dasharray="4 30" stroke-linecap="butt" stroke-linejoin="round"/>
+        <path d="M 330,75 L 440,75 L 440,225 L 550,225" stroke="rgba(255,255,255,.3)" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <!-- PIPE 03→04 (red→pink) -->
+        <path d="M 550,225 L 660,225 L 660,75 L 770,75" stroke="url(#ps3)" stroke-width="32" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 550,225 L 660,225 L 660,75 L 770,75" stroke="url(#pg3)" stroke-width="24" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 550,225 L 660,225 L 660,75 L 770,75" stroke="rgba(0,0,0,.18)" stroke-width="24" fill="none" stroke-dasharray="4 30" stroke-linecap="butt" stroke-linejoin="round"/>
+        <path d="M 550,225 L 660,225 L 660,75 L 770,75" stroke="rgba(255,255,255,.3)" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <!-- PIPE 04→05 (pink→purple) -->
+        <path d="M 770,75 L 880,75 L 880,225 L 990,225" stroke="url(#ps4)" stroke-width="32" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 770,75 L 880,75 L 880,225 L 990,225" stroke="url(#pg4)" stroke-width="24" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 770,75 L 880,75 L 880,225 L 990,225" stroke="rgba(0,0,0,.18)" stroke-width="24" fill="none" stroke-dasharray="4 30" stroke-linecap="butt" stroke-linejoin="round"/>
+        <path d="M 770,75 L 880,75 L 880,225 L 990,225" stroke="rgba(255,255,255,.3)" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <!-- ── CIRCLE NODES (shadow + fill + inner ring) ── -->
+
+        <!-- 01 yellow -->
+        <circle cx="110" cy="285" r="46" fill="#a08800"/>
+        <circle cx="110" cy="285" r="40" fill="#e6c800"/>
+        <circle cx="110" cy="285" r="28" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="3"/>
+        <text x="110" y="293" text-anchor="middle" font-size="26" fill="white">💬</text>
+
+        <!-- 02 orange -->
+        <circle cx="330" cy="75" r="46" fill="#b05500"/>
+        <circle cx="330" cy="75" r="40" fill="#f58000"/>
+        <circle cx="330" cy="75" r="28" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="3"/>
+        <text x="330" y="83" text-anchor="middle" font-size="26" fill="white">🤖</text>
+
+        <!-- 03 red -->
+        <circle cx="550" cy="225" r="46" fill="#a01818"/>
+        <circle cx="550" cy="225" r="40" fill="#e03838"/>
+        <circle cx="550" cy="225" r="28" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="3"/>
+        <text x="550" y="233" text-anchor="middle" font-size="26" fill="white">🎨</text>
+
+        <!-- 04 pink/magenta -->
+        <circle cx="770" cy="75" r="46" fill="#980880"/>
+        <circle cx="770" cy="75" r="40" fill="#d038b0"/>
+        <circle cx="770" cy="75" r="28" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="3"/>
+        <text x="770" y="83" text-anchor="middle" font-size="26" fill="white">⚡</text>
+
+        <!-- 05 purple -->
+        <circle cx="990" cy="225" r="46" fill="#480890"/>
+        <circle cx="990" cy="225" r="40" fill="#7838c0"/>
+        <circle cx="990" cy="225" r="28" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="3"/>
+        <text x="990" y="233" text-anchor="middle" font-size="26" fill="white">🚀</text>
+      </svg>
+
+      <!-- Labels below -->
+      <div class="pipe-labels">
+        <div class="pipe-label-item">
+          <div class="pipe-num-big" style="color:#e6c800;">01</div>
+          <div class="pipe-label-title" style="color:#b08800;">Describe Idea</div>
+          <div class="pipe-label-desc">Tell AI what app you want in Hindi or English</div>
         </div>
-        <div class="pipe-connector"></div>
-        <div class="pipe-item">
-          <div class="pipe-circle c2">🤖</div>
-          <div class="pipe-num">02</div>
-          <div class="pipe-label">AI Builds It</div>
-          <div class="pipe-desc">AI writes all the code automatically</div>
+        <div class="pipe-label-item">
+          <div class="pipe-num-big" style="color:#f58000;">02</div>
+          <div class="pipe-label-title" style="color:#c06000;">AI Builds It</div>
+          <div class="pipe-label-desc">AI writes all the code automatically</div>
         </div>
-        <div class="pipe-connector"></div>
-        <div class="pipe-item">
-          <div class="pipe-circle c3">🎨</div>
-          <div class="pipe-num">03</div>
-          <div class="pipe-label">Customize</div>
-          <div class="pipe-desc">Add your logo, colors and branding</div>
+        <div class="pipe-label-item">
+          <div class="pipe-num-big" style="color:#e03838;">03</div>
+          <div class="pipe-label-title" style="color:#b01818;">Customize</div>
+          <div class="pipe-label-desc">Add your logo, colors and branding</div>
         </div>
-        <div class="pipe-connector"></div>
-        <div class="pipe-item">
-          <div class="pipe-circle c4">⚡</div>
-          <div class="pipe-num">04</div>
-          <div class="pipe-label">Add Features</div>
-          <div class="pipe-desc">Payments, bookings, login by just typing</div>
+        <div class="pipe-label-item">
+          <div class="pipe-num-big" style="color:#d038b0;">04</div>
+          <div class="pipe-label-title" style="color:#a01880;">Add Features</div>
+          <div class="pipe-label-desc">Payments, bookings by just typing</div>
         </div>
-        <div class="pipe-connector"></div>
-        <div class="pipe-item">
-          <div class="pipe-circle c5">🚀</div>
-          <div class="pipe-num">05</div>
-          <div class="pipe-label">Launch!</div>
-          <div class="pipe-desc">Share with customers same day</div>
+        <div class="pipe-label-item">
+          <div class="pipe-num-big" style="color:#7838c0;">05</div>
+          <div class="pipe-label-title" style="color:#5818a0;">Launch!</div>
+          <div class="pipe-label-desc">Share with customers same day</div>
         </div>
       </div>
     </div>
@@ -756,6 +918,87 @@
         </div>
         <div class="vt-quote">"Saved ₹3 Lakhs in developer fees. Built everything myself with AI!"</div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- PHONE PROOF SECTION -->
+<section class="phones-proof">
+  <div class="phones-proof-inner">
+    <p class="handwritten-annot" style="color:var(--navy);">And when you start applying these principles...<br/>your inbox could start looking like this.</p>
+
+    <div class="phones-row">
+
+      <!-- LEFT PHONE (flat) -->
+      <div class="phone-device">
+        <div class="phone-screen">
+          <div class="ph-topbar"><span>1:18 ▲</span><span>⚫</span><span>▶ 🔋</span></div>
+          <div class="ph-gmailbar">← no-reply@razorpay.com "la... <span class="xbtn">×</span></div>
+          <div class="ph-filterrow">
+            <span class="ph-ftag">Label ▼</span><span class="ph-ftag">From ▼</span>
+            <span class="ph-ftag">To ▼</span><span class="ph-ftag">Attachment ▼</span>
+          </div>
+          <div class="ph-sort">Most relevant ▼</div>
+          <div class="ph-scroll-wrap">
+            <div class="ph-scroll-inner">
+              <!-- Emails × 2 for seamless loop -->
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages</div><div class="ph-edate">11 Feb</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹3,42,300.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Pu...</div></div></div>
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages 2</div><div class="ph-edate">3 Feb</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹1,54,301.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Pr...</div></div></div>
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages 2</div><div class="ph-edate">1 Feb</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹1,58,301.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Pq... <span style="font-size:8px;color:#333;">+1</span></div></div></div>
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages</div><div class="ph-edate">28 Jan</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹80,000.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Po...</div></div></div>
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages</div><div class="ph-edate">26 Jan</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹30,000.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Po...</div></div></div>
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages</div><div class="ph-edate">24 Jan</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹15,000.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Pn...</div></div></div>
+              <!-- Duplicate for seamless loop -->
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages</div><div class="ph-edate">11 Feb</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹3,42,300.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Pu...</div></div></div>
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages 2</div><div class="ph-edate">3 Feb</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹1,54,301.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Pr...</div></div></div>
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages 2</div><div class="ph-edate">1 Feb</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹1,58,301.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Pq... <span style="font-size:8px;color:#333;">+1</span></div></div></div>
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages</div><div class="ph-edate">28 Jan</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹80,000.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Po...</div></div></div>
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages</div><div class="ph-edate">26 Jan</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹30,000.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Po...</div></div></div>
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages</div><div class="ph-edate">24 Jan</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹15,000.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Pn...</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT PHONE (tilted 3D) -->
+      <div class="phone-device tilted">
+        <div class="phone-screen">
+          <div class="ph-topbar"><span>1:30</span><span>⚫</span><span>▶ 🔋</span></div>
+          <div class="ph-gmailbar">← no-reply@razorpay.com "la... <span class="xbtn">×</span></div>
+          <div class="ph-filterrow">
+            <span class="ph-ftag">Label ▼</span><span class="ph-ftag">From ▼</span>
+            <span class="ph-ftag">To ▼</span><span class="ph-ftag">Attachment ▼</span>
+          </div>
+          <div class="ph-sort">Most relevant ▼</div>
+          <div class="ph-scroll-wrap">
+            <div class="ph-scroll-inner" style="animation-delay:-7s;">
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages</div><div class="ph-edate">11 Feb</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹3,42,300.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Pu...</div></div></div>
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages 2</div><div class="ph-edate">3 Feb</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹1,54,301.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Pr...</div></div></div>
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages 2</div><div class="ph-edate">1 Feb</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹1,58,301.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Pq...</div></div></div>
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages</div><div class="ph-edate">28 Jan</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹80,000.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Po...</div></div></div>
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages</div><div class="ph-edate">26 Jan</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹30,000.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Po...</div></div></div>
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages</div><div class="ph-edate">24 Jan</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹15,000.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Pn...</div></div></div>
+              <!-- duplicate -->
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages</div><div class="ph-edate">11 Feb</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹3,42,300.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Pu...</div></div></div>
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages 2</div><div class="ph-edate">3 Feb</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹1,54,301.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Pr...</div></div></div>
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages 2</div><div class="ph-edate">1 Feb</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹1,58,301.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Pq...</div></div></div>
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages</div><div class="ph-edate">28 Jan</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹80,000.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Po...</div></div></div>
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages</div><div class="ph-edate">26 Jan</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹30,000.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Po...</div></div></div>
+              <div class="ph-email"><div class="ph-av">R</div><div class="ph-eb"><div class="ph-er"><div class="ph-ename">Razorpay Payment Pages</div><div class="ph-edate">24 Jan</div></div><div class="ph-esubj">Successful payment on Payment Page -</div><div class="ph-eamt">AI DREAM APP. ₹15,000.00... <span class="ph-inbox">Inbox</span></div><div class="ph-pdf">📄 Receipt pay_Pn...</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end phones-row -->
+
+    <p class="handwritten-annot green" style="font-size:clamp(20px,2.5vw,26px);margin-top:10px;">Hundreds of sales @ High Ticket through this<br/>AI App Building System in a span of 2 hours ...</p>
+
+    <!-- 3 red down arrows (pointing to testimonials below) -->
+    <div class="red-dnarrows">
+      <div class="red-dnarrow">↓</div>
+      <div class="red-dnarrow">↓</div>
+      <div class="red-dnarrow">↓</div>
     </div>
   </div>
 </section>
