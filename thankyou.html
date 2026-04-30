@@ -71,20 +71,18 @@
     document.getElementById('user-name').textContent = firstName;
   }
 
-  // Backup: re-send lead to Google Sheet from thank-you page
-  // (catches cases where the initial send was cancelled during redirect)
+  // Backup: fire image pixel to save lead after payment completes
   try {
     const pending = sessionStorage.getItem('pending_lead');
     if (pending) {
       const data = JSON.parse(pending);
-      data.paymentId = 'PAID_VIA_RAZORPAY_LINK';
-      fetch(APPS_SCRIPT, {
-        method: 'POST',
-        mode: 'no-cors',
-        keepalive: true,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+      const urlParams = new URLSearchParams({
+        name:      data.name,
+        email:     data.email,
+        phone:     data.phone,
+        paymentId: 'PAID_VIA_RAZORPAY'
       });
+      new Image().src = APPS_SCRIPT + '?' + urlParams.toString();
       sessionStorage.removeItem('pending_lead');
       sessionStorage.removeItem('buyer_name');
     }

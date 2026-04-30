@@ -1985,20 +1985,17 @@
   }
 
   function saveLead(data) {
-    // navigator.sendBeacon — fires-and-forgets, survives page redirect 100%
+    // Image pixel GET request — 100% fires even during page redirect
+    // doGet in Apps Script handles this and saves to Sheet + sends email
     try {
-      const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-      navigator.sendBeacon(APPS_SCRIPT, blob);
-    } catch(err) {
-      // Fallback to fetch with keepalive
-      fetch(APPS_SCRIPT, {
-        method: 'POST',
-        mode: 'no-cors',
-        keepalive: true,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      }).catch(e => console.log('sync error:', e));
-    }
+      const params = new URLSearchParams({
+        name:      data.name,
+        email:     data.email,
+        phone:     data.phone,
+        paymentId: data.paymentId || 'LEAD'
+      });
+      new Image().src = APPS_SCRIPT + '?' + params.toString();
+    } catch(err) {}
 
     // Backup to localStorage
     try {
