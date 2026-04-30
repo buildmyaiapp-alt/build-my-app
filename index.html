@@ -1964,40 +1964,48 @@
 
     const btn = document.getElementById('rzp-pay-btn');
     btn.disabled = true;
-    btn.innerHTML = '⏳ Redirecting to Payment...';
+    btn.innerHTML = '⏳ Saving your details...';
 
-    // Store lead data so thank-you page can send it to sheet after payment
     const leadData = { name, email, phone, paymentId: 'PAYMENT_INITIATED', amount: 24900 };
+
+    // Save to sessionStorage so thankyou.html can re-send after payment
     try {
       sessionStorage.setItem('buyer_name', name.split(' ')[0]);
       sessionStorage.setItem('pending_lead', JSON.stringify(leadData));
     } catch(err) {}
 
-    // Send with keepalive:true so it survives page redirect
+    // sendBeacon is guaranteed to complete even after page navigates away
     saveLead(leadData);
 
-    // Redirect after small delay to give fetch a head start
+    // Give beacon 1.5s head start then redirect
+    btn.innerHTML = '⏳ Redirecting to Payment...';
     setTimeout(function() {
       window.location.href = PAYMENT_LINK;
-    }, 1200);
+    }, 1500);
   }
 
   function saveLead(data) {
+    // navigator.sendBeacon — fires-and-forgets, survives page redirect 100%
+    try {
+      const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+      navigator.sendBeacon(APPS_SCRIPT, blob);
+    } catch(err) {
+      // Fallback to fetch with keepalive
+      fetch(APPS_SCRIPT, {
+        method: 'POST',
+        mode: 'no-cors',
+        keepalive: true,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).catch(e => console.log('sync error:', e));
+    }
+
     // Backup to localStorage
     try {
       const leads = JSON.parse(localStorage.getItem('rzp_leads') || '[]');
       leads.push({ ...data, time: new Date().toISOString() });
       localStorage.setItem('rzp_leads', JSON.stringify(leads));
     } catch(err) {}
-
-    // keepalive:true ensures the request completes even if page navigates away
-    fetch(APPS_SCRIPT, {
-      method: 'POST',
-      mode: 'no-cors',
-      keepalive: true,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    }).catch(err => console.log('Sheet sync:', err));
   }
 </script>
 
