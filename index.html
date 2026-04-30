@@ -1931,7 +1931,8 @@
 
 <!-- ── RAZORPAY LOGIC ── -->
 <script>
-  const RZP_KEY = 'rzp_test_SjeSqUK7tNzin6';
+  const RZP_KEY      = 'rzp_test_SjeSqUK7tNzin6';
+  const APPS_SCRIPT  = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE'; // ← you'll fill this in 5 mins
 
   // Open modal when any enroll button clicked
   document.querySelectorAll('.enroll-btn, .sticky-btn').forEach(btn => {
@@ -1964,21 +1965,19 @@
     const email = document.getElementById('rzp-email').value.trim();
     const phone = '+91' + document.getElementById('rzp-phone').value.trim();
 
-    // Disable button
     const btn = document.getElementById('rzp-pay-btn');
     btn.disabled = true;
     btn.innerHTML = '⏳ Opening Payment...';
 
     const options = {
       key: RZP_KEY,
-      amount: 24900,           // ₹249 in paise
+      amount: 24900,
       currency: 'INR',
       name: 'AI App Building Workshop',
       description: 'Build Your App in 30 Minutes – Live Workshop',
-      image: '',
       prefill: { name: name, email: email, contact: phone },
-      notes: { name: name, email: email, phone: phone },
-      theme: { color: '#0d1b6e' },
+      notes:   { name: name, email: email, phone: phone },
+      theme:   { color: '#0d1b6e' },
       modal: {
         ondismiss: function() {
           btn.disabled = false;
@@ -1986,8 +1985,8 @@
         }
       },
       handler: function(response) {
-        // Payment successful — save lead & redirect
-        saveLead(name, email, phone, response.razorpay_payment_id);
+        // Payment successful
+        saveLead(name, email, phone, response.razorpay_payment_id, 24900);
         closeModal();
         window.location.href = 'thankyou.html?name=' + encodeURIComponent(name.split(' ')[0]);
       }
@@ -2003,17 +2002,21 @@
     closeModal();
   }
 
-  function saveLead(name, email, phone, paymentId) {
-    // Save to localStorage as backup
+  function saveLead(name, email, phone, paymentId, amount) {
+    // 1. Backup to localStorage
     const leads = JSON.parse(localStorage.getItem('rzp_leads') || '[]');
-    leads.push({
-      name, email, phone, paymentId,
-      time: new Date().toISOString()
-    });
+    leads.push({ name, email, phone, paymentId, amount, time: new Date().toISOString() });
     localStorage.setItem('rzp_leads', JSON.stringify(leads));
 
-    // Send to Google Form (webhook) — fill in your form URL later
-    // fetch('YOUR_GOOGLE_FORM_URL', { method:'POST', body: ... });
+    // 2. Send to Google Apps Script → saves to Sheet + sends Email + WhatsApp
+    if (APPS_SCRIPT && APPS_SCRIPT !== 'PASTE_YOUR_APPS_SCRIPT_URL_HERE') {
+      fetch(APPS_SCRIPT, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, paymentId, amount })
+      }).catch(err => console.log('Sheet sync error (non-critical):', err));
+    }
   }
 </script>
 
