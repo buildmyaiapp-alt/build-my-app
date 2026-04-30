@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🎉 Payment Successful – Workshop Confirmed!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Inter',sans-serif;background:linear-gradient(160deg,#0a1045,#0d1b6e);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+    .card{background:#fff;border-radius:24px;max-width:540px;width:100%;padding:48px 40px;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,.4);}
+    .tick-circle{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#25d366,#128c7e);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:44px;}
+    h1{font-size:28px;font-weight:900;color:#0d1b6e;margin-bottom:10px;}
+    .name{color:#e8251a;}
+    .sub{font-size:16px;color:#555;line-height:1.6;margin-bottom:32px;}
+    .steps{background:#f8f9ff;border-radius:16px;padding:24px;text-align:left;margin-bottom:32px;}
+    .steps h3{font-size:14px;font-weight:800;color:#0d1b6e;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;}
+    .step{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;}
+    .step:last-child{margin-bottom:0;}
+    .step-num{width:30px;height:30px;border-radius:50%;background:#0d1b6e;color:#fff176;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .step-text{font-size:14px;color:#333;line-height:1.5;padding-top:5px;}
+    .step-text strong{color:#0d1b6e;}
+    .wa-btn{display:block;background:#25d366;color:#fff;text-decoration:none;border-radius:50px;padding:18px;font-size:17px;font-weight:800;margin-bottom:14px;box-shadow:0 8px 24px rgba(37,211,102,.35);}
+    .wa-btn:hover{background:#128c7e;}
+    .guarantee{font-size:12px;color:#aaa;margin-top:20px;}
+    .confetti{font-size:32px;margin-bottom:16px;}
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="confetti">🎉 🎊 🎉</div>
+  <div class="tick-circle">✅</div>
+
+  <h1>You're In, <span class="name" id="user-name">Friend</span>!</h1>
+  <p class="sub">
+    Payment successful! Your seat for the<br/>
+    <strong>AI App Building Workshop</strong> is confirmed.<br/>
+    Check your email for the receipt.
+  </p>
+
+  <div class="steps">
+    <h3>📋 What Happens Next</h3>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-text">You'll receive a <strong>confirmation email</strong> from Razorpay with your receipt.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-text">Join our <strong>Private WhatsApp Community</strong> using the button below — workshop link will be shared there.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-text">Show up on <strong>Workshop Day</strong> — build your app live in 30 minutes! 🚀</div>
+    </div>
+  </div>
+
+  <a href="https://chat.whatsapp.com/YOUR_GROUP_LINK" class="wa-btn" target="_blank">
+    💬 Join WhatsApp Community Now →
+  </a>
+
+  <p class="guarantee">🔐 Payment secured by Razorpay &nbsp;|&nbsp; ✅ 100% Money Back Guarantee</p>
+</div>
+
+<script>
+  // Show user's first name from URL
+  const params = new URLSearchParams(window.location.search);
+  const name = params.get('name');
+  if (name) document.getElementById('user-name').textContent = name;
+</script>
+</body>
+</html>

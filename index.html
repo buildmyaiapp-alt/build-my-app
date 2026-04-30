@@ -53,16 +53,17 @@
 
     /* Hero 2col */
     .hero-2col{
-      display:grid;grid-template-columns:1fr 1fr;gap:20px;
-      max-width:1000px;margin:0 auto;text-align:left;
+      display:grid;grid-template-columns:1.8fr 1fr;gap:32px;
+      max-width:1200px;margin:0 auto;text-align:left;
     }
     .hero-video-box{
-      border-radius:14px;overflow:hidden;
+      border-radius:16px;overflow:hidden;
       border:3px solid var(--navy);
+      width:100%;
     }
     .hero-video-header{
       background:var(--navy);color:#fff;
-      padding:10px 16px;font-size:14px;font-weight:700;
+      padding:13px 20px;font-size:15px;font-weight:700;
       display:flex;align-items:center;gap:8px;
     }
     .hero-video-thumb{
@@ -248,26 +249,45 @@
       display:flex;align-items:center;justify-content:center;
       color:var(--red);font-size:16px;font-weight:900;
     }
-    .vt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+    .vt-grid{display:flex;flex-wrap:wrap;gap:18px;justify-content:center;}
+    /* Person testimonial card */
     .vt-card{
-      background:#fff;border:1px solid var(--border);border-radius:12px;
-      overflow:hidden;
+      background:#fff;border:1px solid var(--border);border-radius:16px;
+      overflow:hidden;width:220px;flex-shrink:0;
+      box-shadow:0 4px 20px rgba(0,0,0,.08);
+      display:flex;flex-direction:column;align-items:center;padding:22px 16px 18px;
+      text-align:center;
     }
-    .vt-thumb{
-      background:#222;aspect-ratio:16/9;
-      display:flex;align-items:center;justify-content:center;
-      position:relative;cursor:pointer;
+    .vt-avatar{
+      width:110px;height:110px;border-radius:50%;overflow:hidden;
+      border:3px solid var(--yellow);margin-bottom:12px;flex-shrink:0;
     }
-    .vt-thumb img{width:100%;height:100%;object-fit:cover;opacity:.8;}
-    .vt-play{
-      position:absolute;width:48px;height:48px;border-radius:50%;
-      background:rgba(255,255,255,.9);
-      display:flex;align-items:center;justify-content:center;
-      font-size:16px;color:#333;
-    }
+    .vt-avatar img{width:100%;height:100%;object-fit:cover;object-position:center center;display:block;}
+    .vt-name{font-size:15px;font-weight:800;color:var(--navy);margin-bottom:4px;}
+    .vt-built{font-size:11px;color:#888;margin-bottom:10px;line-height:1.4;}
     .vt-quote{
-      padding:16px;font-size:13px;color:#444;text-align:center;
-      font-style:italic;line-height:1.55;
+      font-size:12px;color:#444;font-style:italic;line-height:1.6;
+      border-top:1px solid #f0f0f0;padding-top:10px;margin-top:auto;
+    }
+    /* Logo/company testimonial card */
+    .vt-logo-card{
+      background:#fff;border:1px solid var(--border);border-radius:16px;
+      overflow:hidden;width:220px;flex-shrink:0;
+      box-shadow:0 4px 20px rgba(0,0,0,.08);
+      display:flex;flex-direction:column;align-items:center;padding:22px 16px 18px;
+      text-align:center;
+    }
+    .vt-logo-wrap{
+      width:100px;height:100px;border-radius:12px;overflow:hidden;
+      margin-bottom:12px;display:flex;align-items:center;justify-content:center;
+      background:#f8f8f8;border:1px solid #eee;
+    }
+    .vt-logo-wrap img{width:100%;height:100%;object-fit:contain;padding:6px;}
+    .vt-biz-name{font-size:14px;font-weight:800;color:var(--navy);margin-bottom:4px;}
+    .vt-biz-type{font-size:11px;color:#888;margin-bottom:10px;}
+    .vt-biz-quote{
+      font-size:12px;color:#444;font-style:italic;line-height:1.6;
+      border-top:1px solid #f0f0f0;padding-top:10px;margin-top:auto;
     }
 
     /* ── OLD WAY VS NEW WAY ── */
@@ -668,31 +688,24 @@
     .sc-card{flex-shrink:0;width:188px;background:#fff;border-radius:16px;border:1px solid var(--border);overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08);transition:.2s;}
     .sc-card:hover{transform:translateY(-5px);box-shadow:0 12px 32px rgba(0,0,0,.14);}
     .sc-phone-wrap{padding:18px 0 14px;display:flex;justify-content:center;}
-    .sc-phone-device{width:96px;height:166px;background:#1c1c1e;border-radius:18px;padding:7px;box-shadow:0 8px 24px rgba(0,0,0,.4);}
-    .sc-phone-screen{background:#fff;border-radius:13px;height:100%;overflow:hidden;}
-    .sc-app-topbar{padding:6px 8px;display:flex;justify-content:space-between;align-items:center;}
-    .sc-app-topbar-title{font-size:9px;font-weight:800;color:#fff;}
-    .sc-app-topbar-sub{font-size:7px;color:rgba(255,255,255,.8);}
-    .sc-app-content{padding:0 6px;}
-    .sc-srow{display:flex;justify-content:space-between;align-items:center;padding:3.5px 2px;border-bottom:1px solid #f3f3f3;}
-    .sc-slabel{font-size:7px;color:#888;}
-    .sc-sval{font-size:8.5px;font-weight:800;}
-    .sc-pbar{height:4px;background:#eee;border-radius:2px;overflow:hidden;margin:4px 2px 2px;}
-    .sc-pfill{height:100%;border-radius:2px;animation:scProg 3s ease-in-out infinite;}
-    @keyframes scProg{0%,100%{width:15%;}50%{width:82%;}}
-    .sc-pfill2{animation-delay:1s;}
-    .sc-mini-btn{margin:5px 2px 0;font-size:7px;font-weight:700;text-align:center;padding:4px;border-radius:4px;color:#fff;letter-spacing:.3px;}
-    .sc-slot{display:flex;align-items:center;gap:5px;padding:3px 2px;border-bottom:1px solid #f3f3f3;}
-    .sc-slot-time{font-size:7px;font-weight:700;color:#555;flex-shrink:0;}
-    .sc-slot-name{font-size:7px;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .sc-slot-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-    .sc-proj-row{display:flex;align-items:center;gap:5px;padding:3px 2px;border-bottom:1px solid #f3f3f3;}
-    .sc-proj-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;animation:dotPulse 1.5s ease-in-out infinite;}
-    @keyframes dotPulse{0%,100%{opacity:.5;}50%{opacity:1;}}
-    .sc-proj-name{font-size:7px;color:#333;flex:1;}
-    .sc-proj-status{font-size:6.5px;font-weight:700;padding:1px 4px;border-radius:3px;}
-    .sc-grid2{display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:4px 2px 2px;}
-    .sc-prod{height:28px;border-radius:4px;display:flex;align-items:flex-end;padding:2px 3px;font-size:6.5px;font-weight:700;color:rgba(255,255,255,.9);}
+    .sc-phone-device{width:96px;height:168px;background:#1c1c1e;border-radius:18px;padding:7px;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+    .sc-phone-screen{background:#f5f5f5;border-radius:13px;height:100%;overflow:hidden;display:flex;flex-direction:column;}
+    /* status bar */
+    .sc-sb{height:7px;display:flex;justify-content:space-between;align-items:center;padding:0 5px;flex-shrink:0;}
+    .sc-sb-t{font-size:4.5px;font-weight:700;color:#fff;}
+    .sc-sb-i{font-size:4px;color:rgba(255,255,255,.9);}
+    /* app bar */
+    .sc-ab{padding:4px 6px 5px;display:flex;align-items:center;gap:3px;flex-shrink:0;}
+    .sc-ab-ttl{font-size:7.5px;font-weight:800;color:#fff;flex:1;}
+    .sc-ab-ic{font-size:9px;color:rgba(255,255,255,.85);}
+    /* content & nav */
+    .sc-content{flex:1;overflow:hidden;background:#fff;}
+    .sc-bnav{display:flex;border-top:1px solid #ebebeb;background:#fff;flex-shrink:0;padding:2px 0 2px;}
+    .sc-bnav-i{flex:1;display:flex;flex-direction:column;align-items:center;gap:.5px;}
+    .sc-bnav-em{font-size:7.5px;line-height:1.4;}
+    .sc-bnav-lb{font-size:4px;font-weight:700;}
+    @keyframes dotPulse{0%,100%{opacity:.4;}50%{opacity:1;}}
+    /* card body */
     .sc-card-body{padding:12px 14px 14px;}
     .sc-app-name{font-size:13px;font-weight:800;color:var(--navy);margin-bottom:4px;}
     .sc-app-desc{font-size:10.5px;color:#666;line-height:1.5;margin-bottom:8px;}
@@ -700,6 +713,40 @@
     .sc-tag{font-size:9.5px;font-weight:600;padding:2px 8px;border-radius:20px;background:#f0f0f0;color:#555;}
     .sc-tag.built{background:#f0fff4;color:#27ae60;font-weight:700;}
     .scroll-hint{text-align:center;font-size:12px;color:#aaa;margin-top:4px;}
+
+    /* ── WHATSAPP REVIEWS ── */
+    .wa-section{background:var(--navy);padding:70px 20px;}
+    .wa-section .sec-title{color:#fff;}
+    .wa-green-sub{font-family:'Caveat',cursive;font-size:28px;color:#25d366;text-align:center;margin:12px 0 36px;font-weight:700;}
+    .wa-grid{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;max-width:1100px;margin:0 auto;}
+    .wa-img-card{border-radius:14px;overflow:hidden;box-shadow:0 6px 24px rgba(0,0,0,.45);width:190px;flex-shrink:0;}
+    .wa-img-card img{width:100%;display:block;}
+    /* Card = real WhatsApp window */
+    .wa-card{background:#e5ddd5;border-radius:14px;overflow:hidden;box-shadow:0 8px 36px rgba(0,0,0,.5);display:flex;flex-direction:column;}
+    .wa-sb{background:#1f2c34;padding:5px 14px 3px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+    .wa-sb-t{font-size:9.5px;font-weight:700;color:#fff;}
+    .wa-sb-i{font-size:8.5px;color:rgba(255,255,255,.85);}
+    .wa-hdr{background:#075e54;padding:7px 10px;display:flex;align-items:center;gap:7px;flex-shrink:0;}
+    .wa-back{color:rgba(255,255,255,.9);font-size:17px;font-weight:300;line-height:1;margin-right:1px;}
+    .wa-av{width:31px;height:31px;border-radius:50%;color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .wa-hinfo{flex:1;}
+    .wa-hname{font-size:13px;font-weight:700;color:#fff;line-height:1.2;}
+    .wa-hstatus{font-size:9.5px;color:rgba(255,255,255,.72);}
+    .wa-hicons{display:flex;gap:14px;color:rgba(255,255,255,.85);font-size:15px;}
+    .wa-body{background:#e5ddd5;padding:8px 8px 4px;flex:1;}
+    .wa-date{text-align:center;margin-bottom:8px;}
+    .wa-date span{background:rgba(0,0,0,.14);color:#4a4a4a;font-size:9.5px;padding:2px 12px;border-radius:10px;}
+    /* received (left, white) */
+    .wa-r{background:#fff;border-radius:8px;border-top-left-radius:2px;padding:7px 10px 4px;max-width:82%;font-size:11.5px;color:#111;line-height:1.55;box-shadow:0 1px 1px rgba(0,0,0,.12);margin-bottom:5px;}
+    /* sent (right, green) */
+    .wa-s{background:#dcf8c6;border-radius:8px;border-top-right-radius:2px;padding:7px 10px 4px;max-width:82%;font-size:11.5px;color:#111;line-height:1.55;box-shadow:0 1px 1px rgba(0,0,0,.12);margin-bottom:5px;margin-left:auto;}
+    .wa-ts{font-size:9.5px;color:rgba(0,0,0,.38);text-align:right;margin-top:2px;}
+    .wa-tick{color:#53bdeb;}
+    /* input bar */
+    .wa-inp{background:#f0f0f0;display:flex;align-items:center;padding:5px 9px;gap:8px;flex-shrink:0;}
+    .wa-inp-em{font-size:19px;color:#777;}
+    .wa-inp-fld{flex:1;background:#fff;border-radius:22px;padding:6px 14px;font-size:10px;color:#bbb;}
+    .wa-inp-mic{font-size:19px;color:#777;}
 
     /* ── RESPONSIVE ── */
     @media(max-width:768px){
@@ -807,39 +854,6 @@
   <div class="hurry">⚠️ Hurry! Seats For This Workshop Are Low</div>
 </div>
 
-<!-- SOME OF OUR STUDENTS -->
-<section class="sec-wrap gray">
-  <div class="sec-inner">
-    <h2 class="sec-title">Some Of Our Students...</h2>
-    <div class="sec-divider"></div>
-    <div class="clients-grid">
-      <div class="client-card">
-        <div class="client-av">👩</div>
-        <div class="client-name">Priya Sharma</div>
-        <div class="client-role">Coaching Center Owner, Pune</div>
-        <div class="client-ig"><span class="ig-icon">📱</span> App Built in 22 Min ✅</div>
-      </div>
-      <div class="client-card">
-        <div class="client-av">👨</div>
-        <div class="client-name">Rajan Patel</div>
-        <div class="client-role">Restaurant Owner, Surat</div>
-        <div class="client-ig"><span class="ig-icon">📱</span> Saved ₹2 Lakhs 💰</div>
-      </div>
-      <div class="client-card">
-        <div class="client-av">👩</div>
-        <div class="client-name">Sneha Gupta</div>
-        <div class="client-role">Salon Owner, Mumbai</div>
-        <div class="client-ig"><span class="ig-icon">📱</span> Bookings Doubled 🚀</div>
-      </div>
-      <div class="client-card">
-        <div class="client-av">👨</div>
-        <div class="client-name">Amit Verma</div>
-        <div class="client-role">Shop Owner, Delhi</div>
-        <div class="client-ig"><span class="ig-icon">📱</span> App Live Same Day ⚡</div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- IN JUST 30 MINUTES -->
 <section class="sec-wrap">
@@ -847,15 +861,30 @@
     <h2 class="sec-title">In Just 30 Minutes... You Can Start Getting <span class="ul">Ready<br/>To Launch</span> Your Dream App!!</h2>
     <p class="sec-sub">This Is The Ultimate Method That TOP Business Owners Use (They Won't Tell You...)</p>
     <div class="sec-divider"></div>
-    <div class="results-2col" style="margin-top:36px;">
-      <div style="text-align:center;">
-        <img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=500&q=80" style="border-radius:14px;width:100%;border:1px solid #eee;"/>
-        <p style="margin-top:12px;font-size:13px;color:#777;font-style:italic;">Your app — built live in the workshop</p>
+    <div style="margin-top:36px;text-align:center;">
+      <!-- Phone mockup with screen recording inside -->
+      <div style="display:inline-block;position:relative;">
+        <div style="
+          width:260px;
+          background:#1c1c1e;
+          border-radius:38px;
+          padding:12px;
+          box-shadow:0 24px 60px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.08);
+          display:inline-block;
+        ">
+          <!-- notch -->
+          <div style="position:absolute;top:22px;left:50%;transform:translateX(-50%);width:80px;height:20px;background:#1c1c1e;border-radius:0 0 14px 14px;z-index:10;"></div>
+          <!-- screen -->
+          <div style="border-radius:28px;overflow:hidden;background:#000;aspect-ratio:9/19.5;position:relative;">
+            <video width="100%" height="100%" autoplay muted loop playsinline style="display:block;object-fit:cover;width:100%;height:100%;">
+              <source src="app-demo.mp4" type="video/mp4"/>
+            </video>
+          </div>
+          <!-- home bar -->
+          <div style="margin-top:8px;width:80px;height:4px;background:rgba(255,255,255,.3);border-radius:4px;margin-left:auto;margin-right:auto;"></div>
+        </div>
       </div>
-      <div style="text-align:center;">
-        <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=300&q=80" style="border-radius:14px;width:70%;border:1px solid #eee;"/>
-        <p style="margin-top:12px;font-size:14px;color:var(--navy);font-style:italic;font-weight:700;">And when you follow this method...<br/>your app could be live same day!</p>
-      </div>
+      <p style="margin-top:20px;font-size:15px;color:var(--navy);font-style:italic;font-weight:700;">And when you follow this method... your app could be live same day! ⚡</p>
     </div>
   </div>
 </section>
@@ -1013,27 +1042,57 @@
       <div class="vt-arrow">↓</div>
     </div>
     <div class="vt-grid">
+
+      <!-- Person 1: Abhishek -->
       <div class="vt-card">
-        <div class="vt-thumb">
-          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80" alt=""/>
-          <div class="vt-play">▶</div>
+        <div class="vt-avatar">
+          <img src="abhishek.jpg" alt="Abhishek"/>
         </div>
-        <div class="vt-quote">"Built my coaching app in just 25 minutes — what usually takes months and lakhs of rupees!"</div>
+        <div class="vt-name">Abhishek</div>
+        <div class="vt-built">📸 Marriage Video Shoot App</div>
+        <div class="vt-quote">"Built a complete booking app for my video shoot business in under 30 minutes. Clients now book and pay directly through the app!"</div>
       </div>
+
+      <!-- Person 2: Abhimanue -->
       <div class="vt-card">
-        <div class="vt-thumb">
-          <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80" alt=""/>
-          <div class="vt-play">▶</div>
+        <div class="vt-avatar">
+          <img src="abhimanue.jpg" alt="Abhimanue"/>
         </div>
-        <div class="vt-quote">"Got my restaurant booking app live the same day. Customers love it!"</div>
+        <div class="vt-name">Abhimanue</div>
+        <div class="vt-built">📦 Trading Company App</div>
+        <div class="vt-quote">"My trading company now has a professional app. Orders, inventory, client management — all in one place. Zero coding needed!"</div>
       </div>
-      <div class="vt-card">
-        <div class="vt-thumb">
-          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80" alt=""/>
-          <div class="vt-play">▶</div>
+
+      <!-- Logo 1: Brocliy Restaurant -->
+      <div class="vt-logo-card">
+        <div class="vt-logo-wrap">
+          <img src="logo-brocliy.jpg" alt="Brocliy Italian Cuisine"/>
         </div>
-        <div class="vt-quote">"Saved ₹3 Lakhs in developer fees. Built everything myself with AI!"</div>
+        <div class="vt-biz-name">Brocliy</div>
+        <div class="vt-biz-type">🍝 Italian Cuisine Restaurant</div>
+        <div class="vt-biz-quote">"Our restaurant app handles table bookings, menu display & takeaway orders. Built in one workshop session!"</div>
       </div>
+
+      <!-- Logo 2: Shiva Traders -->
+      <div class="vt-logo-card">
+        <div class="vt-logo-wrap" style="background:#fffde7;">
+          <img src="logo-shiva.jpg" alt="Shiva Traders"/>
+        </div>
+        <div class="vt-biz-name">Shiva Traders</div>
+        <div class="vt-biz-type">🔧 Hardware Shop</div>
+        <div class="vt-biz-quote">"Stock management, billing & customer orders — our hardware shop runs so much smoother with our custom app!"</div>
+      </div>
+
+      <!-- Logo 3: The Workout Fitness Gym -->
+      <div class="vt-logo-card">
+        <div class="vt-logo-wrap" style="background:#1a1a1a;">
+          <img src="logo-workout.jpg" alt="The Workout Fitness Gym"/>
+        </div>
+        <div class="vt-biz-name">The Workout</div>
+        <div class="vt-biz-type">💪 Fitness Gym</div>
+        <div class="vt-biz-quote">"Member check-ins, fee collection & class schedules — all automated. Saved us lakhs in developer costs!"</div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -1052,17 +1111,45 @@
         <div class="sc-phone-wrap" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2);">
           <div class="sc-phone-device">
             <div class="sc-phone-screen">
-              <div class="sc-app-topbar" style="background:linear-gradient(135deg,#ff5c00,#f5a623);">
-                <div class="sc-app-topbar-title">💪 GymPro</div>
-                <div class="sc-app-topbar-sub">125 Members</div>
+              <div class="sc-sb" style="background:#e65100;"><span class="sc-sb-t">9:41</span><span class="sc-sb-i">▌▌ WiFi 🔋</span></div>
+              <div class="sc-ab" style="background:#e65100;">
+                <span class="sc-ab-ttl">💪 GymPro</span>
+                <span class="sc-ab-ic">🔍</span><span class="sc-ab-ic">🔔</span>
               </div>
-              <div class="sc-app-content">
-                <div class="sc-srow"><div class="sc-slabel">Check-ins Today</div><div class="sc-sval" style="color:#ff5c00;">48 🔥</div></div>
-                <div style="padding:3px 2px 1px;"><div style="font-size:6.5px;color:#999;margin-bottom:1px;">Monthly Goal</div><div class="sc-pbar"><div class="sc-pfill" style="background:linear-gradient(90deg,#ff5c00,#f5a623);"></div></div></div>
-                <div class="sc-srow"><div class="sc-slabel">Revenue</div><div class="sc-sval" style="color:#27ae60;">₹45,000</div></div>
-                <div class="sc-srow"><div class="sc-slabel">Active Plans</div><div class="sc-sval" style="color:#1565c0;">87</div></div>
-                <div class="sc-srow"><div class="sc-slabel">Expiring Soon</div><div class="sc-sval" style="color:#e74c3c;">7 ⚠️</div></div>
-                <div class="sc-mini-btn" style="background:#ff5c00;">+ Add Member</div>
+              <div class="sc-content">
+                <div style="margin:4px 5px 2px;background:#f5f5f5;border-radius:5px;padding:3px 6px;font-size:6px;color:#bbb;display:flex;align-items:center;gap:2px;">🔍 Search members...</div>
+                <div style="display:flex;justify-content:space-between;padding:1px 6px 2px;"><span style="font-size:5.5px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.4px;">Check-ins Today</span><span style="font-size:5.5px;color:#e65100;font-weight:700;">48 ›</span></div>
+                <div style="display:flex;align-items:center;gap:3px;padding:2px 5px;border-bottom:1px solid #f5f5f5;">
+                  <div style="width:16px;height:16px;border-radius:50%;background:#e65100;color:#fff;font-size:7px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">R</div>
+                  <div style="flex:1;"><div style="font-size:6.5px;font-weight:700;color:#222;">Rahul Kumar</div><div style="font-size:5.5px;color:#aaa;">9:15 AM · Monthly</div></div>
+                  <span style="font-size:5.5px;background:#27ae60;color:#fff;padding:1px 4px;border-radius:3px;font-weight:700;">✓ In</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:3px;padding:2px 5px;border-bottom:1px solid #f5f5f5;">
+                  <div style="width:16px;height:16px;border-radius:50%;background:#1565c0;color:#fff;font-size:7px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">P</div>
+                  <div style="flex:1;"><div style="font-size:6.5px;font-weight:700;color:#222;">Priya Singh</div><div style="font-size:5.5px;color:#aaa;">9:42 AM · Quarterly</div></div>
+                  <span style="font-size:5.5px;background:#27ae60;color:#fff;padding:1px 4px;border-radius:3px;font-weight:700;">✓ In</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:3px;padding:2px 5px;border-bottom:1px solid #f5f5f5;">
+                  <div style="width:16px;height:16px;border-radius:50%;background:#c62828;color:#fff;font-size:7px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">A</div>
+                  <div style="flex:1;"><div style="font-size:6.5px;font-weight:700;color:#222;">Amit Verma</div><div style="font-size:5.5px;color:#c62828;">Fee Due ₹1,500 ⚠️</div></div>
+                  <span style="font-size:5.5px;background:#fff0f0;color:#c62828;padding:1px 4px;border-radius:3px;font-weight:700;">Due</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:3px;padding:2px 5px;">
+                  <div style="width:16px;height:16px;border-radius:50%;background:#7b1fa2;color:#fff;font-size:7px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">S</div>
+                  <div style="flex:1;"><div style="font-size:6.5px;font-weight:700;color:#222;">Sneha Patel</div><div style="font-size:5.5px;color:#aaa;">10:05 AM · Annual</div></div>
+                  <span style="font-size:5.5px;background:#27ae60;color:#fff;padding:1px 4px;border-radius:3px;font-weight:700;">✓ In</span>
+                </div>
+                <div style="display:flex;border-top:1px solid #f0f0f0;margin-top:3px;">
+                  <div style="flex:1;text-align:center;padding:3px;"><div style="font-size:8.5px;font-weight:900;color:#e65100;">125</div><div style="font-size:4.5px;color:#999;">Members</div></div>
+                  <div style="width:1px;background:#f0f0f0;"></div>
+                  <div style="flex:1;text-align:center;padding:3px;"><div style="font-size:8.5px;font-weight:900;color:#27ae60;">₹45K</div><div style="font-size:4.5px;color:#999;">This Month</div></div>
+                </div>
+              </div>
+              <div class="sc-bnav">
+                <div class="sc-bnav-i"><span class="sc-bnav-em">🏠</span><span class="sc-bnav-lb" style="color:#e65100;">Home</span></div>
+                <div class="sc-bnav-i"><span class="sc-bnav-em">👥</span><span class="sc-bnav-lb" style="color:#bbb;">Members</span></div>
+                <div class="sc-bnav-i"><span class="sc-bnav-em">📅</span><span class="sc-bnav-lb" style="color:#bbb;">Classes</span></div>
+                <div class="sc-bnav-i"><span class="sc-bnav-em">⚙️</span><span class="sc-bnav-lb" style="color:#bbb;">More</span></div>
               </div>
             </div>
           </div>
@@ -1070,10 +1157,7 @@
         <div class="sc-card-body">
           <div class="sc-app-name">💪 GymPro</div>
           <div class="sc-app-desc">Member management, attendance, billing & renewal alerts</div>
-          <div class="sc-tags">
-            <span class="sc-tag">Fitness</span>
-            <span class="sc-tag built">⚡ 22 min</span>
-          </div>
+          <div class="sc-tags"><span class="sc-tag">Fitness</span><span class="sc-tag built">⚡ 22 min</span></div>
         </div>
       </div>
 
@@ -1082,18 +1166,42 @@
         <div class="sc-phone-wrap" style="background:linear-gradient(135deg,#e8eaf6,#c5cae9);">
           <div class="sc-phone-device">
             <div class="sc-phone-screen">
-              <div class="sc-app-topbar" style="background:linear-gradient(135deg,#0d1b6e,#1565c0);">
-                <div class="sc-app-topbar-title">📊 AgencyHub</div>
-                <div class="sc-app-topbar-sub">8 Clients</div>
+              <div class="sc-sb" style="background:#0d1b6e;"><span class="sc-sb-t">9:41</span><span class="sc-sb-i">▌▌ WiFi 🔋</span></div>
+              <div class="sc-ab" style="background:#0d1b6e;">
+                <span class="sc-ab-ttl">📊 My Projects</span>
+                <span class="sc-ab-ic">🔍</span><span class="sc-ab-ic" style="font-size:11px;font-weight:700;">＋</span>
               </div>
-              <div class="sc-app-content">
-                <div style="font-size:6.5px;font-weight:700;color:#999;padding:3px 2px 1px;text-transform:uppercase;">Active Projects</div>
-                <div class="sc-proj-row"><div class="sc-proj-dot" style="background:#27ae60;animation-delay:0s;"></div><div class="sc-proj-name">Website Redesign</div><div class="sc-proj-status" style="background:#e8f8f0;color:#27ae60;">Live</div></div>
-                <div class="sc-proj-row"><div class="sc-proj-dot" style="background:#f5a623;animation-delay:.5s;"></div><div class="sc-proj-name">App Development</div><div class="sc-proj-status" style="background:#fff8e1;color:#f5a623;">Active</div></div>
-                <div class="sc-proj-row"><div class="sc-proj-dot" style="background:#1565c0;animation-delay:1s;"></div><div class="sc-proj-name">Social Marketing</div><div class="sc-proj-status" style="background:#e3f2fd;color:#1565c0;">Review</div></div>
-                <div class="sc-pbar"><div class="sc-pfill sc-pfill2" style="background:linear-gradient(90deg,#0d1b6e,#1565c0);"></div></div>
-                <div class="sc-srow"><div class="sc-slabel">Monthly Revenue</div><div class="sc-sval" style="color:#27ae60;">₹1.8L</div></div>
-                <div class="sc-mini-btn" style="background:#0d1b6e;">+ New Project</div>
+              <div class="sc-content">
+                <div style="display:flex;gap:3px;padding:4px 5px 3px;border-bottom:1px solid #f0f0f0;">
+                  <span style="font-size:6px;font-weight:700;color:#fff;background:#0d1b6e;padding:2px 7px;border-radius:10px;">All</span>
+                  <span style="font-size:6px;color:#999;padding:2px 5px;">Active</span>
+                  <span style="font-size:6px;color:#999;padding:2px 5px;">Review</span>
+                  <span style="font-size:6px;color:#999;padding:2px 5px;">Done</span>
+                </div>
+                <div style="margin:4px 5px 3px;background:#fff;border-radius:6px;padding:5px;box-shadow:0 1px 4px rgba(0,0,0,.1);border-left:3px solid #27ae60;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:6.5px;font-weight:800;color:#222;">Website Redesign</span><span style="font-size:5.5px;background:#e8f8f0;color:#27ae60;padding:1px 4px;border-radius:3px;font-weight:700;">Live ✓</span></div>
+                  <div style="font-size:5px;color:#aaa;margin-top:1px;">TechCorp · ₹45,000</div>
+                  <div style="height:3px;background:#eee;border-radius:2px;margin-top:4px;overflow:hidden;"><div style="height:100%;width:90%;background:#27ae60;border-radius:2px;"></div></div>
+                  <div style="font-size:4.5px;color:#bbb;text-align:right;margin-top:1px;">90% complete</div>
+                </div>
+                <div style="margin:0 5px 3px;background:#fff;border-radius:6px;padding:5px;box-shadow:0 1px 4px rgba(0,0,0,.1);border-left:3px solid #f5a623;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:6.5px;font-weight:800;color:#222;">Mobile App Dev</span><span style="font-size:5.5px;background:#fff8e1;color:#f5a623;padding:1px 4px;border-radius:3px;font-weight:700;">Active</span></div>
+                  <div style="font-size:5px;color:#aaa;margin-top:1px;">StartupX · ₹80,000</div>
+                  <div style="height:3px;background:#eee;border-radius:2px;margin-top:4px;overflow:hidden;"><div style="height:100%;width:55%;background:#f5a623;border-radius:2px;"></div></div>
+                  <div style="font-size:4.5px;color:#bbb;text-align:right;margin-top:1px;">55% complete</div>
+                </div>
+                <div style="margin:0 5px;background:#fff;border-radius:6px;padding:5px;box-shadow:0 1px 4px rgba(0,0,0,.1);border-left:3px solid #1565c0;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:6.5px;font-weight:800;color:#222;">SEO Campaign</span><span style="font-size:5.5px;background:#e3f2fd;color:#1565c0;padding:1px 4px;border-radius:3px;font-weight:700;">Review</span></div>
+                  <div style="font-size:5px;color:#aaa;margin-top:1px;">ShopHub · ₹18,000</div>
+                  <div style="height:3px;background:#eee;border-radius:2px;margin-top:4px;overflow:hidden;"><div style="height:100%;width:70%;background:#1565c0;border-radius:2px;"></div></div>
+                  <div style="font-size:4.5px;color:#bbb;text-align:right;margin-top:1px;">70% complete</div>
+                </div>
+              </div>
+              <div class="sc-bnav">
+                <div class="sc-bnav-i"><span class="sc-bnav-em">🏠</span><span class="sc-bnav-lb" style="color:#0d1b6e;">Home</span></div>
+                <div class="sc-bnav-i"><span class="sc-bnav-em">📋</span><span class="sc-bnav-lb" style="color:#bbb;">Tasks</span></div>
+                <div class="sc-bnav-i"><span class="sc-bnav-em">💬</span><span class="sc-bnav-lb" style="color:#bbb;">Chat</span></div>
+                <div class="sc-bnav-i"><span class="sc-bnav-em">👤</span><span class="sc-bnav-lb" style="color:#bbb;">Profile</span></div>
               </div>
             </div>
           </div>
@@ -1101,10 +1209,7 @@
         <div class="sc-card-body">
           <div class="sc-app-name">📊 AgencyHub</div>
           <div class="sc-app-desc">Client management, project tracking & invoicing system</div>
-          <div class="sc-tags">
-            <span class="sc-tag">Agency</span>
-            <span class="sc-tag built">⚡ 28 min</span>
-          </div>
+          <div class="sc-tags"><span class="sc-tag">Agency</span><span class="sc-tag built">⚡ 28 min</span></div>
         </div>
       </div>
 
@@ -1113,18 +1218,42 @@
         <div class="sc-phone-wrap" style="background:linear-gradient(135deg,#fce4ec,#f8bbd9);">
           <div class="sc-phone-device">
             <div class="sc-phone-screen">
-              <div class="sc-app-topbar" style="background:linear-gradient(135deg,#c62828,#e53935);">
-                <div class="sc-app-topbar-title">🍽️ QuickBites</div>
-                <div class="sc-app-topbar-sub" style="background:#27ae60;padding:1px 4px;border-radius:3px;font-size:6px;">● OPEN</div>
+              <div class="sc-sb" style="background:#b71c1c;"><span class="sc-sb-t">9:41</span><span class="sc-sb-i">▌▌ WiFi 🔋</span></div>
+              <div style="background:#b71c1c;padding:4px 5px 5px;display:flex;align-items:center;gap:3px;flex-shrink:0;">
+                <div style="flex:1;background:rgba(255,255,255,.18);border-radius:5px;padding:3px 6px;font-size:5.5px;color:rgba(255,255,255,.7);">🔍 Search menu...</div>
+                <span style="font-size:5.5px;color:#fff;background:#27ae60;padding:2px 5px;border-radius:3px;font-weight:700;flex-shrink:0;">● OPEN</span>
               </div>
-              <div class="sc-app-content">
-                <div class="sc-srow"><div class="sc-slabel">Today's Orders</div><div class="sc-sval" style="color:#e53935;">47 📦</div></div>
-                <div style="font-size:6.5px;font-weight:700;color:#999;padding:3px 2px 0;text-transform:uppercase;">Today's Specials</div>
-                <div class="sc-srow"><div class="sc-slabel">🍛 Biryani Special</div><div class="sc-sval" style="color:#c62828;">₹280</div></div>
-                <div class="sc-srow"><div class="sc-slabel">🥘 Thali Combo</div><div class="sc-sval" style="color:#c62828;">₹159</div></div>
-                <div class="sc-srow"><div class="sc-slabel">Ready to Pickup</div><div class="sc-sval" style="color:#27ae60;">8 ✅</div></div>
-                <div class="sc-pbar"><div class="sc-pfill" style="background:linear-gradient(90deg,#e53935,#ff7043);animation-delay:.3s;"></div></div>
-                <div class="sc-mini-btn" style="background:#e53935;">View Full Menu</div>
+              <div style="display:flex;gap:3px;padding:3px 5px;overflow:hidden;background:#fff;border-bottom:1px solid #f0f0f0;flex-shrink:0;">
+                <span style="font-size:5.5px;font-weight:700;color:#fff;background:#b71c1c;padding:2px 6px;border-radius:10px;white-space:nowrap;">All</span>
+                <span style="font-size:5.5px;color:#888;padding:2px 5px;border:1px solid #eee;border-radius:10px;white-space:nowrap;">Starters</span>
+                <span style="font-size:5.5px;color:#888;padding:2px 5px;border:1px solid #eee;border-radius:10px;white-space:nowrap;">Main</span>
+                <span style="font-size:5.5px;color:#888;padding:2px 5px;border:1px solid #eee;border-radius:10px;white-space:nowrap;">Drinks</span>
+              </div>
+              <div class="sc-content">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:4px 5px;">
+                  <div style="background:#fff;border-radius:6px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.1);">
+                    <div style="background:#fff3e0;padding:6px;text-align:center;font-size:18px;line-height:1;">🍛</div>
+                    <div style="padding:3px 4px;"><div style="font-size:6px;font-weight:700;color:#222;">Butter Chicken</div><div style="font-size:6.5px;font-weight:800;color:#b71c1c;">₹280</div><div style="font-size:5px;color:#f57c00;">★★★★★ 4.8</div></div>
+                  </div>
+                  <div style="background:#fff;border-radius:6px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.1);">
+                    <div style="background:#e8f5e9;padding:6px;text-align:center;font-size:18px;line-height:1;">🍚</div>
+                    <div style="padding:3px 4px;"><div style="font-size:6px;font-weight:700;color:#222;">Veg Biryani</div><div style="font-size:6.5px;font-weight:800;color:#b71c1c;">₹220</div><div style="font-size:5px;color:#f57c00;">★★★★☆ 4.6</div></div>
+                  </div>
+                  <div style="background:#fff;border-radius:6px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.1);">
+                    <div style="background:#fce4ec;padding:6px;text-align:center;font-size:18px;line-height:1;">🫓</div>
+                    <div style="padding:3px 4px;"><div style="font-size:6px;font-weight:700;color:#222;">Paneer Tikka</div><div style="font-size:6.5px;font-weight:800;color:#b71c1c;">₹180</div><div style="font-size:5px;color:#f57c00;">★★★★★ 4.9</div></div>
+                  </div>
+                  <div style="background:#fff;border-radius:6px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.1);">
+                    <div style="background:#e8eaf6;padding:6px;text-align:center;font-size:18px;line-height:1;">🍜</div>
+                    <div style="padding:3px 4px;"><div style="font-size:6px;font-weight:700;color:#222;">Dal Tadka</div><div style="font-size:6.5px;font-weight:800;color:#b71c1c;">₹160</div><div style="font-size:5px;color:#f57c00;">★★★★☆ 4.7</div></div>
+                  </div>
+                </div>
+              </div>
+              <div class="sc-bnav">
+                <div class="sc-bnav-i"><span class="sc-bnav-em">🍽️</span><span class="sc-bnav-lb" style="color:#b71c1c;">Menu</span></div>
+                <div class="sc-bnav-i"><span class="sc-bnav-em">📦</span><span class="sc-bnav-lb" style="color:#bbb;">Orders</span></div>
+                <div class="sc-bnav-i"><span class="sc-bnav-em">🪑</span><span class="sc-bnav-lb" style="color:#bbb;">Tables</span></div>
+                <div class="sc-bnav-i"><span class="sc-bnav-em">📊</span><span class="sc-bnav-lb" style="color:#bbb;">Reports</span></div>
               </div>
             </div>
           </div>
@@ -1132,10 +1261,7 @@
         <div class="sc-card-body">
           <div class="sc-app-name">🍽️ QuickBites</div>
           <div class="sc-app-desc">Restaurant ordering, menu management & table booking</div>
-          <div class="sc-tags">
-            <span class="sc-tag">Restaurant</span>
-            <span class="sc-tag built">⚡ 25 min</span>
-          </div>
+          <div class="sc-tags"><span class="sc-tag">Restaurant</span><span class="sc-tag built">⚡ 25 min</span></div>
         </div>
       </div>
 
@@ -1144,18 +1270,46 @@
         <div class="sc-phone-wrap" style="background:linear-gradient(135deg,#f3e5f5,#e1bee7);">
           <div class="sc-phone-device">
             <div class="sc-phone-screen">
-              <div class="sc-app-topbar" style="background:linear-gradient(135deg,#6a1b9a,#8e24aa);">
-                <div class="sc-app-topbar-title">✂️ GlamBook</div>
-                <div class="sc-app-topbar-sub">12 Bookings</div>
+              <div class="sc-sb" style="background:#4a148c;"><span class="sc-sb-t">9:41</span><span class="sc-sb-i">▌▌ WiFi 🔋</span></div>
+              <div class="sc-ab" style="background:#4a148c;">
+                <span class="sc-ab-ttl">✂️ GlamBook</span>
+                <span class="sc-ab-ic">📅</span><span class="sc-ab-ic" style="font-size:11px;font-weight:700;">＋</span>
               </div>
-              <div class="sc-app-content">
-                <div style="font-size:6.5px;font-weight:700;color:#999;padding:3px 2px 1px;text-transform:uppercase;">Today's Slots</div>
-                <div class="sc-slot"><div class="sc-slot-dot" style="background:#27ae60;"></div><div class="sc-slot-time">10:00</div><div class="sc-slot-name">Priya — Haircut</div></div>
-                <div class="sc-slot"><div class="sc-slot-dot" style="background:#f5a623;"></div><div class="sc-slot-time">12:30</div><div class="sc-slot-name">Rahul — Hair Color</div></div>
-                <div class="sc-slot"><div class="sc-slot-dot" style="background:#1565c0;"></div><div class="sc-slot-time">15:00</div><div class="sc-slot-name">Meera — Facial</div></div>
-                <div class="sc-slot"><div class="sc-slot-dot" style="background:#e0e0e0;"></div><div class="sc-slot-time">17:00</div><div class="sc-slot-name" style="color:#bbb;">Available</div></div>
-                <div class="sc-srow"><div class="sc-slabel">Today's Earnings</div><div class="sc-sval" style="color:#27ae60;">₹4,200</div></div>
-                <div class="sc-mini-btn" style="background:#7b1fa2;">+ Book Appointment</div>
+              <div class="sc-content">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 7px;background:#f9f4fc;border-bottom:1px solid #ede;">
+                  <span style="font-size:8px;color:#7b1fa2;font-weight:700;">‹</span>
+                  <span style="font-size:6.5px;font-weight:700;color:#333;">Tue, 28 Apr 2026</span>
+                  <span style="font-size:8px;color:#7b1fa2;font-weight:700;">›</span>
+                </div>
+                <div style="display:flex;gap:5px;padding:4px 5px;border-bottom:1px solid #f0f0f0;">
+                  <div style="text-align:center;"><div style="width:20px;height:20px;border-radius:50%;background:#4a148c;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;border:2px solid #7b1fa2;">A</div><div style="font-size:4.5px;color:#4a148c;margin-top:2px;font-weight:700;">Anita</div></div>
+                  <div style="text-align:center;"><div style="width:20px;height:20px;border-radius:50%;background:#e91e8c;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;">R</div><div style="font-size:4.5px;color:#999;margin-top:2px;">Rekha</div></div>
+                  <div style="text-align:center;"><div style="width:20px;height:20px;border-radius:50%;background:#1565c0;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;">M</div><div style="font-size:4.5px;color:#999;margin-top:2px;">Mona</div></div>
+                </div>
+                <div style="padding:2px 5px;">
+                  <div style="display:flex;align-items:center;gap:4px;padding:2px 0;border-bottom:1px solid #f5f5f5;">
+                    <span style="font-size:5.5px;color:#aaa;width:24px;flex-shrink:0;">10:00</span>
+                    <div style="flex:1;background:#e1bee7;border-left:2px solid #4a148c;border-radius:3px;padding:2px 4px;"><div style="font-size:6px;font-weight:700;color:#4a148c;">Priya — Haircut</div><div style="font-size:5px;color:#7b1fa2;">₹500 · Done ✓</div></div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:4px;padding:2px 0;border-bottom:1px solid #f5f5f5;">
+                    <span style="font-size:5.5px;color:#aaa;width:24px;flex-shrink:0;">12:30</span>
+                    <div style="flex:1;background:#fff3e0;border-left:2px solid #f57c00;border-radius:3px;padding:2px 4px;"><div style="font-size:6px;font-weight:700;color:#e65100;">Rahul — Hair Color</div><div style="font-size:5px;color:#f57c00;">₹1,200 · In Progress 🕐</div></div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:4px;padding:2px 0;border-bottom:1px solid #f5f5f5;">
+                    <span style="font-size:5.5px;color:#aaa;width:24px;flex-shrink:0;">3:00</span>
+                    <div style="flex:1;background:#e8f5e9;border-left:2px solid #27ae60;border-radius:3px;padding:2px 4px;"><div style="font-size:6px;font-weight:700;color:#1b5e20;">Meera — Facial</div><div style="font-size:5px;color:#27ae60;">₹800 · Upcoming 📅</div></div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:4px;padding:2px 0;">
+                    <span style="font-size:5.5px;color:#aaa;width:24px;flex-shrink:0;">5:00</span>
+                    <div style="flex:1;background:#f5f5f5;border-left:2px dashed #ccc;border-radius:3px;padding:2px 4px;"><div style="font-size:6px;color:#bbb;">Available — Tap to book</div></div>
+                  </div>
+                </div>
+              </div>
+              <div class="sc-bnav">
+                <div class="sc-bnav-i"><span class="sc-bnav-em">📅</span><span class="sc-bnav-lb" style="color:#4a148c;">Calendar</span></div>
+                <div class="sc-bnav-i"><span class="sc-bnav-em">👥</span><span class="sc-bnav-lb" style="color:#bbb;">Clients</span></div>
+                <div class="sc-bnav-i"><span class="sc-bnav-em">✂️</span><span class="sc-bnav-lb" style="color:#bbb;">Services</span></div>
+                <div class="sc-bnav-i"><span class="sc-bnav-em">⚙️</span><span class="sc-bnav-lb" style="color:#bbb;">Settings</span></div>
               </div>
             </div>
           </div>
@@ -1163,10 +1317,7 @@
         <div class="sc-card-body">
           <div class="sc-app-name">✂️ GlamBook</div>
           <div class="sc-app-desc">Salon appointment booking, stylist schedule & billing</div>
-          <div class="sc-tags">
-            <span class="sc-tag">Salon</span>
-            <span class="sc-tag built">⚡ 18 min</span>
-          </div>
+          <div class="sc-tags"><span class="sc-tag">Salon</span><span class="sc-tag built">⚡ 18 min</span></div>
         </div>
       </div>
 
@@ -1175,20 +1326,67 @@
         <div class="sc-phone-wrap" style="background:linear-gradient(135deg,#e0f7fa,#b2ebf2);">
           <div class="sc-phone-device">
             <div class="sc-phone-screen">
-              <div class="sc-app-topbar" style="background:linear-gradient(135deg,#00695c,#00897b);">
-                <div class="sc-app-topbar-title">🛍️ ShopEasy</div>
-                <div class="sc-app-topbar-sub">🛒 3 in cart</div>
+              <div class="sc-sb" style="background:#004d40;"><span class="sc-sb-t">9:41</span><span class="sc-sb-i">▌▌ WiFi 🔋</span></div>
+              <div style="background:#004d40;padding:4px 5px 5px;display:flex;align-items:center;gap:3px;flex-shrink:0;">
+                <div style="flex:1;background:rgba(255,255,255,.18);border-radius:5px;padding:3px 6px;font-size:5.5px;color:rgba(255,255,255,.7);">🔍 Search products...</div>
+                <span style="font-size:12px;color:#fff;">🛒</span>
               </div>
-              <div class="sc-app-content">
-                <div style="font-size:6.5px;font-weight:700;color:#999;padding:3px 2px 1px;text-transform:uppercase;">Featured Products</div>
-                <div class="sc-grid2">
-                  <div class="sc-prod" style="background:linear-gradient(135deg,#1565c0,#42a5f5);">T-Shirt<br/>₹499</div>
-                  <div class="sc-prod" style="background:linear-gradient(135deg,#e53935,#ef9a9a);">Shoes<br/>₹1299</div>
-                  <div class="sc-prod" style="background:linear-gradient(135deg,#f57c00,#ffcc02);">Watch<br/>₹2499</div>
-                  <div class="sc-prod" style="background:linear-gradient(135deg,#6a1b9a,#ce93d8);">Bag<br/>₹899</div>
+              <div style="display:flex;gap:3px;padding:3px 5px;overflow:hidden;background:#fff;border-bottom:1px solid #f0f0f0;flex-shrink:0;">
+                <span style="font-size:5.5px;font-weight:700;color:#fff;background:#004d40;padding:2px 6px;border-radius:10px;white-space:nowrap;">All</span>
+                <span style="font-size:5.5px;color:#888;padding:2px 5px;border:1px solid #eee;border-radius:10px;white-space:nowrap;">Fashion</span>
+                <span style="font-size:5.5px;color:#888;padding:2px 5px;border:1px solid #eee;border-radius:10px;white-space:nowrap;">Electronics</span>
+                <span style="font-size:5.5px;color:#888;padding:2px 5px;border:1px solid #eee;border-radius:10px;white-space:nowrap;">Home</span>
+              </div>
+              <div class="sc-content">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:4px 5px;">
+                  <div style="background:#fff;border-radius:6px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.1);">
+                    <div style="background:#e3f2fd;padding:7px;text-align:center;font-size:18px;line-height:1;">👕</div>
+                    <div style="padding:3px 4px;"><div style="font-size:6px;font-weight:700;color:#222;">Classic T-Shirt</div><div style="font-size:6.5px;font-weight:800;color:#004d40;">₹499</div><div style="font-size:5px;color:#f57c00;">★★★★★ 4.8</div></div>
+                  </div>
+                  <div style="background:#fff;border-radius:6px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.1);">
+                    <div style="background:#fce4ec;padding:7px;text-align:center;font-size:18px;line-height:1;">👟</div>
+                    <div style="padding:3px 4px;"><div style="font-size:6px;font-weight:700;color:#222;">Sports Shoes</div><div style="font-size:6.5px;font-weight:800;color:#004d40;">₹1,299</div><div style="font-size:5px;color:#f57c00;">★★★★☆ 4.5</div></div>
+                  </div>
+                  <div style="background:#fff;border-radius:6px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.1);">
+                    <div style="background:#fff8e1;padding:7px;text-align:center;font-size:18px;line-height:1;">⌚</div>
+                    <div style="padding:3px 4px;"><div style="font-size:6px;font-weight:700;color:#222;">Smart Watch</div><div style="font-size:6.5px;font-weight:800;color:#004d40;">₹2,499</div><div style="font-size:5px;color:#f57c00;">★★★★★ 4.9</div></div>
+                  </div>
+                  <div style="background:#fff;border-radius:6px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.1);">
+                    <div style="background:#f3e5f5;padding:7px;text-align:center;font-size:18px;line-height:1;">👜</div>
+                    <div style="padding:3px 4px;"><div style="font-size:6px;font-weight:700;color:#222;">Leather Bag</div><div style="font-size:6.5px;font-weight:800;color:#004d40;">₹899</div><div style="font-size:5px;color:#f57c00;">★★★★☆ 4.6</div></div>
+                  </div>
                 </div>
-                <div class="sc-srow" style="margin-top:3px;"><div class="sc-slabel">Today's Sales</div><div class="sc-sval" style="color:#27ae60;">₹12,400</div></div>
-                <div class="sc-mini-btn" style="background:#00695c;">View All Products</div>
+              </div>
+              <div class="sc-bnav">
+                <div class="sc-bnav-i"><span class="sc-bnav-em">🏠</span><span class="sc-bnav-lb" style="color:#004d40;">Home</span></div>
+                <div class="sc-bnav-i"><span class="sc-bnav-em">🔍</span><span class="sc-bnav-lb" style="color:#bbb;">Search</span></div>
+                <div class="sc-bnav-i"><span class="sc-bnav-em">🛒</span><span class="sc-bnav-lb" style="color:#bbb;">Cart</span></div>
+                <div class="sc-bnav-i"><span class="sc-bnav-em">👤</span><span class="sc-bnav-lb" style="color:#bbb;">Profile</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="sc-card-body">
+          <div class="sc-app-name">🛍️ ShopEasy</div>
+          <div class="sc-app-desc">E-commerce store with cart, payments & order tracking</div>
+          <div class="sc-tags"><span class="sc-tag">E-commerce</span><span class="sc-tag built">⚡ 30 min</span></div>
+        </div>
+      </div>
+                    <div style="font-size:5px;background:#fff3e0;color:#e65100;border-radius:2px;padding:0 2px;">Low Stock</div>
+                  </div>
+                </div>
+                <!-- product row 4 -->
+                <div style="display:flex;align-items:center;gap:4px;background:#fff;border-radius:4px;padding:3px;box-shadow:0 1px 2px rgba(0,0,0,.06);">
+                  <div style="width:18px;height:18px;background:linear-gradient(135deg,#6a1b9a,#ce93d8);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0;">👜</div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-size:6.5px;font-weight:700;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Leather Bag</div>
+                    <div style="font-size:5.5px;color:#f57c00;">★★★★☆ <span style="color:#888;">4.6</span></div>
+                  </div>
+                  <div style="text-align:right;flex-shrink:0;">
+                    <div style="font-size:7px;font-weight:800;color:#00695c;">₹899</div>
+                    <div style="font-size:5px;background:#e8f5e9;color:#1b5e20;border-radius:2px;padding:0 2px;">In Stock</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1205,6 +1403,22 @@
 
     </div><!-- end showcase-scroll -->
     <p class="scroll-hint">← Scroll to see more apps →</p>
+  </div>
+</section>
+
+<!-- WHATSAPP REVIEWS SECTION -->
+<section class="wa-section">
+  <div class="sec-inner" style="text-align:center;">
+    <h2 class="sec-title">You Can Keep Paying Developers The Hard Way...<br/>Or <span style="background:var(--yellow);padding:0 6px;border-radius:3px;color:var(--navy);">Learn The Skill That Changes Everything</span></h2>
+    <p class="wa-green-sub">Here's what our students said in our WhatsApp community...</p>
+
+    <div class="wa-grid">
+      <div class="wa-img-card"><img src="wa-Abhimanyu.jpg" alt="Abhimanyu WhatsApp"/></div>
+      <div class="wa-img-card"><img src="wa-abhishek.jpg" alt="Abhishek WhatsApp"/></div>
+      <div class="wa-img-card"><img src="wa-rohit.jpg" alt="Rohit WhatsApp"/></div>
+      <div class="wa-img-card"><img src="wa-vaishali.jpg" alt="Vaishali WhatsApp"/></div>
+      <div class="wa-img-card"><img src="wa-alex.jpg" alt="Alex WhatsApp"/></div>
+    </div>
   </div>
 </section>
 
@@ -1666,6 +1880,142 @@
     <small>Get Bonuses worth 24,997/-</small>
   </a>
 </div>
+
+<!-- ── RAZORPAY SCRIPT ── -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<!-- ── LEAD FORM MODAL ── -->
+<div id="rzp-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:20px;padding:40px 36px;max-width:460px;width:92%;position:relative;box-shadow:0 24px 60px rgba(0,0,0,.35);">
+    <!-- close -->
+    <button onclick="closeModal()" style="position:absolute;top:16px;right:20px;background:none;border:none;font-size:26px;cursor:pointer;color:#999;">×</button>
+    <!-- header -->
+    <div style="text-align:center;margin-bottom:28px;">
+      <div style="background:#fff176;display:inline-block;padding:6px 20px;border-radius:30px;font-size:13px;font-weight:800;color:#0d1b6e;margin-bottom:14px;">🔥 ONLY 49 SEATS LEFT</div>
+      <h2 style="font-size:22px;font-weight:900;color:#0d1b6e;line-height:1.3;">One Step Away From<br/>Building Your First App!</h2>
+      <p style="font-size:13px;color:#777;margin-top:8px;">Enter your details to proceed to payment</p>
+    </div>
+    <!-- form -->
+    <form id="rzp-form" onsubmit="startPayment(event)">
+      <div style="margin-bottom:16px;">
+        <label style="font-size:13px;font-weight:700;color:#333;display:block;margin-bottom:6px;">Full Name *</label>
+        <input id="rzp-name" type="text" placeholder="Enter your full name" required
+          style="width:100%;padding:14px 16px;border:2px solid #e0e0e0;border-radius:10px;font-size:15px;outline:none;font-family:inherit;"
+          onfocus="this.style.borderColor='#0d1b6e'" onblur="this.style.borderColor='#e0e0e0'"/>
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:13px;font-weight:700;color:#333;display:block;margin-bottom:6px;">Email Address *</label>
+        <input id="rzp-email" type="email" placeholder="Enter your email" required
+          style="width:100%;padding:14px 16px;border:2px solid #e0e0e0;border-radius:10px;font-size:15px;outline:none;font-family:inherit;"
+          onfocus="this.style.borderColor='#0d1b6e'" onblur="this.style.borderColor='#e0e0e0'"/>
+      </div>
+      <div style="margin-bottom:24px;">
+        <label style="font-size:13px;font-weight:700;color:#333;display:block;margin-bottom:6px;">WhatsApp Number *</label>
+        <div style="display:flex;gap:10px;">
+          <div style="background:#f5f5f5;border:2px solid #e0e0e0;border-radius:10px;padding:14px 14px;font-size:15px;font-weight:700;color:#333;flex-shrink:0;">+91</div>
+          <input id="rzp-phone" type="tel" placeholder="10-digit mobile number" required maxlength="10" pattern="[0-9]{10}"
+            style="flex:1;padding:14px 16px;border:2px solid #e0e0e0;border-radius:10px;font-size:15px;outline:none;font-family:inherit;"
+            onfocus="this.style.borderColor='#0d1b6e'" onblur="this.style.borderColor='#e0e0e0'"/>
+        </div>
+      </div>
+      <button type="submit" id="rzp-pay-btn"
+        style="width:100%;background:linear-gradient(135deg,#e8251a,#ff4444);color:#fff;border:none;border-radius:50px;padding:18px;font-size:18px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:inherit;">
+        🔒 Pay ₹249 &amp; Secure My Seat →
+      </button>
+      <p style="text-align:center;font-size:12px;color:#aaa;margin-top:12px;">
+        🔐 100% Secure Payment via Razorpay &nbsp;|&nbsp; ✅ Money Back Guarantee
+      </p>
+    </form>
+  </div>
+</div>
+
+<!-- ── RAZORPAY LOGIC ── -->
+<script>
+  const RZP_KEY = 'rzp_test_SjeSqUK7tNzin6';
+
+  // Open modal when any enroll button clicked
+  document.querySelectorAll('.enroll-btn, .sticky-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      openModal();
+    });
+  });
+
+  function openModal() {
+    const m = document.getElementById('rzp-modal');
+    m.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    const m = document.getElementById('rzp-modal');
+    m.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  // Close on backdrop click
+  document.getElementById('rzp-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  function startPayment(e) {
+    e.preventDefault();
+    const name  = document.getElementById('rzp-name').value.trim();
+    const email = document.getElementById('rzp-email').value.trim();
+    const phone = '+91' + document.getElementById('rzp-phone').value.trim();
+
+    // Disable button
+    const btn = document.getElementById('rzp-pay-btn');
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Opening Payment...';
+
+    const options = {
+      key: RZP_KEY,
+      amount: 24900,           // ₹249 in paise
+      currency: 'INR',
+      name: 'AI App Building Workshop',
+      description: 'Build Your App in 30 Minutes – Live Workshop',
+      image: '',
+      prefill: { name: name, email: email, contact: phone },
+      notes: { name: name, email: email, phone: phone },
+      theme: { color: '#0d1b6e' },
+      modal: {
+        ondismiss: function() {
+          btn.disabled = false;
+          btn.innerHTML = '🔒 Pay ₹249 &amp; Secure My Seat →';
+        }
+      },
+      handler: function(response) {
+        // Payment successful — save lead & redirect
+        saveLead(name, email, phone, response.razorpay_payment_id);
+        closeModal();
+        window.location.href = 'thankyou.html?name=' + encodeURIComponent(name.split(' ')[0]);
+      }
+    };
+
+    const rzp = new Razorpay(options);
+    rzp.on('payment.failed', function(response) {
+      btn.disabled = false;
+      btn.innerHTML = '🔒 Pay ₹249 &amp; Secure My Seat →';
+      alert('Payment failed. Please try again.\n' + response.error.description);
+    });
+    rzp.open();
+    closeModal();
+  }
+
+  function saveLead(name, email, phone, paymentId) {
+    // Save to localStorage as backup
+    const leads = JSON.parse(localStorage.getItem('rzp_leads') || '[]');
+    leads.push({
+      name, email, phone, paymentId,
+      time: new Date().toISOString()
+    });
+    localStorage.setItem('rzp_leads', JSON.stringify(leads));
+
+    // Send to Google Form (webhook) — fill in your form URL later
+    // fetch('YOUR_GOOGLE_FORM_URL', { method:'POST', body: ... });
+  }
+</script>
 
 </body>
 </html>

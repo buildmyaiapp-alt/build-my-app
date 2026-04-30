@@ -1,0 +1,10 @@
+node_modules/
+*.log
+.DS_Store
+serve.sh
+save-ads.js
+extract-ads.py
+ad1.html
+ad2.html
+ad3.html
+ad4.html
