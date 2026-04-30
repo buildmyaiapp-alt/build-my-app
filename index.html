@@ -1978,6 +1978,7 @@
       prefill: { name: name, email: email, contact: phone },
       notes:   { name: name, email: email, phone: phone },
       theme:   { color: '#0d1b6e' },
+      config:  { display: { blocks: { banks: { name: 'Pay via UPI', instruments: [{ method: 'upi' }] } }, sequence: ['block.banks'], preferences: { show_default_blocks: true } } },
       modal: {
         ondismiss: function() {
           btn.disabled = false;
