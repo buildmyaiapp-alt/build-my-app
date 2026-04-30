@@ -1881,9 +1881,6 @@
   </a>
 </div>
 
-<!-- ── RAZORPAY SCRIPT ── -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
 <!-- ── LEAD FORM MODAL ── -->
 <div id="rzp-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:9999;align-items:center;justify-content:center;">
   <div style="background:#fff;border-radius:20px;padding:40px 36px;max-width:460px;width:92%;position:relative;box-shadow:0 24px 60px rgba(0,0,0,.35);">
@@ -1929,9 +1926,9 @@
   </div>
 </div>
 
-<!-- ── RAZORPAY LOGIC ── -->
+<!-- ── PAYMENT LOGIC ── -->
 <script>
-  const RZP_KEY      = 'rzp_test_SjeSqUK7tNzin6';
+  const PAYMENT_LINK = 'https://rzp.io/rzp/q7b3P6S';
   const APPS_SCRIPT  = 'https://script.google.com/macros/s/AKfycbyuzv1OEQkGJG5hRKqlJV9Awo0jyG4HStpY0z697IpjR9X_DPtTxEbEn_jobdNm3nPXNQ/exec';
 
   // Open modal when any enroll button clicked
@@ -1967,57 +1964,35 @@
 
     const btn = document.getElementById('rzp-pay-btn');
     btn.disabled = true;
-    btn.innerHTML = '⏳ Opening Payment...';
+    btn.innerHTML = '⏳ Redirecting to Payment...';
 
-    const options = {
-      key: RZP_KEY,
-      amount: 24900,
-      currency: 'INR',
-      name: 'AI App Building Workshop',
-      description: 'Build Your App in 30 Minutes – Live Workshop',
-      prefill: { name: name, email: email, contact: phone },
-      notes:   { name: name, email: email, phone: phone },
-      theme:   { color: '#0d1b6e' },
-      config:  { display: { blocks: { banks: { name: 'Pay via UPI', instruments: [{ method: 'upi' }] } }, sequence: ['block.banks'], preferences: { show_default_blocks: true } } },
-      modal: {
-        ondismiss: function() {
-          btn.disabled = false;
-          btn.innerHTML = '🔒 Pay ₹249 &amp; Secure My Seat →';
-        }
-      },
-      handler: function(response) {
-        // Payment successful
-        saveLead(name, email, phone, response.razorpay_payment_id, 24900);
-        closeModal();
-        window.location.href = 'thankyou.html?name=' + encodeURIComponent(name.split(' ')[0]);
-      }
-    };
+    // 1. Save lead to Google Sheet + trigger confirmation email
+    saveLead(name, email, phone, 'PAYMENT_INITIATED', 24900);
 
-    const rzp = new Razorpay(options);
-    rzp.on('payment.failed', function(response) {
-      btn.disabled = false;
-      btn.innerHTML = '🔒 Pay ₹249 &amp; Secure My Seat →';
-      alert('Payment failed. Please try again.\n' + response.error.description);
-    });
-    rzp.open();
-    closeModal();
+    // 2. Store first name so thank-you page can greet the user
+    try { sessionStorage.setItem('buyer_name', name.split(' ')[0]); } catch(err) {}
+
+    // 3. Redirect to Razorpay payment link (no domain restrictions)
+    setTimeout(function() {
+      window.location.href = PAYMENT_LINK;
+    }, 600);
   }
 
   function saveLead(name, email, phone, paymentId, amount) {
-    // 1. Backup to localStorage
-    const leads = JSON.parse(localStorage.getItem('rzp_leads') || '[]');
-    leads.push({ name, email, phone, paymentId, amount, time: new Date().toISOString() });
-    localStorage.setItem('rzp_leads', JSON.stringify(leads));
+    // Backup to localStorage
+    try {
+      const leads = JSON.parse(localStorage.getItem('rzp_leads') || '[]');
+      leads.push({ name, email, phone, paymentId, amount, time: new Date().toISOString() });
+      localStorage.setItem('rzp_leads', JSON.stringify(leads));
+    } catch(err) {}
 
-    // 2. Send to Google Apps Script → saves to Sheet + sends Email + WhatsApp
-    if (APPS_SCRIPT && APPS_SCRIPT !== 'PASTE_YOUR_APPS_SCRIPT_URL_HERE') {
-      fetch(APPS_SCRIPT, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, phone, paymentId, amount })
-      }).catch(err => console.log('Sheet sync error (non-critical):', err));
-    }
+    // Send to Google Apps Script → saves to Sheet + sends Email
+    fetch(APPS_SCRIPT, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, phone, paymentId, amount })
+    }).catch(err => console.log('Sheet sync (non-critical):', err));
   }
 </script>
 

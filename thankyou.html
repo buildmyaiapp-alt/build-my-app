@@ -62,10 +62,13 @@
 </div>
 
 <script>
-  // Show user's first name from URL
+  // Show user's first name — from URL param or sessionStorage
   const params = new URLSearchParams(window.location.search);
-  const name = params.get('name');
-  if (name) document.getElementById('user-name').textContent = name;
+  const name = params.get('name') || sessionStorage.getItem('buyer_name') || '';
+  if (name) {
+    document.getElementById('user-name').textContent = name;
+    try { sessionStorage.removeItem('buyer_name'); } catch(e) {}
+  }
 </script>
 </body>
 </html>
