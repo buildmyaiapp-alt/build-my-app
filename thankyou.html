@@ -62,13 +62,33 @@
 </div>
 
 <script>
+  const APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbwcDaPzfmVf23rTxIU1Tbx3PcPZawcdOeUP6MyH6pW5NQy0NOzpr9N2BZk9nIm8uPX0hw/exec';
+
   // Show user's first name — from URL param or sessionStorage
   const params = new URLSearchParams(window.location.search);
-  const name = params.get('name') || sessionStorage.getItem('buyer_name') || '';
-  if (name) {
-    document.getElementById('user-name').textContent = name;
-    try { sessionStorage.removeItem('buyer_name'); } catch(e) {}
+  const firstName = params.get('name') || sessionStorage.getItem('buyer_name') || '';
+  if (firstName) {
+    document.getElementById('user-name').textContent = firstName;
   }
+
+  // Backup: re-send lead to Google Sheet from thank-you page
+  // (catches cases where the initial send was cancelled during redirect)
+  try {
+    const pending = sessionStorage.getItem('pending_lead');
+    if (pending) {
+      const data = JSON.parse(pending);
+      data.paymentId = 'PAID_VIA_RAZORPAY_LINK';
+      fetch(APPS_SCRIPT, {
+        method: 'POST',
+        mode: 'no-cors',
+        keepalive: true,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      sessionStorage.removeItem('pending_lead');
+      sessionStorage.removeItem('buyer_name');
+    }
+  } catch(e) {}
 </script>
 </body>
 </html>

@@ -1929,7 +1929,7 @@
 <!-- ── PAYMENT LOGIC ── -->
 <script>
   const PAYMENT_LINK = 'https://rzp.io/rzp/q7b3P6S';
-  const APPS_SCRIPT  = 'https://script.google.com/macros/s/AKfycbyuzv1OEQkGJG5hRKqlJV9Awo0jyG4HStpY0z697IpjR9X_DPtTxEbEn_jobdNm3nPXNQ/exec';
+  const APPS_SCRIPT  = 'https://script.google.com/macros/s/AKfycbwcDaPzfmVf23rTxIU1Tbx3PcPZawcdOeUP6MyH6pW5NQy0NOzpr9N2BZk9nIm8uPX0hw/exec';
 
   // Open modal when any enroll button clicked
   document.querySelectorAll('.enroll-btn, .sticky-btn').forEach(btn => {
@@ -1966,33 +1966,38 @@
     btn.disabled = true;
     btn.innerHTML = '⏳ Redirecting to Payment...';
 
-    // 1. Save lead to Google Sheet + trigger confirmation email
-    saveLead(name, email, phone, 'PAYMENT_INITIATED', 24900);
+    // Store lead data so thank-you page can send it to sheet after payment
+    const leadData = { name, email, phone, paymentId: 'PAYMENT_INITIATED', amount: 24900 };
+    try {
+      sessionStorage.setItem('buyer_name', name.split(' ')[0]);
+      sessionStorage.setItem('pending_lead', JSON.stringify(leadData));
+    } catch(err) {}
 
-    // 2. Store first name so thank-you page can greet the user
-    try { sessionStorage.setItem('buyer_name', name.split(' ')[0]); } catch(err) {}
+    // Send with keepalive:true so it survives page redirect
+    saveLead(leadData);
 
-    // 3. Redirect to Razorpay payment link (no domain restrictions)
+    // Redirect after small delay to give fetch a head start
     setTimeout(function() {
       window.location.href = PAYMENT_LINK;
-    }, 600);
+    }, 1200);
   }
 
-  function saveLead(name, email, phone, paymentId, amount) {
+  function saveLead(data) {
     // Backup to localStorage
     try {
       const leads = JSON.parse(localStorage.getItem('rzp_leads') || '[]');
-      leads.push({ name, email, phone, paymentId, amount, time: new Date().toISOString() });
+      leads.push({ ...data, time: new Date().toISOString() });
       localStorage.setItem('rzp_leads', JSON.stringify(leads));
     } catch(err) {}
 
-    // Send to Google Apps Script → saves to Sheet + sends Email
+    // keepalive:true ensures the request completes even if page navigates away
     fetch(APPS_SCRIPT, {
       method: 'POST',
       mode: 'no-cors',
+      keepalive: true,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, phone, paymentId, amount })
-    }).catch(err => console.log('Sheet sync (non-critical):', err));
+      body: JSON.stringify(data)
+    }).catch(err => console.log('Sheet sync:', err));
   }
 </script>
 
