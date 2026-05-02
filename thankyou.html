@@ -54,7 +54,7 @@
     </div>
   </div>
 
-  <a href="https://chat.whatsapp.com/YOUR_GROUP_LINK" class="wa-btn" target="_blank">
+  <a href="YOUR_WHATSAPP_GROUP_LINK" class="wa-btn" target="_blank" id="wa-btn">
     💬 Join WhatsApp Community Now →
   </a>
 
@@ -64,14 +64,18 @@
 <script>
   const APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbzNB3oxskcUcn2sw4TBqMidDOK1LSd7T0-bA4eabjearbweOYCdkrS-i7JaMIdfQttV/exec';
 
-  // Show user's first name — from URL param or sessionStorage
   const params = new URLSearchParams(window.location.search);
+
+  // Razorpay sends razorpay_payment_id in redirect URL
+  const razorpayPaymentId = params.get('razorpay_payment_id') || 'PAID_VIA_RAZORPAY';
+
+  // Show user's first name — from URL param or sessionStorage
   const firstName = params.get('name') || sessionStorage.getItem('buyer_name') || '';
   if (firstName) {
     document.getElementById('user-name').textContent = firstName;
   }
 
-  // Backup: fire image pixel to save lead after payment completes
+  // Fire pixel to save PAID lead with actual payment ID
   try {
     const pending = sessionStorage.getItem('pending_lead');
     if (pending) {
@@ -80,11 +84,20 @@
         name:      data.name,
         email:     data.email,
         phone:     data.phone,
-        paymentId: 'PAID_VIA_RAZORPAY'
+        paymentId: razorpayPaymentId
       });
       new Image().src = APPS_SCRIPT + '?' + urlParams.toString();
       sessionStorage.removeItem('pending_lead');
       sessionStorage.removeItem('buyer_name');
+    } else if (params.get('email')) {
+      // Razorpay may pass email/name/phone in redirect params
+      const urlParams = new URLSearchParams({
+        name:      params.get('name') || 'Customer',
+        email:     params.get('email'),
+        phone:     params.get('contact') || '',
+        paymentId: razorpayPaymentId
+      });
+      new Image().src = APPS_SCRIPT + '?' + urlParams.toString();
     }
   } catch(e) {}
 </script>

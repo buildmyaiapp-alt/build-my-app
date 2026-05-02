@@ -40,10 +40,23 @@ function doPost(e) {
   }
 }
 
-// ── ALLOW CORS for static site ──────────────────────────────
+// ── ALLOW CORS for static site — also saves leads via image pixel ──
 function doGet(e) {
+  try {
+    const p = e.parameter;
+    if (p && p.name && p.email) {
+      // Save lead from image pixel fired before/after payment
+      saveLead(p.name, p.email, p.phone || '', p.paymentId || 'LEAD', null);
+      // Send confirmation email only when payment confirmed
+      if (p.paymentId && p.paymentId !== 'LEAD' && p.paymentId !== 'PAYMENT_INITIATED') {
+        sendEmail(p.name, p.email, p.paymentId);
+      }
+    }
+  } catch(err) {
+    Logger.log('doGet error: ' + err.message);
+  }
   return ContentService
-    .createTextOutput(JSON.stringify({ status: 'API is running ✅' }))
+    .createTextOutput(JSON.stringify({ status: 'OK' }))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
