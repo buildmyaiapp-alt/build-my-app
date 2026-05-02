@@ -946,7 +946,7 @@
   <div class="event-grid" style="max-width:700px;margin:0 auto;">
     <div class="event-box">
       <div class="event-icon">📅</div>
-      <div><div class="lbl">DATE</div><div class="val">Coming Soon</div></div>
+      <div><div class="lbl">DATE</div><div class="val">9th May 2026</div></div>
     </div>
     <div class="event-box">
       <div class="event-icon">🕐</div>
@@ -962,6 +962,59 @@
     </div>
   </div>
 </div>
+
+<!-- COUNTDOWN TIMER -->
+<div style="background:linear-gradient(135deg,#1A1200,#2A2000);padding:28px 20px;text-align:center;border-top:1px solid rgba(245,166,35,.2);border-bottom:1px solid rgba(245,166,35,.2);">
+  <p style="color:#F5A623;font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin:0 0 14px;">⚡ Workshop Starts In</p>
+  <div id="countdown" style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+    <div style="text-align:center;">
+      <div id="cd-days" style="background:#F5A623;color:#000;font-size:36px;font-weight:900;width:72px;height:72px;border-radius:12px;display:flex;align-items:center;justify-content:center;line-height:1;">00</div>
+      <div style="color:#AAA;font-size:11px;font-weight:700;margin-top:6px;letter-spacing:1px;">DAYS</div>
+    </div>
+    <div style="color:#F5A623;font-size:36px;font-weight:900;padding-top:14px;">:</div>
+    <div style="text-align:center;">
+      <div id="cd-hours" style="background:#F5A623;color:#000;font-size:36px;font-weight:900;width:72px;height:72px;border-radius:12px;display:flex;align-items:center;justify-content:center;line-height:1;">00</div>
+      <div style="color:#AAA;font-size:11px;font-weight:700;margin-top:6px;letter-spacing:1px;">HOURS</div>
+    </div>
+    <div style="color:#F5A623;font-size:36px;font-weight:900;padding-top:14px;">:</div>
+    <div style="text-align:center;">
+      <div id="cd-mins" style="background:#F5A623;color:#000;font-size:36px;font-weight:900;width:72px;height:72px;border-radius:12px;display:flex;align-items:center;justify-content:center;line-height:1;">00</div>
+      <div style="color:#AAA;font-size:11px;font-weight:700;margin-top:6px;letter-spacing:1px;">MINS</div>
+    </div>
+    <div style="color:#F5A623;font-size:36px;font-weight:900;padding-top:14px;">:</div>
+    <div style="text-align:center;">
+      <div id="cd-secs" style="background:#1C1C1C;border:2px solid #F5A623;color:#F5A623;font-size:36px;font-weight:900;width:72px;height:72px;border-radius:12px;display:flex;align-items:center;justify-content:center;line-height:1;">00</div>
+      <div style="color:#AAA;font-size:11px;font-weight:700;margin-top:6px;letter-spacing:1px;">SECS</div>
+    </div>
+  </div>
+  <p style="color:#fff;font-size:14px;font-weight:700;margin:16px 0 0;">9th May 2026 &nbsp;·&nbsp; 7:00 PM IST &nbsp;·&nbsp; Live on Zoom</p>
+</div>
+<script>
+(function(){
+  const target = new Date('2026-05-09T19:00:00+05:30').getTime();
+  function tick(){
+    const now = Date.now();
+    const diff = target - now;
+    if(diff <= 0){
+      document.getElementById('cd-days').textContent='00';
+      document.getElementById('cd-hours').textContent='00';
+      document.getElementById('cd-mins').textContent='00';
+      document.getElementById('cd-secs').textContent='00';
+      return;
+    }
+    const d = Math.floor(diff/86400000);
+    const h = Math.floor((diff%86400000)/3600000);
+    const m = Math.floor((diff%3600000)/60000);
+    const s = Math.floor((diff%60000)/1000);
+    document.getElementById('cd-days').textContent  = String(d).padStart(2,'0');
+    document.getElementById('cd-hours').textContent = String(h).padStart(2,'0');
+    document.getElementById('cd-mins').textContent  = String(m).padStart(2,'0');
+    document.getElementById('cd-secs').textContent  = String(s).padStart(2,'0');
+  }
+  tick();
+  setInterval(tick,1000);
+})();
+</script>
 
 <!-- CTA BLOCK 1 -->
 <div class="cta-block">
