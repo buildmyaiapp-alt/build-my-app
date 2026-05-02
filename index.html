@@ -34,7 +34,7 @@
       --border:#e0e0e0;
     }
     html{scroll-behavior:smooth;}
-    body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);overflow-x:hidden;}
+    body{font-family:'Inter',sans-serif;background:linear-gradient(180deg,#060d2e 0%,#0d1b6e 8%,#f5f5f7 20%,#fff 100%);color:var(--text);overflow-x:hidden;}
 
     /* ── PILL BUTTON TOP ── */
     .top-pill-wrap{text-align:center;padding:20px 16px 0;}
@@ -47,31 +47,31 @@
     }
 
     /* ── HERO ── */
-    .hero{padding:36px 24px 40px;text-align:center;background:#fff;}
+    .hero{padding:48px 24px 56px;text-align:center;background:linear-gradient(160deg,#060d2e 0%,#0d1b6e 60%,#1a2f8a 100%);}
     .hero h1{
       font-size:clamp(28px,4vw,54px);font-weight:900;
-      color:var(--navy);line-height:1.18;margin-bottom:14px;max-width:860px;margin-left:auto;margin-right:auto;
+      color:#fff;line-height:1.18;margin-bottom:14px;max-width:860px;margin-left:auto;margin-right:auto;
     }
-    .hero h1 .hl{background:var(--yellow);padding:0 4px;border-radius:3px;}
-    .hero h1 .ul{text-decoration:underline;text-underline-offset:4px;}
-    .hero-sub{font-size:18px;color:#444;font-style:italic;margin-bottom:22px;}
+    .hero h1 .hl{background:var(--yellow);padding:0 4px;border-radius:3px;color:#0d1b6e;}
+    .hero h1 .ul{text-decoration:underline;text-underline-offset:4px;color:#fff;}
+    .hero-sub{font-size:18px;color:rgba(255,255,255,.8);font-style:italic;margin-bottom:22px;}
     .no-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-bottom:32px;}
     .no-badge{
       display:flex;align-items:center;gap:8px;
-      border:1px solid var(--border);border-radius:8px;
-      padding:10px 20px;font-size:14px;font-weight:600;color:#333;
-      background:#fff;
+      border:1px solid rgba(255,255,255,.25);border-radius:8px;
+      padding:10px 20px;font-size:14px;font-weight:600;color:#fff;
+      background:rgba(255,255,255,.1);backdrop-filter:blur(8px);
     }
-    .no-badge .ck{color:var(--navy2);font-size:16px;font-weight:900;}
+    .no-badge .ck{color:var(--yellow);font-size:16px;font-weight:900;}
 
     /* Hero 2col */
     .hero-2col{
-      display:grid;grid-template-columns:1.8fr 1fr;gap:32px;
-      max-width:1200px;margin:0 auto;text-align:left;
+      display:grid;grid-template-columns:2.2fr 1fr;gap:32px;
+      max-width:1400px;margin:0 auto;text-align:left;
     }
     .hero-video-box{
       border-radius:16px;overflow:hidden;
-      border:3px solid var(--navy);
+      border:3px solid rgba(255,255,255,.3);
       width:100%;
     }
     .hero-video-header{
