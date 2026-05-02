@@ -683,8 +683,18 @@
     @keyframes badgeAppear{0%,55%{opacity:0;}65%,90%{opacity:1;}100%{opacity:0;}}
 
     /* ── APP SHOWCASE ── */
-    .showcase-scroll{display:flex;gap:18px;overflow-x:auto;padding:30px 4px 20px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+    .showcase-wrap{position:relative;}
+    .showcase-scroll{display:flex;gap:18px;overflow-x:auto;padding:30px 4px 20px;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;}
     .showcase-scroll::-webkit-scrollbar{display:none;}
+    .sc-card{scroll-snap-align:center;}
+    /* Dot indicators — mobile only */
+    .showcase-dots{display:none;justify-content:center;gap:7px;margin:4px 0 8px;}
+    .showcase-dots .dot{width:8px;height:8px;border-radius:50%;background:#ccc;transition:background .3s,width .3s;cursor:pointer;}
+    .showcase-dots .dot.active{background:var(--navy);width:22px;border-radius:4px;}
+    @media(max-width:640px){
+      .showcase-dots{display:flex;}
+      .scroll-hint{display:none;}
+    }
     .sc-card{flex-shrink:0;width:188px;background:#fff;border-radius:16px;border:1px solid var(--border);overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08);transition:.2s;}
     .sc-card:hover{transform:translateY(-5px);box-shadow:0 12px 32px rgba(0,0,0,.14);}
     .sc-phone-wrap{padding:18px 0 14px;display:flex;justify-content:center;}
@@ -1104,7 +1114,8 @@
     <p class="sec-sub">Real working apps — built with AI in under 30 minutes each</p>
     <div class="sec-divider"></div>
 
-    <div class="showcase-scroll">
+    <div class="showcase-wrap">
+    <div class="showcase-scroll" id="showcaseScroll">
 
       <!-- APP 1: GymPro -->
       <div class="sc-card">
@@ -1402,6 +1413,8 @@
       </div>
 
     </div><!-- end showcase-scroll -->
+    <div class="showcase-dots" id="showcaseDots"></div>
+    </div><!-- end showcase-wrap -->
     <p class="scroll-hint">← Scroll to see more apps →</p>
   </div>
 </section>
@@ -1817,11 +1830,14 @@
   <div class="about-box">
     <div style="text-align:center;">
       <div class="about-photo-circle" style="background:#0d1b6e;border:4px solid rgba(255,255,255,.25);">
-        <img src="Palash-pro.png" alt="Palash Rajak" style="width:130%;height:130%;object-fit:contain;object-position:center bottom;border-radius:50%;margin-left:-15%;margin-top:-10%;"/>
+        <img src="Palash-pro.png" alt="Palash Rajak" style="width:100%;height:100%;object-fit:cover;object-position:center top;border-radius:50%;margin:0;"/>
       </div>
     </div>
     <div>
       <h2>Who Is Palash And Why Should You Care?</h2>
+      <p style="font-size:15px;font-weight:700;color:rgba(255,255,255,.75);margin-bottom:4px;letter-spacing:.3px;">
+        <span style="color:#fff176;">Palash Rajak</span> &nbsp;·&nbsp; Founder, <span style="text-decoration:underline;text-underline-offset:3px;">VisualPro Media</span> &amp; <span style="text-decoration:underline;text-underline-offset:3px;">BuildMyApp</span>
+      </p>
       <div class="about-divider"></div>
       <div class="about-list">
         <div class="about-item"><div class="about-dot"></div><p>Helped <u>500+ Business Owners</u> Build Their Apps Using AI.</p></div>
@@ -2004,6 +2020,98 @@
       localStorage.setItem('rzp_leads', JSON.stringify(leads));
     } catch(err) {}
   }
+</script>
+
+<!-- AUTO-SCROLL CAROUSEL (mobile only) -->
+<script>
+(function(){
+  const scroll  = document.getElementById('showcaseScroll');
+  const dotsWrap= document.getElementById('showcaseDots');
+  if (!scroll || !dotsWrap) return;
+
+  // Only activate on mobile-width
+  function isMobile(){ return window.innerWidth <= 640; }
+
+  let cards, dots, current = 0, timer, paused = false;
+
+  function buildDots(){
+    cards = Array.from(scroll.querySelectorAll('.sc-card'));
+    dotsWrap.innerHTML = '';
+    dots = cards.map(function(_, i){
+      const d = document.createElement('span');
+      d.className = 'dot' + (i === 0 ? ' active' : '');
+      d.addEventListener('click', function(){ goTo(i); resetTimer(); });
+      dotsWrap.appendChild(d);
+      return d;
+    });
+  }
+
+  function setActive(i){
+    dots.forEach(function(d){ d.classList.remove('active'); });
+    if (dots[i]) dots[i].classList.add('active');
+    current = i;
+  }
+
+  function goTo(i){
+    if (!cards.length) return;
+    i = (i + cards.length) % cards.length;
+    // scroll so card is centered
+    const card = cards[i];
+    const scrollLeft = card.offsetLeft - (scroll.clientWidth / 2) + (card.offsetWidth / 2);
+    scroll.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+    setActive(i);
+  }
+
+  function next(){ goTo(current + 1); }
+
+  function resetTimer(){
+    clearInterval(timer);
+    if (isMobile()) timer = setInterval(next, 2800);
+  }
+
+  // Detect manual swipe → pause 6 s then resume
+  let scrollEnd;
+  scroll.addEventListener('scroll', function(){
+    clearTimeout(scrollEnd);
+    paused = true;
+    scrollEnd = setTimeout(function(){
+      // Find which card is most visible
+      let closest = 0, minDist = Infinity;
+      cards.forEach(function(card, i){
+        const center = card.offsetLeft + card.offsetWidth / 2;
+        const scrollCenter = scroll.scrollLeft + scroll.clientWidth / 2;
+        const dist = Math.abs(center - scrollCenter);
+        if (dist < minDist){ minDist = dist; closest = i; }
+      });
+      setActive(closest);
+      paused = false;
+      resetTimer();
+    }, 300);
+  });
+
+  function init(){
+    if (!isMobile()) return;
+    buildDots();
+    resetTimer();
+  }
+
+  // Re-init on resize (e.g. rotation)
+  let resizeTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function(){
+      clearInterval(timer);
+      if (isMobile()){ buildDots(); current = 0; goTo(0); resetTimer(); }
+    }, 250);
+  });
+
+  // Run after page loads
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
 </script>
 
 </body>
