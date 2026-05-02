@@ -1983,26 +1983,30 @@
     const email = document.getElementById('rzp-email').value.trim();
     const phone = '+91' + document.getElementById('rzp-phone').value.trim();
 
+    if (!name || !email || !phone || phone.length < 13) {
+      alert('Please fill all fields correctly.');
+      return;
+    }
+
     const btn = document.getElementById('rzp-pay-btn');
     btn.disabled = true;
-    btn.innerHTML = '⏳ Saving your details...';
+    btn.innerHTML = '⏳ Redirecting to Payment...';
 
     const leadData = { name, email, phone, paymentId: 'PAYMENT_INITIATED', amount: 24900 };
 
-    // Save to sessionStorage so thankyou.html can re-send after payment
+    // Save to sessionStorage
     try {
       sessionStorage.setItem('buyer_name', name.split(' ')[0]);
       sessionStorage.setItem('pending_lead', JSON.stringify(leadData));
     } catch(err) {}
 
-    // sendBeacon is guaranteed to complete even after page navigates away
+    // Fire lead save in background — don't wait for it
     saveLead(leadData);
 
-    // Give beacon 1.5s head start then redirect
-    btn.innerHTML = '⏳ Redirecting to Payment...';
+    // Redirect immediately — don't wait for Apps Script
     setTimeout(function() {
       window.location.href = PAYMENT_LINK;
-    }, 1500);
+    }, 600);
   }
 
   function saveLead(data) {
