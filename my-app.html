@@ -1,1056 +1,631 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Spice Kitchen</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        :root {
-            --primary: #FF6B35;
-            --primary-dark: #E55A2B;
-            --secondary: #F7931E;
-            --accent: #FFD23F;
-            --dark: #1A1A2E;
-            --gray: #6B7280;
-            --light-gray: #F3F4F6;
-            --white: #FFFFFF;
-            --success: #10B981;
-            --warning: #FBBF24;
-            --danger: #EF4444;
-            --gradient: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
-            --gradient-dark: linear-gradient(135deg, #1A1A2E 0%, #16213E 100%);
-        }
-
-        body {
-            background: var(--light-gray);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .app-container {
-            max-width: 480px;
-            margin: 0 auto;
-            background: var(--white);
-            min-height: 100vh;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .page {
-            display: none;
-            padding-bottom: 80px;
-            min-height: 100vh;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-
-        /* Bottom Navigation */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 480px;
-            background: var(--white);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0 20px;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
-            z-index: 1000;
-            border-radius: 20px 20px 0 0;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-            padding: 8px 16px;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .nav-item i {
-            font-size: 22px;
-            color: var(--gray);
-            transition: all 0.3s ease;
-        }
-
-        .nav-item span {
-            font-size: 10px;
-            color: var(--gray);
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .nav-item.active i,
-        .nav-item.active span {
-            color: var(--primary);
-        }
-
-        .nav-item.active {
-            background: rgba(255, 107, 53, 0.1);
-        }
-
-        .nav-item .badge {
-            position: absolute;
-            top: 2px;
-            right: 8px;
-            background: var(--danger);
-            color: white;
-            font-size: 10px;
-            font-weight: 600;
-            padding: 2px 6px;
-            border-radius: 10px;
-            min-width: 18px;
-            text-align: center;
-        }
-
-        /* Hero Section */
-        .hero {
-            background: var(--gradient);
-            padding: 40px 20px 60px;
-            border-radius: 0 0 40px 40px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-        }
-
-        .hero-logo {
-            width: 80px;
-            height: 80px;
-            background: var(--white);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .hero-logo i {
-            font-size: 40px;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero h1 {
-            color: var(--white);
-            font-size: 32px;
-            font-weight: 800;
-            margin-bottom: 8px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-
-        .hero p {
-            color: rgba(255,255,255,0.9);
-            font-size: 14px;
-            font-weight: 400;
-        }
-
-        /* Section Styles */
-        .section {
-            padding: 20px;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .section-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--dark);
-        }
-
-        .see-all {
-            color: var(--primary);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        /* Dish Cards */
-        .dish-scroll {
-            display: flex;
-            gap: 16px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-            scrollbar-width: none;
-        }
-
-        .dish-scroll::-webkit-scrollbar {
-            display: none;
-        }
-
-        .dish-card {
-            min-width: 160px;
-            background: var(--white);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .dish-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-
-        .dish-image {
-            height: 120px;
-            background: linear-gradient(135deg, #FFE4D6 0%, #FFC7AA 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .dish-image i {
-            font-size: 50px;
-            color: var(--primary);
-            opacity: 0.5;
-        }
-
-        .dish-badge {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            background: var(--success);
-            color: white;
-            font-size: 10px;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-weight: 600;
-        }
-
-        .dish-info {
-            padding: 12px;
-        }
-
-        .dish-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--dark);
-            margin-bottom: 4px;
-        }
-
-        .dish-price {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        /* Reviews */
-        .review-card {
-            background: var(--white);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
-        }
-
-        .review-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .review-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: var(--gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        .review-user h4 {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .review-stars {
-            color: var(--warning);
-            font-size: 12px;
-        }
-
-        .review-text {
-            font-size: 13px;
-            color: var(--gray);
-            line-height: 1.5;
-        }
-
-        /* Primary Button */
-        .btn-primary {
-            width: 100%;
-            padding: 16px;
-            background: var(--gradient);
-            color: white;
-            border: none;
-            border-radius: 14px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 35px rgba(255, 107, 53, 0.4);
-        }
-
-        .btn-primary:active {
-            transform: scale(0.98);
-        }
-
-        /* Menu Page */
-        .page-header {
-            padding: 20px;
-            background: var(--white);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .page-title {
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--dark);
-        }
-
-        .search-bar {
-            display: flex;
-            align-items: center;
-            background: var(--light-gray);
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin-top: 16px;
-            gap: 12px;
-        }
-
-        .search-bar i {
-            color: var(--gray);
-        }
-
-        .search-bar input {
-            flex: 1;
-            border: none;
-            background: none;
-            font-size: 14px;
-            outline: none;
-        }
-
-        .category-filter {
-            display: flex;
-            gap: 10px;
-            padding: 16px 20px;
-            overflow-x: auto;
-            scrollbar-width: none;
-        }
-
-        .category-filter::-webkit-scrollbar {
-            display: none;
-        }
-
-        .category-chip {
-            padding: 10px 20px;
-            background: var(--light-gray);
-            border-radius: 25px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--gray);
-            white-space: nowrap;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .category-chip.active {
-            background: var(--gradient);
-            color: white;
-        }
-
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            padding: 0 20px 20px;
-        }
-
-        .menu-card {
-            background: var(--white);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-        }
-
-        .menu-card:active {
-            transform: scale(0.97);
-        }
-
-        .menu-image {
-            height: 100px;
-            background: linear-gradient(135deg, #FFE4D6 0%, #FFC7AA 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .menu-image i {
-            font-size: 40px;
-            color: var(--primary);
-            opacity: 0.5;
-        }
-
-        .veg-badge {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            width: 16px;
-            height: 16px;
-            border: 2px solid var(--success);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .veg-badge::after {
-            content: '';
-            width: 8px;
-            height: 8px;
-            background: var(--success);
-            border-radius: 50%;
-        }
-
-        .non-veg-badge {
-            border-color: var(--danger);
-        }
-
-        .non-veg-badge::after {
-            background: var(--danger);
-        }
-
-        .menu-info {
-            padding: 12px;
-        }
-
-        .menu-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--dark);
-            margin-bottom: 4px;
-            line-height: 1.3;
-        }
-
-        .menu-desc {
-            font-size: 11px;
-            color: var(--gray);
-            margin-bottom: 8px;
-            line-height: 1.4;
-        }
-
-        .menu-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .menu-price {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .add-btn {
-            width: 32px;
-            height: 32px;
-            background: var(--gradient);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .add-btn:active {
-            transform: scale(0.9);
-        }
-
-        /* Cart Page */
-        .cart-empty {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 60px 20px;
-            text-align: center;
-        }
-
-        .cart-empty i {
-            font-size: 80px;
-            color: var(--light-gray);
-            margin-bottom: 20px;
-        }
-
-        .cart-empty h3 {
-            font-size: 20px;
-            color: var(--dark);
-            margin-bottom: 8px;
-        }
-
-        .cart-empty p {
-            color: var(--gray);
-            font-size: 14px;
-        }
-
-        .cart-item {
-            display: flex;
-            gap: 16px;
-            padding: 16px 20px;
-            background: var(--white);
-            border-bottom: 1px solid var(--light-gray);
-            animation: slideUp 0.3s ease;
-        }
-
-        .cart-item-image {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #FFE4D6 0%, #FFC7AA 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .cart-item-image i {
-            font-size: 30px;
-            color: var(--primary);
-            opacity: 0.5;
-        }
-
-        .cart-item-info {
-            flex: 1;
-        }
-
-        .cart-item-name {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--dark);
-            margin-bottom: 4px;
-        }
-
-        .cart-item-price {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 12px;
-        }
-
-        .quantity-control {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .qty-btn {
-            width: 32px;
-            height: 32px;
-            border: 2px solid var(--primary);
-            background: var(--white);
-            border-radius: 8px;
-            color: var(--primary);
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .qty-btn:active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .qty-value {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--dark);
-            min-width: 24px;
-            text-align: center;
-        }
-
-        .remove-btn {
-            background: none;
-            border: none;
-            color: var(--danger);
-            font-size: 20px;
-            cursor: pointer;
-            padding: 8px;
-        }
-
-        .cart-summary {
-            position: fixed;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 480px;
-            background: var(--white);
-            padding: 20px;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            font-size: 14px;
-            color: var(--gray);
-        }
-
-        .summary-row.total {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--dark);
-            padding-top: 12px;
-            border-top: 2px dashed var(--light-gray);
-            margin-top: 12px;
-        }
-
-        /* Orders Page */
-        .order-card {
-            background: var(--white);
-            border-radius: 16px;
-            padding: 16px;
-            margin: 0 20px 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
-        }
-
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
-
-        .order-id {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .order-date {
-            font-size: 12px;
-            color: var(--gray);
-            margin-top: 2px;
-        }
-
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .status-delivered {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-        }
-
-        .status-preparing {
-            background: rgba(251, 191, 36, 0.1);
-            color: var(--warning);
-        }
-
-        .status-cancelled {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-        }
-
-        .order-items {
-            padding: 12px 0;
-            border-top: 1px solid var(--light-gray);
-            border-bottom: 1px solid var(--light-gray);
-        }
-
-        .order-item-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            color: var(--gray);
-            margin-bottom: 6px;
-        }
-
-        .order-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 12px;
-        }
-
-        .order-total {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--dark);
-        }
-
-        .reorder-btn {
-            padding: 10px 20px;
-            background: var(--gradient);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .reorder-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* Profile Page */
-        .profile-header {
-            background: var(--gradient);
-            padding: 40px 20px;
-            text-align: center;
-            border-radius: 0 0 40px 40px;
-        }
-
-        .profile-avatar {
-            width: 100px;
-            height: 100px;
-            background: var(--white);
-            border-radius: 50%;
-            margin: 0 auto 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-        }
-
-        .profile-avatar i {
-            font-size: 50px;
-            color: var(--primary);
-        }
-
-        .profile-name {
-            font-size: 24px;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 4px;
-        }
-
-        .profile-email {
-            font-size: 14px;
-            color: rgba(255,255,255,0.8);
-        }
-
-        .profile-section {
-            padding: 20px;
-        }
-
-        .profile-card {
-            background: var(--white);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
-        }
-
-        .profile-card-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--gray);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 16px;
-        }
-
-        .profile-item {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--light-gray);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .profile-item:last-child {
-            border-bottom: none;
-        }
-
-        .profile-item:active {
-            opacity: 0.7;
-        }
-
-        .profile-item-icon {
-            width: 44px;
-            height: 44px;
-            background: var(--light-gray);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .profile-item-icon i {
-            font-size: 18px;
-            color: var(--primary);
-        }
-
-        .profile-item-info {
-            flex: 1;
-        }
-
-        .profile-item-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .profile-item-value {
-            font-size: 12px;
-            color: var(--gray);
-        }
-
-        .profile-item i.fa-chevron-right {
-            color: var(--gray);
-            font-size: 14px;
-        }
-
-        .logout-btn {
-            width: 100%;
-            padding: 16px;
-            background: var(--white);
-            color: var(--danger);
-            border: 2px solid var(--danger);
-            border-radius: 14px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            background: var(--danger);
-            color: white;
-        }
-
-        /* Toast Notification */
-        .toast {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: var(--dark);
-            color: white;
-            padding: 14px 24px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 500;
-            z-index: 2000;
-            opacity: 0;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        .toast i {
-            color: var(--success);
-        }
-
-        /* Success Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 3000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .modal-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-content {
-            background: var(--white);
-            border-radius: 24px;
-            padding: 40px;
-            text-align: center;
-            max-width: 320px;
-            transform: scale(0.8);
-            transition: all 0.3s ease;
-        }
-
-        .modal-overlay.show .modal-content {
-            transform: scale(1);
-        }
-
-        .modal-icon {
-            width: 80px;
-            height: 80px;
-            background: rgba(16, 185, 129, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-        }
-
-        .modal-icon i {
-            font-size: 40px;
-            color: var(--success);
-        }
-
-        .modal-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 8px;
-        }
-
-        .modal-text {
-            font-size: 14px;
-            color: var(--gray);
-            margin-bottom: 24px;
-        }
-    </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Sharma Store - Instant Delivery</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Poppins:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary: #D4AF37;
+  --accent: #F59E0B;
+  --bg: #0A0A0A;
+  --surface: rgba(30,25,20,0.8);
+  --text: #F5F5DC;
+  --text2: rgba(212,175,55,0.7);
+  --glass: rgba(212,175,55,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:linear-gradient(135deg, #0A0A0A 0%, #1a1510 50%, #0f0a05 100%);color:var(--text);max-width:430px;margin:0 auto;min-height:100vh;overflow-x:hidden;position:relative}
+body::before{content:'';position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:300px;background:radial-gradient(circle at 50% 0%, rgba(212,175,55,0.15), transparent 70%);pointer-events:none;z-index:0}
+.page{display:none;padding-bottom:75px;min-height:calc(100vh - 56px);position:relative;z-index:1}
+.page.active{display:block;animation:fadeIn 0.3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.status-bar{background:var(--bg);padding:10px 20px 6px;display:flex;justify-content:space-between;font-size:12px;font-weight:700;position:sticky;top:0;z-index:50;backdrop-filter:blur(20px);color:var(--primary)}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(10,10,10,0.98);backdrop-filter:blur(20px);border-top:1px solid rgba(212,175,55,0.2);display:flex;padding:6px 0 12px;z-index:100;box-shadow:0 -10px 40px rgba(0,0,0,0.5)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 0;opacity:0.45;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);-webkit-tap-highlight-color:transparent;color:var(--text2)}
+.nav-item.active{opacity:1;color:var(--primary);transform:translateY(-2px)}.nav-item .ni{font-size:22px;transition:transform 0.3s}.nav-item.active .ni{transform:scale(1.1)}.nav-item .nl{font-size:10px;font-weight:700}
+.nav-icon-wrap{position:relative;display:inline-block}
+.cart-badge{background:linear-gradient(135deg, #D4AF37, #B8941F);color:#000;border-radius:50%;min-width:16px;height:16px;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center;position:absolute;top:-3px;right:-5px;padding:0 3px;box-shadow:0 2px 8px rgba(212,175,55,0.6)}
+button:active{transform:scale(0.96)}
+
+/* ── SHARMA STORE CUSTOM STYLES ── */
+
+.hero{padding:24px 20px;background:linear-gradient(135deg, rgba(212,175,55,0.15) 0%, rgba(184,148,31,0.08) 100%);border-radius:0 0 32px 32px;margin-bottom:20px;backdrop-filter:blur(10px);border:1px solid rgba(212,175,55,0.1)}
+.hero h1{font-family:'Poppins',sans-serif;font-size:32px;font-weight:900;margin-bottom:6px;background:linear-gradient(135deg, #D4AF37 0%, #F4E5A1 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--text2);font-size:14px;margin-bottom:16px}
+.delivery-banner{background:linear-gradient(135deg, rgba(212,175,55,0.25), rgba(184,148,31,0.15));padding:12px 16px;border-radius:16px;display:flex;align-items:center;gap:12px;backdrop-filter:blur(10px);border:1px solid rgba(212,175,55,0.4);box-shadow:0 4px 16px rgba(212,175,55,0.2)}
+.delivery-banner .icon{font-size:24px}
+.delivery-banner .text{flex:1}
+.delivery-banner .text strong{display:block;font-size:15px;font-weight:800;color:var(--primary)}
+.delivery-banner .text span{font-size:12px;color:var(--text2)}
+
+.search-box{margin:0 20px 20px;position:relative}
+.search-box input{width:100%;padding:14px 50px 14px 44px;background:var(--surface);backdrop-filter:blur(20px);border:1px solid rgba(212,175,55,0.2);border-radius:20px;color:var(--text);font-size:15px;outline:none;transition:all 0.3s}
+.search-box input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(212,175,55,0.15)}
+.search-box::before{content:'🔍';position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:18px}
+.voice-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:linear-gradient(135deg, var(--primary), #B8941F);border:none;color:#000;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.3s;box-shadow:0 4px 12px rgba(212,175,55,0.4)}
+.voice-btn:hover{transform:translateY(-50%) scale(1.1);box-shadow:0 6px 20px rgba(212,175,55,0.6)}
+
+.section{padding:0 20px 24px}
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.section-header h2{font-size:18px;font-weight:800;color:var(--primary)}
+.section-header a{color:var(--primary);font-size:13px;font-weight:700;text-decoration:none}
+
+.categories{display:flex;gap:10px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none}
+.categories::-webkit-scrollbar{display:none}
+.category-chip{background:var(--surface);backdrop-filter:blur(10px);border:1px solid rgba(212,175,55,0.2);padding:10px 18px;border-radius:16px;white-space:nowrap;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;gap:6px;color:var(--text2)}
+.category-chip:hover,.category-chip.active{background:linear-gradient(135deg, var(--primary), #B8941F);border-color:var(--primary);transform:translateY(-2px);box-shadow:0 4px 12px rgba(212,175,55,0.5);color:#000}
+
+.product-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.product-card{background:var(--surface);backdrop-filter:blur(20px);border:1px solid rgba(212,175,55,0.2);border-radius:20px;padding:12px;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden}
+.product-card::before{content:'';position:absolute;top:0;left:0;right:0;height:100%;background:linear-gradient(135deg, rgba(212,175,55,0.15), transparent);opacity:0;transition:opacity 0.3s}
+.product-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(212,175,55,0.3);border-color:rgba(212,175,55,0.6)}
+.product-card:hover::before{opacity:1}
+.product-img{width:100%;height:120px;background:linear-gradient(135deg, rgba(212,175,55,0.08), rgba(184,148,31,0.05));border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:10px;position:relative;z-index:1;border:1px solid rgba(212,175,55,0.15)}
+.badge{position:absolute;top:8px;right:8px;background:linear-gradient(135deg, #D4AF37, #F4E5A1);color:#000;font-size:9px;font-weight:800;padding:3px 8px;border-radius:8px;text-transform:uppercase;letter-spacing:0.5px;box-shadow:0 2px 8px rgba(212,175,55,0.5)}
+.badge.new{background:linear-gradient(135deg, var(--accent), #D97706)}
+.product-info{position:relative;z-index:1}
+.product-name{font-size:14px;font-weight:700;margin-bottom:4px;color:var(--text);line-height:1.3}
+.product-rating{font-size:11px;margin-bottom:6px;color:var(--accent)}
+.product-price{display:flex;justify-content:space-between;align-items:center}
+.price{font-size:18px;font-weight:900;color:var(--primary)}
+.add-btn{background:linear-gradient(135deg, var(--primary), #B8941F);border:none;color:#000;width:32px;height:32px;border-radius:50%;font-size:18px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.3s;box-shadow:0 4px 12px rgba(212,175,55,0.4)}
+.add-btn:hover{transform:scale(1.1) rotate(90deg);box-shadow:0 6px 20px rgba(212,175,55,0.6)}
+
+.offers-carousel{display:flex;gap:12px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none}
+.offers-carousel::-webkit-scrollbar{display:none}
+.offer-card{min-width:280px;background:linear-gradient(135deg, rgba(212,175,55,0.25), rgba(184,148,31,0.15));backdrop-filter:blur(20px);border:1px solid rgba(212,175,55,0.4);border-radius:20px;padding:16px;position:relative;overflow:hidden}
+.offer-card::before{content:'';position:absolute;top:-50%;right:-50%;width:200%;height:200%;background:radial-gradient(circle, rgba(212,175,55,0.2), transparent 70%);animation:shimmer 3s infinite}
+@keyframes shimmer{0%,100%{transform:translate(0,0)}50%{transform:translate(-30%,30%)}}
+.offer-card h3{font-size:16px;font-weight:800;margin-bottom:4px;color:var(--primary)}
+.offer-card p{font-size:13px;color:var(--text2)}
+
+.profile-header{background:linear-gradient(135deg, rgba(212,175,55,0.25), rgba(184,148,31,0.15));padding:30px 20px;text-align:center;border-radius:0 0 32px 32px;margin-bottom:20px;border:1px solid rgba(212,175,55,0.2)}
+.avatar{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg, var(--primary), #B8941F);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 14px;border:4px solid rgba(212,175,55,0.3);box-shadow:0 8px 24px rgba(212,175,55,0.4)}
+.profile-name{font-size:22px;font-weight:900;margin-bottom:4px;color:var(--primary)}
+.profile-phone{font-size:14px;color:var(--text2)}
+
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0 20px 24px}
+.stat-box{background:var(--surface);backdrop-filter:blur(20px);border:1px solid rgba(212,175,55,0.2);border-radius:16px;padding:16px;text-align:center}
+.stat-box .value{font-size:24px;font-weight:900;color:var(--primary);display:block;margin-bottom:4px}
+.stat-box .label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px}
+
+.menu-list{padding:0 20px}
+.menu-item{background:var(--surface);backdrop-filter:blur(20px);border:1px solid rgba(212,175,55,0.2);padding:16px;border-radius:16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all 0.3s}
+.menu-item:hover{background:rgba(30,25,20,0.9);border-color:rgba(212,175,55,0.5);transform:translateX(4px)}
+.menu-item .icon{font-size:24px;width:40px;height:40px;background:rgba(212,175,55,0.15);border-radius:12px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(212,175,55,0.3)}
+.menu-item .text{flex:1}
+.menu-item .text strong{display:block;font-size:15px;margin-bottom:2px;color:var(--text)}
+.menu-item .text span{font-size:12px;color:var(--text2)}
+.menu-item .arrow{color:var(--text2);font-size:18px}
+
+.list-header{padding:20px;background:linear-gradient(135deg, rgba(212,175,55,0.15), rgba(184,148,31,0.08));margin-bottom:20px;border-bottom:1px solid rgba(212,175,55,0.2)}
+.list-header h1{font-size:28px;font-weight:900;margin-bottom:6px;color:var(--primary)}
+.list-header p{color:var(--text2);font-size:14px}
+
+.filter-chips{display:flex;gap:8px;overflow-x:auto;padding:0 20px 16px;scrollbar-width:none}
+.filter-chips::-webkit-scrollbar{display:none}
+
+.product-list{padding:0 20px}
+.list-product-card{background:var(--surface);backdrop-filter:blur(20px);border:1px solid rgba(212,175,55,0.2);border-radius:20px;padding:14px;margin-bottom:14px;display:flex;gap:14px;transition:all 0.3s;position:relative}
+.list-product-card:hover{transform:translateX(4px);box-shadow:0 8px 24px rgba(212,175,55,0.3);border-color:rgba(212,175,55,0.5)}
+.list-product-img{width:90px;height:90px;background:linear-gradient(135deg, rgba(212,175,55,0.08), rgba(184,148,31,0.05));border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:42px;flex-shrink:0;border:1px solid rgba(212,175,55,0.15)}
+.list-product-info{flex:1}
+.list-product-name{font-size:16px;font-weight:700;margin-bottom:4px;color:var(--text)}
+.list-product-desc{font-size:12px;color:var(--text2);margin-bottom:6px;line-height:1.4}
+.list-product-footer{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+
+</style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Home Page -->
-        <div id="home" class="page active">
-            <div class="hero">
-                <div class="hero-content">
-                    <div class="hero-logo">
-                        <i class="fas fa-utensils"></i>
-                    </div>
-                    <h1>Spice Kitchen</h1>
-                    <p>Fresh Indian Food Delivered Fast</p>
-                </div>
-            </div>
+<div class="status-bar"><span id="statusTime">9:41</span><span>▲▲▲ 🔋</span></div>
 
-            <div class="section">
-                <div class="section-header">
-                    <h2 class="section-title">Featured Dishes</h2>
-                    <span class="see-all" onclick="showPage('menu')">See All</span>
-                </div>
-                <div class="dish-scroll">
-                    <div class="dish-card" onclick="addToCart('Butter Chicken', 299)">
-                        <div class="dish-image">
-                            <span class="dish-badge">Bestseller</span>
-                            <i class="fas fa-drumstick-bite"></i>
-                        </div>
-                        <div class="dish-info">
-                            <h3 class="dish-name">Butter Chicken</h3>
-                            <p class="dish-price">₹299</p>
-                        </div>
-                    </div>
-                    <div class="dish-card" onclick="addToCart('Paneer Tikka', 249)">
-                        <div class="dish-image">
-                            <i class="fas fa-cheese"></i>
-                        </div>
-                        <div class="dish-info">
-                            <h3 class="dish-name">Paneer Tikka</h3>
-                            <p class="dish-price">₹249</p>
-                        </div>
-                    </div>
-                    <div class="dish-card" onclick="addToCart('Biryani', 349)">
-                        <div class="dish-image">
-                            <span class="dish-badge">Popular</span>
-                            <i class="fas fa-bowl-rice"></i>
-                        </div>
-                        <div class="dish-info">
-                            <h3 class="dish-name">Hyderabadi Biryani</h3>
-                            <p class="
+<div id="page-home" class="page active">
+  <div class="hero">
+    <h1>Sharma Store</h1>
+    <p>Your trusted neighborhood store, delivered instantly 🚀</p>
+    <div class="delivery-banner">
+      <div class="icon">⚡</div>
+      <div class="text">
+        <strong>10-Minute Delivery</strong>
+        <span>Free delivery on orders above ₹199</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="search-box">
+    <input type="text" placeholder="Search household essentials...">
+    <button class="voice-btn" onclick="showToast('🎤 Voice search activated!')">🎤</button>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <h2>Shop by Category</h2>
+      <a href="#" onclick="showPage('page-list',document.querySelectorAll('.nav-item')[1]);return false">View All →</a>
+    </div>
+    <div class="categories">
+      <div class="category-chip active">🧼 Cleaning</div>
+      <div class="category-chip">🍽️ Kitchen</div>
+      <div class="category-chip">🧴 Personal Care</div>
+      <div class="category-chip">🏠 Household</div>
+      <div class="category-chip">🧺 Laundry</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <h2>⚡ Flash Deals</h2>
+    </div>
+    <div class="offers-carousel">
+      <div class="offer-card">
+        <h3>🎉 Flat 30% OFF</h3>
+        <p>On all cleaning supplies today</p>
+      </div>
+      <div class="offer-card">
+        <h3>🚀 Free Delivery</h3>
+        <p>No minimum order till midnight</p>
+      </div>
+      <div class="offer-card">
+        <h3>💰 Save ₹100</h3>
+        <p>On orders above ₹499</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <h2>🔥 Trending Products</h2>
+    </div>
+    <div class="product-grid">
+      <div class="product-card">
+        <div class="product-img">
+          🧼
+          <span class="badge">POPULAR</span>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Vim Dishwash Bar</div>
+          <div class="product-rating">★★★★★ (324)</div>
+          <div class="product-price">
+            <span class="price">₹29</span>
+            <button class="add-btn" onclick="addToCart('Vim Dishwash Bar', 29)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-img">
+          🧴
+          <span class="badge new">NEW</span>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Surf Excel Liquid</div>
+          <div class="product-rating">★★★★☆ (198)</div>
+          <div class="product-price">
+            <span class="price">₹249</span>
+            <button class="add-btn" onclick="addToCart('Surf Excel Liquid', 249)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-img">🧽</div>
+        <div class="product-info">
+          <div class="product-name">Scotch Brite Scrub</div>
+          <div class="product-rating">★★★★★ (445)</div>
+          <div class="product-price">
+            <span class="price">₹45</span>
+            <button class="add-btn" onclick="addToCart('Scotch Brite Scrub', 45)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-img">
+          🧹
+          <span class="badge">POPULAR</span>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Gala Floor Wiper</div>
+          <div class="product-rating">★★★★☆ (267)</div>
+          <div class="product-price">
+            <span class="price">₹89</span>
+            <button class="add-btn" onclick="addToCart('Gala Floor Wiper', 89)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <h2>🏆 Best Sellers</h2>
+    </div>
+    <div class="product-grid">
+      <div class="product-card">
+        <div class="product-img">🧻</div>
+        <div class="product-info">
+          <div class="product-name">Origami Tissues</div>
+          <div class="product-rating">★★★★★ (512)</div>
+          <div class="product-price">
+            <span class="price">₹120</span>
+            <button class="add-btn" onclick="addToCart('Origami Tissues', 120)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-img">🍽️</div>
+        <div class="product-info">
+          <div class="product-name">Tupperware Set</div>
+          <div class="product-rating">★★★★★ (389)</div>
+          <div class="product-price">
+            <span class="price">₹399</span>
+            <button class="add-btn" onclick="addToCart('Tupperware Set', 399)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-list" class="page">
+  <div class="list-header">
+    <h1>All Products</h1>
+    <p>Fresh household essentials, delivered in 10 minutes</p>
+  </div>
+
+  <div class="filter-chips">
+    <div class="category-chip active">All Items</div>
+    <div class="category-chip">Cleaning</div>
+    <div class="category-chip">Kitchen</div>
+    <div class="category-chip">Laundry</div>
+  </div>
+
+  <div class="product-list">
+    <div class="list-product-card">
+      <div class="list-product-img">🧼</div>
+      <div class="list-product-info">
+        <div class="list-product-name">Vim Dishwash Bar (3 Pack)</div>
+        <div class="product-rating">★★★★★ (324)</div>
+        <div class="list-product-desc">Removes tough grease instantly. Lemon fresh scent.</div>
+        <div class="list-product-footer">
+          <span class="price">₹79</span>
+          <button class="add-btn" onclick="addToCart('Vim Dishwash Bar (3 Pack)', 79)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="list-product-card">
+      <div class="list-product-img">🧴</div>
+      <div class="list-product-info">
+        <div class="list-product-name">Surf Excel Matic Liquid 1L</div>
+        <div class="product-rating">★★★★☆ (198)</div>
+        <div class="list-product-desc">Perfect for automatic washing machines.</div>
+        <div class="list-product-footer">
+          <span class="price">₹249</span>
+          <button class="add-btn" onclick="addToCart('Surf Excel Matic Liquid 1L', 249)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="list-product-card">
+      <div class="list-product-img">🧽</div>
+      <div class="list-product-info">
+        <div class="list-product-name">Scotch Brite Scrub Pad (5 Pc)</div>
+        <div class="product-rating">★★★★★ (445)</div>
+        <div class="list-product-desc">Tough on stains, gentle on surfaces.</div>
+        <div class="list-product-footer">
+          <span class="price">₹125</span>
+          <button class="add-btn" onclick="addToCart('Scotch Brite Scrub Pad (5 Pc)', 125)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="list-product-card">
+      <div class="list-product-img">🧹</div>
+      <div class="list-product-info">
+        <div class="list-product-name">Gala Premium Floor Wiper</div>
+        <div class="product-rating">★★★★☆ (267)</div>
+        <div class="list-product-desc">Extendable handle, super absorbent.</div>
+        <div class="list-product-footer">
+          <span class="price">₹189</span>
+          <button class="add-btn" onclick="addToCart('Gala Premium Floor Wiper', 189)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="list-product-card">
+      <div class="list-product-img">🧻</div>
+      <div class="list-product-info">
+        <div class="list-product-name">Origami Premium Tissues 400 Pulls</div>
+        <div class="product-rating">★★★★★ (512)</div>
+        <div class="list-product-desc">3-ply soft tissues, hygienic packaging.</div>
+        <div class="list-product-footer">
+          <span class="price">₹120</span>
+          <button class="add-btn" onclick="addToCart('Origami Premium Tissues 400 Pulls', 120)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="list-product-card">
+      <div class="list-product-img">🍽️</div>
+      <div class="list-product-info">
+        <div class="list-product-name">Tupperware Container Set 4 Pcs</div>
+        <div class="product-rating">★★★★★ (389)</div>
+        <div class="list-product-desc">Airtight, microwave safe, BPA free.</div>
+        <div class="list-product-footer">
+          <span class="price">₹399</span>
+          <button class="add-btn" onclick="addToCart('Tupperware Container Set 4 Pcs', 399)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="list-product-card">
+      <div class="list-product-img">🧴</div>
+      <div class="list-product-info">
+        <div class="list-product-name">Dettol Handwash 750ml</div>
+        <div class="product-rating">★★★★★ (678)</div>
+        <div class="list-product-desc">Original, kills 99.9% germs instantly.</div>
+        <div class="list-product-footer">
+          <span class="price">₹149</span>
+          <button class="add-btn" onclick="addToCart('Dettol Handwash 750ml', 149)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="list-product-card">
+      <div class="list-product-img">🧽</div>
+      <div class="list-product-info">
+        <div class="list-product-name">Lizol Floor Cleaner 975ml</div>
+        <div class="product-rating">★★★★☆ (334)</div>
+        <div class="list-product-desc">Jasmine fragrance, disinfectant formula.</div>
+        <div class="list-product-footer">
+          <span class="price">₹199</span>
+          <button class="add-btn" onclick="addToCart('Lizol Floor Cleaner 975ml', 199)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="list-product-card">
+      <div class="list-product-img">🧺</div>
+      <div class="list-product-info">
+        <div class="list-product-name">Ariel Matic Powder 2kg</div>
+        <div class="product-rating">★★★★★ (456)</div>
+        <div class="list-product-desc">Tough stain removal in just 1 wash.</div>
+        <div class="list-product-footer">
+          <span class="price">₹379</span>
+          <button class="add-btn" onclick="addToCart('Ariel Matic Powder 2kg', 379)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="list-product-card">
+      <div class="list-product-img">🧹</div>
+      <div class="list-product-info">
+        <div class="list-product-name">Cello Kleeno Dustpan & Brush Set</div>
+        <div class="product-rating">★★★★☆ (223)</div>
+        <div class="list-product-desc">Ergonomic design, durable plastic.</div>
+        <div class="list-product-footer">
+          <span class="price">₹129</span>
+          <button class="add-btn" onclick="addToCart('Cello Kleeno Dustpan & Brush Set', 129)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="list-product-card">
+      <div class="list-product-img">🧴</div>
+      <div class="list-product-info">
+        <div class="list-product-name">Colin Glass Cleaner 500ml</div>
+        <div class="product-rating">★★★★★ (401)</div>
+        <div class="list-product-desc">Streak-free shine for all glass surfaces.</div>
+        <div class="list-product-footer">
+          <span class="price">₹89</span>
+          <button class="add-btn" onclick="addToCart('Colin Glass Cleaner 500ml', 89)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="list-product-card">
+      <div class="list-product-img">🧻</div>
+      <div class="list-product-info">
+        <div class="list-product-name">Odonil Room Freshener Pack of 3</div>
+        <div class="product-rating">★★★★☆ (312)</div>
+        <div class="list-product-desc">Lavender meadows fragrance, long lasting.</div>
+        <div class="list-product-footer">
+          <span class="price">₹159</span>
+          <button class="add-btn" onclick="addToCart('Odonil Room Freshener Pack of 3', 159)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-cart" class="page">
+<div style="padding:20px">
+<h2 style="margin-bottom:16px;font-size:20px;display:flex;align-items:center;gap:8px;color:var(--primary)">🛒 My Cart</h2>
+<div id="cartList"><p style="text-align:center;padding:40px;color:var(--text2)">Your cart is empty<br><span style="font-size:12px">Add items to get started!</span></p></div>
+<div style="margin-top:16px;padding:16px;background:var(--surface);backdrop-filter:blur(20px);border:1px solid rgba(212,175,55,0.2);border-radius:20px;display:flex;justify-content:space-between;align-items:center">
+<span style="font-weight:600;color:var(--text2)">Total Amount</span>
+<span id="cartTotal" style="font-size:22px;font-weight:900;color:var(--primary)">₹0</span>
+</div>
+<button onclick="placeOrder()" style="width:100%;margin-top:14px;padding:16px;background:linear-gradient(135deg, var(--primary), #B8941F);color:#000;border:none;border-radius:20px;font-size:16px;font-weight:900;cursor:pointer;box-shadow:0 8px 24px rgba(212,175,55,0.5);transition:all 0.3s">🚀 Place Order - 10 Min Delivery</button>
+<div style="margin-top:16px;padding:14px;background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.3);border-radius:16px;text-align:center">
+<span style="font-size:13px;color:var(--text2)">⚡ Free delivery on orders above ₹199</span>
+</div>
+</div>
+</div>
+
+<div id="page-profile" class="page">
+  <div class="profile-header">
+    <div class="avatar">👤</div>
+    <div class="profile-name">Rajesh Sharma</div>
+    <div class="profile-phone">+91 98765 43210</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-box">
+      <span class="value">24</span>
+      <span class="label">Orders</span>
+    </div>
+    <div class="stat-box">
+      <span class="value">₹8.9K</span>
+      <span class="label">Spent</span>
+    </div>
+    <div class="stat-box">
+      <span class="value">12</span>
+      <span class="label">Saved</span>
+    </div>
+  </div>
+
+  <div class="menu-list">
+    <div class="menu-item" onclick="showToast('📍 Address management coming soon!')">
+      <div class="icon">📍</div>
+      <div class="text">
+        <strong>My Addresses</strong>
+        <span>Manage delivery locations</span>
+      </div>
+      <div class="arrow">›</div>
+    </div>
+
+    <div class="menu-item" onclick="showToast('📦 Order history loading...')">
+      <div class="icon">📦</div>
+      <div class="text">
+        <strong>Order History</strong>
+        <span>View past orders</span>
+      </div>
+      <div class="arrow">›</div>
+    </div>
+
+    <div class="menu-item" onclick="showToast('💳 Payment settings opening...')">
+      <div class="icon">💳</div>
+      <div class="text">
+        <strong>Payment Methods</strong>
+        <span>Cards, UPI & wallets</span>
+      </div>
+      <div class="arrow">›</div>
+    </div>
+
+    <div class="menu-item" onclick="showToast('🎁 Offers page loading...')">
+      <div class="icon">🎁</div>
+      <div class="text">
+        <strong>Offers & Coupons</strong>
+        <span>Save on every order</span>
+      </div>
+      <div class="arrow">›</div>
+    </div>
+
+    <div class="menu-item" onclick="showToast('⭐ Share your feedback!')">
+      <div class="icon">⭐</div>
+      <div class="text">
+        <strong>Rate Sharma Store</strong>
+        <span>Help us improve</span>
+      </div>
+      <div class="arrow">›</div>
+    </div>
+
+    <div class="menu-item" onclick="showToast('📞 Customer support: 1800-123-4567')">
+      <div class="icon">💬</div>
+      <div class="text">
+        <strong>Help & Support</strong>
+        <span>24/7 customer service</span>
+      </div>
+      <div class="arrow">›</div>
+    </div>
+
+    <div class="menu-item" onclick="showToast('⚙️ Settings panel opening...')">
+      <div class="icon">⚙️</div>
+      <div class="text">
+        <strong>Settings</strong>
+        <span>Notifications & preferences</span>
+      </div>
+      <div class="arrow">›</div>
+    </div>
+
+    <div class="menu-item" onclick="showToast('👋 Logged out successfully!')">
+      <div class="icon">🚪</div>
+      <div class="text">
+        <strong>Logout</strong>
+        <span>Sign out of your account</span>
+      </div>
+      <div class="arrow">›</div>
+    </div>
+  </div>
+
+  <div style="padding:20px;text-align:center;color:var(--text2);font-size:12px;margin-top:20px">
+    <p style="margin-bottom:8px">🏪 Sharma Store v2.1.0</p>
+    <p>Your trusted neighborhood store since 2020</p>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-item active" onclick="showPage('page-home',this)"><span class="ni">🏠</span><span class="nl">Home</span></div>
+  <div class="nav-item" onclick="showPage('page-list',this)"><span class="ni">🛍️</span><span class="nl">Products</span></div>
+  <div class="nav-item" onclick="showPage('page-cart',this)"><span class="nav-icon-wrap"><span class="ni">🛒</span><span class="cart-badge" id="cartBadge"></span></span><span class="nl">Cart</span></div>
+  <div class="nav-item" onclick="showPage('page-profile',this)"><span class="ni">👤</span><span class="nl">Profile</span></div>
+</div>
+
+<script>
+var _cart=[],_cartCount=0;
+function showPage(id,el){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});var t=document.getElementById(id);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');}
+function addToCart(name,price){_cart.push({name:name,price:Number(price)});_cartCount++;var b=document.getElementById('cartBadge');if(b){b.textContent=_cartCount;b.style.display='flex';}showToast(name+' added! 🛒');updateCartPage();}
+function removeFromCart(i){_cart.splice(i,1);_cartCount--;var b=document.getElementById('cartBadge');if(b){b.textContent=_cartCount>0?_cartCount:'';if(_cartCount<=0)b.style.display='none';}updateCartPage();}
+function updateCartPage(){var list=document.getElementById('cartList');var total=document.getElementById('cartTotal');if(!list)return;if(_cart.length===0){list.innerHTML='<p style="text-align:center;padding:40px;color:var(--text2)">Your cart is empty<br><span style="font-size:12px">Add items to get started!</span></p>';if(total)total.textContent='₹0';return;}list.innerHTML=_cart.map(function(item,i){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid rgba(212,175,55,0.15)"><span style="font-weight:600;color:var(--text)">'+item.name+'</span><div style="display:flex;align-items:center;gap:10px"><span style="font-weight:700;color:var(--primary)">₹'+item.price+'</span><button onclick="removeFromCart('+i+')" style="background:linear-gradient(135deg, #D4AF37, #B8941F);color:#000;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:16px;line-height:1;font-weight:900;box-shadow:0 4px 12px rgba(212,175,55,0.5)">−</button></div></div>';}).join('');var sum=_cart.reduce(function(a,b){return a+b.price;},0);if(total)total.textContent='₹'+sum;}
+function placeOrder(){if(_cart.length===0){showToast('Add items first!');return;}_cart=[];_cartCount=0;var b=document.getElementById('cartBadge');if(b){b.style.display='none';b.textContent='';}updateCartPage();showToast('🎉 Order placed! Arriving in 10 minutes!');showPage('page-home',document.querySelector('.nav-item'));}
+function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:82px;left:50%;transform:translateX(-50%);background:rgba(10,10,10,0.98);backdrop-filter:blur(20px);color:var(--primary);padding:12px 24px;border-radius:24px;font-size:13px;font-weight:600;z-index:9999;white-space:nowrap;pointer-events:none;box-shadow:0 8px 24px rgba(212,175,55,0.5);border:1px solid rgba(212,175,55,0.3);animation:toastSlide 0.3s ease;';document.body.appendChild(t);setTimeout(function(){t.remove();},2500);}
+setInterval(function(){var now=new Date();var h=now.getHours()%12||12;var m=String(now.getMinutes()).padStart(2,'0');var el=document.getElementById('statusTime');if(el)el.textContent=h+':'+m;},30000);
+
+/* ── SHARMA STORE APP SPECIFIC JS ── */
+
+// Category chip interactions
+document.addEventListener('DOMContentLoaded', function() {
+  const categoryChips = document.querySelectorAll('.category-chip');
+  categoryChips.forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      categoryChips.forEach(function(c) { c.classList.remove('active'); });
+      this.classList.add('active');
+      showToast('Showing ' + this.textContent + ' products');
+    });
+  });
+
+  // Add smooth scroll behavior
+  const carousels = document.querySelectorAll('.categories, .offers-carousel');
+  carousels.forEach(function(carousel) {
+    carousel.style.scrollBehavior = 'smooth';
+  });
+});
+
+// Animate elements on page load
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes toastSlide {
+    from { opacity: 0; transform: translate(-50%, 20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+  .product-card, .list-product-card, .menu-item {
+    animation: fadeInUp 0.4s ease forwards;
+    opacity: 0;
+  }
+  .product-card:nth-child(1), .list-product-card:nth-child(1) { animation-delay: 0.05s; }
+  .product-card:nth-child(2), .list-product-card:nth-child(2) { animation-delay: 0.1s; }
+  .product-card:nth-child(3), .list-product-card:nth-child(3) { animation-delay: 0.15s; }
+  .product-card:nth-child(4), .list-product-card:nth-child(4) { animation-delay: 0.2s; }
+  .product-card:nth-child(5), .list-product-card:nth-child(5) { animation-delay: 0.25s; }
+  .product-card:nth-child(6), .list-product-card:nth-child(6) { animation-delay: 0.3s; }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+`;
+document.head.appendChild(style);
+
+</script>
+<script>var _cart=[],_cartCount=0;
+function showPage(id,el){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});var t=document.getElementById(id);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');}
+function addToCart(name,price){_cart.push({name:name,price:Number(price)});_cartCount++;var b=document.getElementById('cartBadge');if(b){b.textContent=_cartCount;b.style.display='flex';}showToast(name+' added! 🛒');updateCartPage();}
+function removeFromCart(i){_cart.splice(i,1);_cartCount--;var b=document.getElementById('cartBadge');if(b){b.textContent=_cartCount>0?_cartCount:'';if(_cartCount<=0)b.style.display='none';}updateCartPage();}
+function updateCartPage(){var list=document.getElementById('cartList');var total=document.getElementById('cartTotal');if(!list)return;if(_cart.length===0){list.innerHTML='<p style="text-align:center;padding:40px;opacity:0.5">Cart is empty</p>';if(total)total.textContent='₹0';return;}list.innerHTML=_cart.map(function(item,i){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid rgba(128,128,128,0.2)"><span>'+item.name+'</span><div style="display:flex;align-items:center;gap:10px"><span style="font-weight:700">₹'+item.price+'</span><button onclick="removeFromCart('+i+')" style="background:#ff5757;color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:15px;line-height:1">−</button></div></div>';}).join('');var sum=_cart.reduce(function(a,b){return a+b.price;},0);if(total)total.textContent='₹'+sum;}
+function placeOrder(){if(_cart.length===0){showToast('Add items first!');return;}_cart=[];_cartCount=0;var b=document.getElementById('cartBadge');if(b){b.style.display='none';b.textContent='';}updateCartPage();showToast('🎉 Order placed! Thank you!');var firstNav=document.querySelector('.nav-item');showPage('page-home',firstNav);}
+function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:82px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;white-space:nowrap;pointer-events:none;';document.body.appendChild(t);setTimeout(function(){t.remove();},2500);}
+setInterval(function(){var now=new Date();var h=now.getHours()%12||12;var m=String(now.getMinutes()).padStart(2,'0');var el=document.getElementById('statusTime');if(el)el.textContent=h+':'+m;},30000);</script>
+</body>
+</html>
