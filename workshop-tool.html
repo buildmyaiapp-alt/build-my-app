@@ -737,22 +737,39 @@ async function modifyApp() {
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
         max_tokens: 16000,
-        system: `You are an app designer. You apply visual and content changes to existing HTML apps. You change only what is asked. You never change function names, element IDs, or class names that control navigation and cart.
+        system: `You are an expert mobile app developer. You add fully working features to existing HTML apps. Every feature you add must actually work — no fake or placeholder functionality.
 
-CRITICAL — NEVER CHANGE THESE (they are pre-built working code):
+PROTECTED — NEVER CHANGE THESE:
 - Function names: showPage, addToCart, removeFromCart, updateCartPage, placeOrder, showToast
 - Element IDs: page-home, page-list, page-cart, page-profile, cartBadge, cartList, cartTotal, statusTime
 - Class names: page, nav-item, bottom-nav, ni, nl, nav-icon-wrap, cart-badge
-- The onclick attributes on .nav-item elements
+- The onclick attributes on existing .nav-item elements
 
-WHAT YOU CAN CHANGE FREELY:
-- Colors (CSS variables --primary, --bg, --surface, --text)
-- Text content, headings, item names, prices, descriptions
-- Images placeholders, icons, emojis
-- Card layouts, spacing, fonts
-- Add new items to lists
-- Add new sections inside existing page divs
-- App name and branding
+WORKING FEATURE PATTERNS — use these when adding features:
+
+LOGIN/SIGNUP — use localStorage to save user, show/hide pages:
+function doLogin(){ var u=document.getElementById('loginUser').value; var p=document.getElementById('loginPass').value; if(u&&p){localStorage.setItem('loggedUser',u); showPage('page-home',document.querySelector('.nav-item')); showToast('Welcome '+u+'!');} else showToast('Fill all fields!'); }
+function doLogout(){ localStorage.removeItem('loggedUser'); showPage('page-login',null); }
+
+SEARCH/FILTER — filter visible cards by input text:
+function doSearch(q){ document.querySelectorAll('.item-card').forEach(function(c){ c.style.display=c.textContent.toLowerCase().includes(q.toLowerCase())?'':'none'; }); }
+
+BOOKING/FORM — save to localStorage array, show confirmation:
+function submitBooking(){ var d={}; document.querySelectorAll('#bookingForm input,#bookingForm select').forEach(function(i){d[i.name]=i.value;}); var b=JSON.parse(localStorage.getItem('bookings')||'[]'); b.push(d); localStorage.setItem('bookings',JSON.stringify(b)); showToast('Booking confirmed!'); showPage('page-home',document.querySelector('.nav-item')); }
+
+COUNTER/QUANTITY — increment/decrement with display update:
+function changeQty(id,delta){ var el=document.getElementById(id); var v=parseInt(el.textContent||0)+delta; if(v<0)v=0; el.textContent=v; }
+
+TOGGLE/FAVOURITE — toggle heart/star state:
+function toggleFav(btn){ btn.textContent=btn.textContent==='🤍'?'❤️':'🤍'; }
+
+RULES FOR NEW FEATURES:
+- Every button MUST have a working onclick
+- Forms MUST save data to localStorage and show toast confirmation
+- Login MUST actually check fields and save user to localStorage
+- Search MUST filter items in real time
+- New pages need class="page" and unique id, added to bottom-nav if needed
+- NEVER add a feature that does nothing when clicked
 
 Return the COMPLETE HTML. Raw HTML only. No markdown. No explanation.`,
         messages: [{
@@ -760,10 +777,12 @@ Return the COMPLETE HTML. Raw HTML only. No markdown. No explanation.`,
           content: `App idea: ${originalIdea || 'mobile app'}
 Requested change: ${changes}
 
+IMPORTANT: Make this feature FULLY WORKING. Use localStorage for data. Every button must do something real. No placeholder functions.
+
 Current code:
 ${generatedCode}
 
-Apply ONLY the requested change. Keep everything else exactly the same. Return complete HTML.`
+Apply the requested change with fully working functionality. Return complete HTML.`
         }]
       })
     });
