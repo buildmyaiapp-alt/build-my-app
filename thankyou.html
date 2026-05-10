@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>You're In! 🎉 AI App Workshop — May 17</title>
+
+  <!-- Facebook Pixel -->
+  <script>
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+  document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '1489981779278274');
+  fbq('track', 'PageView');
+
+  // Fire Purchase ONCE only
+  (function() {
+    var alreadyFired = sessionStorage.getItem('purchase_fired');
+    if (!alreadyFired) {
+      fbq('track', 'Purchase', {
+        value: 99,
+        currency: 'INR',
+        content_name: 'AI App Building Workshop - May 17',
+        content_type: 'product'
+      });
+      sessionStorage.setItem('purchase_fired', '1');
+    }
+  })();
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=1489981779278274&ev=Purchase&cd[value]=99&cd[currency]=INR&noscript=1"/></noscript>
+
+  <!-- Notify Apps Script of confirmed payment -->
+  <script>
+  (function() {
+    var alreadyNotified = sessionStorage.getItem('sheet_notified');
+    if (alreadyNotified) return;
+    var APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbyOmAD732invkJoQskwjUTHzASzf8DYbc-gnpECreIif8xuaAvOqMaopRoioEDo-i8Uew/exec';
+    try {
+      var pending = JSON.parse(sessionStorage.getItem('pending_lead') || '{}');
+      var name  = pending.name  || sessionStorage.getItem('buyer_name') || 'Customer';
+      var email = pending.email || '';
+      var phone = pending.phone || '';
+      if (email || phone) {
+        var params = new URLSearchParams({
+          name: name, email: email, phone: phone,
+          paymentId: 'RAZORPAY_PAID_' + Date.now(), status: 'PAID'
+        });
+        new Image().src = APPS_SCRIPT + '?' + params.toString();
+        sessionStorage.setItem('sheet_notified', '1');
+      }
+    } catch(err) {}
+  })();
+  </script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Inter',sans-serif;background:linear-gradient(160deg,#060d2e 0%,#0d1b6e 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+    .card{background:#fff;border-radius:24px;padding:36px 28px;max-width:500px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+    .emoji{font-size:56px;margin-bottom:10px;}
+    h1{font-size:24px;font-weight:900;color:#0d1b6e;margin-bottom:8px;line-height:1.2;}
+    .sub{font-size:14px;color:#666;margin-bottom:20px;line-height:1.6;}
+
+    /* Countdown box */
+    .wa-box{background:linear-gradient(135deg,#e8f5e9,#d0f0da);border:2.5px solid #25D366;border-radius:20px;padding:22px 20px;margin-bottom:18px;}
+    .wa-label{font-size:12px;font-weight:800;color:#1a6b35;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+    .countdown{font-size:64px;font-weight:900;color:#128C4F;line-height:1;margin:4px 0 6px;}
+    .wa-hint{font-size:13px;color:#2e7d32;margin-bottom:16px;}
+    .whatsapp-btn{display:block;background:#25D366;color:#fff;text-decoration:none;padding:18px 24px;border-radius:14px;font-size:17px;font-weight:900;box-shadow:0 6px 24px rgba(37,211,102,0.45);transition:transform 0.15s,box-shadow 0.15s;}
+    .whatsapp-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(37,211,102,0.5);}
+
+    .detail-box{background:#f5f5f7;border-radius:14px;padding:16px 18px;margin-bottom:16px;text-align:left;}
+    .detail-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #e5e5e5;font-size:14px;}
+    .detail-row:last-child{border-bottom:none;}
+    .detail-label{color:#777;font-weight:500;}
+    .detail-value{color:#0d1b6e;font-weight:700;}
+    .guarantee{background:#fff8e1;border:2px solid #FFD700;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#444;line-height:1.5;}
+    .back-btn{color:#bbb;font-size:12px;text-decoration:none;font-weight:600;}
+  </style>
+
+  <script>
+    var WA_GROUP = 'https://chat.whatsapp.com/C4wmu9pLd707uR0bVAoMbz';
+    var secs = 5;
+    function tick() {
+      var el = document.getElementById('countNum');
+      if (!el) return;
+      el.textContent = secs;
+      if (secs <= 0) {
+        window.location.href = WA_GROUP;
+        return;
+      }
+      secs--;
+      setTimeout(tick, 1000);
+    }
+    window.addEventListener('load', function() { setTimeout(tick, 800); });
+  </script>
+</head>
+<body>
+  <div class="card">
+    <div class="emoji">🎉</div>
+    <h1>Payment Done! You're In!</h1>
+    <p class="sub">Your seat for May 17th is confirmed. Joining you to the WhatsApp group automatically...</p>
+
+    <!-- AUTO-REDIRECT COUNTDOWN -->
+    <div class="wa-box">
+      <div class="wa-label">⚡ Joining WhatsApp Group in</div>
+      <div class="countdown" id="countNum">5</div>
+      <div class="wa-hint">seconds — or tap below to join right now</div>
+      <a href="https://chat.whatsapp.com/C4wmu9pLd707uR0bVAoMbz" class="whatsapp-btn">💬 Join WhatsApp Group Now →</a>
+    </div>
+
+    <div class="detail-box">
+      <div class="detail-row"><span class="detail-label">📅 Date</span><span class="detail-value">17th May 2026</span></div>
+      <div class="detail-row"><span class="detail-label">⏰ Time</span><span class="detail-value">2:00 PM IST</span></div>
+      <div class="detail-row"><span class="detail-label">📍 Platform</span><span class="detail-value">Live on Zoom</span></div>
+      <div class="detail-row"><span class="detail-label">💰 Amount Paid</span><span class="detail-value">₹99 ✅</span></div>
+    </div>
+
+    <div class="guarantee">🛡️ <strong>110% Money Back Guarantee</strong> — If you can't build your app in 30 minutes, get ₹124 back.</div>
+
+    <a href="https://buildmyaiapp-alt.github.io/build-my-app/" class="back-btn">← Back to Home</a>
+  </div>
+</body>
+</html>

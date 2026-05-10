@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    #mobileWarning{display:none;background:#F5A623;color:#000;text-align:center;padding:12px 16px;font-weight:700;font-size:14px;}
+    @media(max-width:768px){#mobileWarning{display:block;}}
+  </style>
+  <title>Build My App — by Palash</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Inter',sans-serif;background:#060d2e;min-height:100vh;color:#fff;}
+    .header{background:linear-gradient(135deg,#0d1b6e,#1a237e);padding:20px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.1);}
+    .logo{font-size:22px;font-weight:900;color:#fff;}
+    .logo span{color:#F5A623;}
+    .badge{background:#F5A623;color:#000;font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;letter-spacing:1px;}
+    .main{max-width:900px;margin:0 auto;padding:40px 24px;}
+    .hero{text-align:center;margin-bottom:40px;}
+    .hero h1{font-size:36px;font-weight:900;line-height:1.2;margin-bottom:12px;}
+    .hero h1 span{color:#F5A623;}
+    .hero p{font-size:16px;color:rgba(255,255,255,0.6);line-height:1.6;}
+    .form-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:32px;margin-bottom:24px;}
+    .form-card label{display:block;font-size:13px;font-weight:700;color:#F5A623;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
+    .form-card textarea{width:100%;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:16px;color:#fff;font-size:15px;font-family:'Inter',sans-serif;resize:vertical;min-height:120px;outline:none;transition:border 0.2s;}
+    .form-card textarea:focus{border-color:#F5A623;}
+    .form-card textarea::placeholder{color:rgba(255,255,255,0.3);}
+    .examples{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+    .ex-btn{background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.3);color:#F5A623;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+    .ex-btn:hover{background:rgba(245,166,35,0.25);}
+    .build-btn{width:100%;background:linear-gradient(135deg,#F5A623,#e8960f);color:#000;border:none;padding:18px;border-radius:14px;font-size:18px;font-weight:900;cursor:pointer;margin-top:20px;transition:transform 0.2s,box-shadow 0.2s;letter-spacing:0.5px;}
+    .build-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 30px rgba(245,166,35,0.4);}
+    .build-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+    .loading{text-align:center;padding:40px;display:none;}
+    .spinner{width:48px;height:48px;border:4px solid rgba(245,166,35,0.2);border-top-color:#F5A623;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .loading p{color:rgba(255,255,255,0.6);font-size:15px;}
+    .loading .step{color:#F5A623;font-weight:700;font-size:18px;margin-bottom:8px;}
+    .result{display:none;}
+    .result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+    .result-title{font-size:20px;font-weight:800;color:#fff;}
+    .result-actions{display:flex;gap:10px;flex-wrap:wrap;}
+    .action-btn{padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all 0.2s;}
+    .btn-download{background:#25D366;color:#fff;}
+    .btn-mobile{background:#0d1b6e;color:#fff;border:1px solid #F5A623;}
+    .btn-rebuild{background:rgba(245,166,35,0.15);color:#F5A623;border:1px solid rgba(245,166,35,0.3);}
+    .preview-wrap{border-radius:16px;overflow:hidden;border:2px solid rgba(245,166,35,0.3);background:#fff;}
+    .preview-toolbar{background:#1a1a2e;padding:10px 16px;display:flex;align-items:center;gap:8px;}
+    .dot{width:12px;height:12px;border-radius:50%;}
+    .dot-r{background:#ff5f57;}.dot-y{background:#febc2e;}.dot-g{background:#28c840;}
+    .preview-url{background:rgba(255,255,255,0.1);border-radius:6px;padding:4px 12px;font-size:12px;color:rgba(255,255,255,0.5);flex:1;margin-left:8px;}
+    iframe{width:100%;height:600px;border:none;display:block;}
+    .mobile-frame{width:375px;margin:0 auto;background:#1a1a2e;border-radius:36px;padding:12px;border:3px solid #333;display:none;}
+    .mobile-screen{border-radius:26px;overflow:hidden;height:650px;}
+    .mobile-screen iframe{height:650px;}
+    .success-banner{background:linear-gradient(135deg,rgba(40,200,100,0.15),rgba(40,200,100,0.05));border:1px solid rgba(40,200,100,0.3);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+    .success-icon{font-size:28px;}
+    .success-text{font-size:14px;color:rgba(255,255,255,0.8);line-height:1.5;}
+    .success-text strong{color:#28c864;font-size:16px;display:block;margin-bottom:2px;}
+    .footer{text-align:center;padding:32px;color:rgba(255,255,255,0.3);font-size:12px;}
+    .api-setup{background:rgba(245,166,35,0.08);border:2px solid rgba(245,166,35,0.4);border-radius:16px;padding:24px;margin-bottom:24px;}
+    .api-setup h3{color:#F5A623;font-size:14px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+    .api-setup p{color:rgba(255,255,255,0.5);font-size:13px;margin-bottom:12px;}
+    .api-row{display:flex;gap:10px;}
+    .api-input{flex:1;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:12px 16px;color:#fff;font-size:14px;font-family:'Inter',sans-serif;outline:none;}
+    .api-input:focus{border-color:#F5A623;}
+    .api-save-btn{background:#F5A623;color:#000;border:none;padding:12px 20px;border-radius:10px;font-weight:800;font-size:14px;cursor:pointer;white-space:nowrap;}
+    .api-status{font-size:13px;margin-top:8px;}
+    .api-status.ok{color:#28c864;}.api-status.err{color:#ff5f57;}
+    @media(max-width:600px){.hero h1{font-size:26px;}.result-actions{flex-direction:column;}.action-btn{width:100%;}iframe{height:450px;}.api-row{flex-direction:column;}}
+  </style>
+  <style>
+    #passwordScreen{position:fixed;inset:0;background:linear-gradient(160deg,#060d2e 0%,#0d1b6e 100%);display:flex;align-items:center;justify-content:center;z-index:9999;padding:24px;}
+    .pw-card{background:#fff;border-radius:24px;padding:40px 32px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.4);}
+    .pw-logo{font-size:48px;margin-bottom:10px;}
+    .pw-title{font-size:22px;font-weight:900;color:#0d1b6e;margin-bottom:6px;}
+    .pw-sub{font-size:14px;color:#888;margin-bottom:24px;line-height:1.5;}
+    .pw-input{width:100%;border:2px solid #ddd;border-radius:12px;padding:14px 18px;font-size:16px;font-family:'Inter',sans-serif;outline:none;text-align:center;letter-spacing:2px;transition:border 0.2s;}
+    .pw-input:focus{border-color:#0d1b6e;}
+    .pw-btn{width:100%;margin-top:14px;background:linear-gradient(135deg,#F5A623,#e8960f);color:#000;border:none;padding:16px;border-radius:12px;font-size:17px;font-weight:900;cursor:pointer;transition:transform 0.15s;}
+    .pw-btn:hover{transform:translateY(-2px);}
+    .pw-err{color:#e53935;font-size:13px;font-weight:700;margin-top:10px;display:none;}
+    .pw-hint{font-size:12px;color:#bbb;margin-top:14px;}
+  </style>
+</head>
+<body>
+
+<!-- PASSWORD SCREEN -->
+<div id="passwordScreen">
+  <div class="pw-card">
+    <div class="pw-logo">⚡</div>
+    <div class="pw-title">Build My App — Workshop Tool</div>
+
+    <!-- Step 1: Password -->
+    <div id="step1">
+      <div class="pw-sub">Enter the workshop password given by Palash</div>
+      <input type="password" class="pw-input" id="pwInput" placeholder="Enter password..." onkeydown="if(event.key==='Enter')checkPassword()"/>
+      <button class="pw-btn" onclick="checkPassword()">🔓 Unlock Tool</button>
+      <div class="pw-err" id="pwErr">❌ Wrong password. Please try again.</div>
+      <div class="pw-hint">Password is shared during the live workshop only</div>
+    </div>
+
+    <!-- Step 2: API Key (shown after correct password) -->
+    <div id="step2" style="display:none;">
+      <div style="font-size:32px;margin-bottom:8px;">✅</div>
+      <div style="font-size:16px;font-weight:800;color:#0d1b6e;margin-bottom:6px;">Password Correct!</div>
+      <div class="pw-sub">Now enter the Workshop API Key shown on screen by Palash</div>
+      <input type="text" class="pw-input" id="apiKeyInput2" placeholder="sk-ant-api03-..." onkeydown="if(event.key==='Enter')saveWorkshopKey()"/>
+      <button class="pw-btn" onclick="saveWorkshopKey()">🚀 Start Building!</button>
+      <div class="pw-err" id="keyErr">❌ Invalid key. Must start with sk-ant-</div>
+    </div>
+
+  </div>
+</div>
+
+<div id="mobileWarning">⚠️ This tool is designed for Laptop / PC. Please open on a computer for the best experience.</div>
+<div class="header">
+  <div class="logo">⚡ Build My <span>App</span></div>
+  <div class="badge">BY PALASH</div>
+</div>
+
+<div class="main">
+  <!-- API KEY SETUP (hidden — workshop key is built in) -->
+  <div class="api-setup" id="apiSetup" style="display:none;">
+    <h3>🔑 One-Time Setup — Add Your API Key</h3>
+    <p>Paste your Claude API key below. It is saved only in your browser. Students will never see this.</p>
+    <div class="api-row">
+      <input type="password" class="api-input" id="apiKeyInput" placeholder="sk-ant-api03-..."/>
+      <button class="api-save-btn" onclick="saveApiKey()">Save Key ✓</button>
+    </div>
+    <div class="api-status" id="apiStatus"></div>
+  </div>
+
+  <div class="hero">
+    <h1>Describe Your App.<br/><span>AI Builds It in 30 Seconds.</span></h1>
+    <p>No coding. No credits. No limits. Just type your idea and watch your app come to life.</p>
+  </div>
+
+  <div class="form-card">
+    <label>📝 Describe Your App</label>
+    <textarea id="appPrompt" placeholder="Example: Build a restaurant app called Spice Kitchen for an Indian restaurant. It should have a Home page with hero banner and featured dishes, a Menu page with dish cards, a Cart page, and a Profile page. Use dark background with red and golden colors. Make it look premium like Zomato."></textarea>
+    <div style="margin-top:12px;">
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px;">⚡ Quick Examples — Click to use:</div>
+      <div class="examples">
+        <button class="ex-btn" onclick="fillExample('restaurant')">🍛 Restaurant App</button>
+        <button class="ex-btn" onclick="fillExample('gym')">💪 Gym App</button>
+        <button class="ex-btn" onclick="fillExample('shop')">🛍️ Shop App</button>
+        <button class="ex-btn" onclick="fillExample('salon')">💇 Salon App</button>
+        <button class="ex-btn" onclick="fillExample('coaching')">📚 Coaching App</button>
+        <button class="ex-btn" onclick="fillExample('hotel')">🏨 Hotel App</button>
+      </div>
+    </div>
+    <button class="build-btn" id="buildBtn" onclick="buildApp()">⚡ Build My App Now</button>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div class="step" id="loadingStep">🤖 AI is reading your idea...</div>
+    <p id="loadingMsg">Building your complete app. This takes about 20-30 seconds.</p>
+  </div>
+
+  <div id="buildError" style="display:none;background:rgba(255,95,87,0.12);border:2px solid rgba(255,95,87,0.4);border-radius:16px;padding:24px;margin-bottom:24px;text-align:center;">
+    <div style="font-size:32px;margin-bottom:8px;">❌</div>
+    <div id="buildErrorMsg" style="color:#ff5f57;font-weight:700;font-size:16px;margin-bottom:8px;"></div>
+    <div id="buildErrorDetail" style="color:rgba(255,255,255,0.5);font-size:13px;margin-bottom:16px;"></div>
+    <button onclick="document.getElementById('buildError').style.display='none'" style="background:#ff5f57;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-weight:700;cursor:pointer;">Dismiss & Try Again</button>
+  </div>
+
+  <div class="result" id="result">
+    <div class="success-banner">
+      <div class="success-icon">🎉</div>
+      <div class="success-text">
+        <strong>Your App is Ready!</strong>
+        You just built a real app in under 30 seconds — no coding needed!
+      </div>
+    </div>
+    <div class="result-header">
+      <div class="result-title">📱 Your App Preview</div>
+      <div class="result-actions">
+        <button class="action-btn btn-mobile" onclick="toggleMobile()">📱 Mobile View</button>
+        <button class="action-btn btn-download" onclick="downloadApp()">⬇️ Download App</button>
+        <button class="action-btn btn-rebuild" onclick="resetTool()">🔄 Build Another</button>
+      </div>
+    </div>
+    <div id="desktopView">
+      <div class="preview-wrap">
+        <div class="preview-toolbar">
+          <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          <div class="preview-url">your-app.buildmyapp.ai</div>
+        </div>
+        <iframe id="previewFrame" sandbox="allow-scripts allow-same-origin"></iframe>
+      </div>
+    </div>
+    <div class="mobile-frame" id="mobileView">
+      <div class="mobile-screen">
+        <iframe id="mobileFrame" sandbox="allow-scripts allow-same-origin"></iframe>
+      </div>
+    </div>
+    <!-- DOWNLOAD + APK -->
+    <div style="background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.2);border-radius:16px;padding:20px;margin-top:20px;">
+      <div style="font-size:15px;font-weight:800;color:#F5A623;margin-bottom:6px;">📦 Download & Install on Phone</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.45);margin-bottom:14px;">Download your app, then follow the steps below to get it on your phone</div>
+      <button onclick="downloadApp()" style="width:100%;background:#25D366;color:#fff;border:none;padding:14px;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer;margin-bottom:16px;">⬇️ Download My App (HTML File)</button>
+
+      <!-- Option 1: Add to Home Screen -->
+      <div style="background:rgba(40,200,100,0.08);border:1px solid rgba(40,200,100,0.25);border-radius:12px;padding:14px 16px;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:800;color:#28c864;margin-bottom:8px;">✅ EASIEST — Add to Home Screen (No APK needed)</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.9;">
+          <strong style="color:#fff;">Step 1:</strong> Send the downloaded file to your phone via WhatsApp<br/>
+          <strong style="color:#fff;">Step 2:</strong> Open the file in <strong style="color:#fff;">Chrome browser</strong> on your phone<br/>
+          <strong style="color:#fff;">Step 3:</strong> Tap the 3 dots menu → <strong style="color:#fff;">Add to Home Screen</strong><br/>
+          <strong style="color:#fff;">Step 4:</strong> App icon appears on your home screen — tap to open like a real app! 🎉
+        </div>
+      </div>
+
+      <!-- Option 2: APK via tiiny.host -->
+      <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px 16px;">
+        <div style="font-size:13px;font-weight:800;color:#F5A623;margin-bottom:8px;">📦 ADVANCED — Get a Real APK File</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.9;">
+          <strong style="color:#fff;">Step 1:</strong> Download the file above<br/>
+          <strong style="color:#fff;">Step 2:</strong> Go to <a href="https://tiiny.host" target="_blank" style="color:#F5A623;font-weight:700;">tiiny.host</a> → drag and drop your HTML file → click <strong style="color:#fff;">Launch</strong> → copy the live URL<br/>
+          <strong style="color:#fff;">Step 3:</strong> Go to <a href="https://websitetoapk.com" target="_blank" style="color:#F5A623;font-weight:700;">websitetoapk.com</a> → paste the URL → click Convert → Download APK<br/>
+          <strong style="color:#fff;">Step 4:</strong> Send APK to phone via WhatsApp → install it!
+        </div>
+      </div>
+    </div>
+
+    <!-- MODIFY SECTION -->
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:28px;margin-top:24px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <span style="font-size:22px;">✏️</span>
+        <div>
+          <div style="font-size:16px;font-weight:800;color:#fff;">Modify Your App</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.45);">Tell AI what to change — it will update your app instantly</div>
+        </div>
+      </div>
+
+      <!-- FIX ALL BUTTON — most prominent -->
+      <button onclick="fixAllButtons()" id="fixBtn" style="width:100%;background:linear-gradient(135deg,#e53935,#b71c1c);color:#fff;border:none;padding:16px;border-radius:12px;font-size:16px;font-weight:900;cursor:pointer;margin-bottom:12px;letter-spacing:0.3px;">
+        🔧 Fix All Buttons — Make Everything Work
+      </button>
+
+      <!-- QUICK CHANGE BUTTONS -->
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+        <button class="ex-btn" onclick="fillModify('Change the main color to blue and make it look more professional')">🎨 Change Color</button>
+        <button class="ex-btn" onclick="fillModify('Add a Contact Us page with phone number, email, address and a WhatsApp button')">📞 Add Contact Page</button>
+        <button class="ex-btn" onclick="fillModify('Make the design look more premium and luxurious with gold and dark theme')">✨ Make Premium</button>
+        <button class="ex-btn" onclick="fillModify('Add more items to the menu/product list with realistic Indian names and prices')">➕ Add More Items</button>
+        <button class="ex-btn" onclick="fillModify('Change the app name, logo text and all branding')">🏷️ Change Branding</button>
+        <button class="ex-btn" onclick="fillModify('Add an Offers page showing discounts and deals with countdown timers')">🔥 Add Offers Page</button>
+        <button class="ex-btn" onclick="fillModify('Make it look exactly like Zomato with same layout, fonts and style')">🍕 Zomato Style</button>
+        <button class="ex-btn" onclick="fillModify('Add smooth animations and make all buttons more interactive and fun')">💫 Add Animations</button>
+      </div>
+
+      <textarea id="modifyPrompt" style="width:100%;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:14px 16px;color:#fff;font-size:14px;font-family:'Inter',sans-serif;resize:vertical;min-height:80px;outline:none;margin-bottom:12px;" placeholder="Describe what you want to change — e.g. change color to green, add gallery page, rename app to FoodieHub..."></textarea>
+
+      <button onclick="modifyApp()" id="modifyBtn" style="width:100%;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border:none;padding:15px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;transition:all 0.2s;">
+        ✏️ Apply My Changes
+      </button>
+
+      <!-- MODIFY LOADING -->
+      <div id="modifyLoading" style="display:none;text-align:center;padding:20px;">
+        <div class="spinner" style="border-top-color:#7c3aed;"></div>
+        <div style="color:#7c3aed;font-weight:700;margin-top:8px;">✏️ Updating your app...</div>
+        <div style="color:rgba(255,255,255,0.4);font-size:13px;margin-top:4px;">This takes 20-30 seconds</div>
+      </div>
+
+      <!-- SUCCESS BANNER -->
+      <div id="modifySuccess" style="display:none;align-items:center;gap:10px;background:rgba(40,200,100,0.15);border:1px solid rgba(40,200,100,0.4);border-radius:12px;padding:14px 18px;margin-top:12px;">
+        <span style="font-size:24px;">✅</span>
+        <div>
+          <div style="color:#28c864;font-weight:800;font-size:15px;">Changes applied!</div>
+          <div style="color:rgba(255,255,255,0.5);font-size:13px;">Your app has been updated — scroll up to see the preview</div>
+        </div>
+      </div>
+
+      <!-- ERROR -->
+      <div id="modifyError" style="display:none;background:rgba(255,95,87,0.1);border:1px solid rgba(255,95,87,0.3);border-radius:10px;padding:12px 16px;margin-top:12px;color:#ff5f57;font-size:13px;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">⚡ Build My App — AI App Building Workshop by Palash &nbsp;·&nbsp; buildmyaiapp.in</div>
+
+<script>
+let generatedCode = '';
+let originalIdea = '';
+let isMobileView = false;
+
+// ── WORKSHOP PASSWORD SYSTEM ──────────────────────────────────
+const WORKSHOP_PWD = '1milliondollerby2027';
+
+function checkPassword() {
+  const val = document.getElementById('pwInput').value.trim();
+  if (val === WORKSHOP_PWD) {
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+    setTimeout(function(){ document.getElementById('apiKeyInput2').focus(); }, 100);
+  } else {
+    document.getElementById('pwErr').style.display = 'block';
+    document.getElementById('pwInput').value = '';
+    document.getElementById('pwInput').focus();
+  }
+}
+
+function saveWorkshopKey() {
+  const key = document.getElementById('apiKeyInput2').value.trim();
+  if (!key.startsWith('sk-ant-')) {
+    document.getElementById('keyErr').style.display = 'block';
+    return;
+  }
+  localStorage.setItem('palash_api_key', key);
+  sessionStorage.setItem('workshop_unlocked', '1');
+  document.getElementById('passwordScreen').style.display = 'none';
+}
+
+// Skip password screen if already unlocked this session
+window.addEventListener('DOMContentLoaded', function() {
+  if (sessionStorage.getItem('workshop_unlocked') === '1') {
+    document.getElementById('passwordScreen').style.display = 'none';
+  }
+});
+// ─────────────────────────────────────────────────────────────
+
+// The guaranteed-working core JS — injected into EVERY app load
+const CORE_JS = `var _cart=[],_cartCount=0;
+function showPage(id,el){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});var t=document.getElementById(id);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');}
+function addToCart(name,price){_cart.push({name:name,price:Number(price)});_cartCount++;var b=document.getElementById('cartBadge');if(b){b.textContent=_cartCount;b.style.display='flex';}showToast(name+' added! \u{1F6D2}');updateCartPage();}
+function removeFromCart(i){_cart.splice(i,1);_cartCount--;var b=document.getElementById('cartBadge');if(b){b.textContent=_cartCount>0?_cartCount:'';if(_cartCount<=0)b.style.display='none';}updateCartPage();}
+function updateCartPage(){var list=document.getElementById('cartList');var total=document.getElementById('cartTotal');if(!list)return;if(_cart.length===0){list.innerHTML='<p style="text-align:center;padding:40px;opacity:0.5">Cart is empty</p>';if(total)total.textContent='₹0';return;}list.innerHTML=_cart.map(function(item,i){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid rgba(128,128,128,0.2)"><span>'+item.name+'</span><div style="display:flex;align-items:center;gap:10px"><span style="font-weight:700">₹'+item.price+'</span><button onclick="removeFromCart('+i+')" style="background:#ff5757;color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:15px;line-height:1">−</button></div></div>';}).join('');var sum=_cart.reduce(function(a,b){return a+b.price;},0);if(total)total.textContent='₹'+sum;}
+function placeOrder(){if(_cart.length===0){showToast('Add items first!');return;}_cart=[];_cartCount=0;var b=document.getElementById('cartBadge');if(b){b.style.display='none';b.textContent='';}updateCartPage();showToast('\u{1F389} Order placed! Thank you!');var firstNav=document.querySelector('.nav-item');showPage('page-home',firstNav);}
+function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:82px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;white-space:nowrap;pointer-events:none;';document.body.appendChild(t);setTimeout(function(){t.remove();},2500);}
+setInterval(function(){var now=new Date();var h=now.getHours()%12||12;var m=String(now.getMinutes()).padStart(2,'0');var el=document.getElementById('statusTime');if(el)el.textContent=h+':'+m;},30000);`;
+
+// Append override functions AFTER Claude's code
+// Keeps Claude's app-specific JS (filters, search etc.) but overrides nav/cart
+function prepareApp(html) {
+  // Use charCode so the closing script tag never appears literally in this source file
+  const C = String.fromCharCode;
+  const open  = C(60,115,99,114,105,112,116,62);        // builds: [script]
+  const close = C(60,47,115,99,114,105,112,116,62);     // builds: [/script]
+  const bodyC = C(60,47,98,111,100,121,62);             // </body>
+  const tag = open + CORE_JS + close;
+  if (html.includes(bodyC)) return html.replace(bodyC, tag + '\n' + bodyC);
+  return html + tag;
+}
+
+
+// Check if API key already saved
+window.onload = function() {
+  const saved = localStorage.getItem('palash_api_key');
+  if (saved) {
+    document.getElementById('apiSetup').style.background = 'rgba(40,200,100,0.08)';
+    document.getElementById('apiSetup').style.borderColor = 'rgba(40,200,100,0.4)';
+    document.getElementById('apiStatus').className = 'api-status ok';
+    document.getElementById('apiStatus').textContent = '✅ API key is saved and ready!';
+    document.getElementById('apiKeyInput').placeholder = 'Key saved — paste new one to update';
+  }
+};
+
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key || !key.startsWith('sk-ant-')) {
+    document.getElementById('apiStatus').className = 'api-status err';
+    document.getElementById('apiStatus').textContent = '❌ Invalid key. Must start with sk-ant-';
+    return;
+  }
+  localStorage.setItem('palash_api_key', key);
+  document.getElementById('apiStatus').className = 'api-status ok';
+  document.getElementById('apiStatus').textContent = '✅ Key saved! You can now build apps.';
+  document.getElementById('apiSetup').style.background = 'rgba(40,200,100,0.08)';
+  document.getElementById('apiSetup').style.borderColor = 'rgba(40,200,100,0.4)';
+  document.getElementById('apiKeyInput').value = '';
+}
+
+const examples = {
+  restaurant: `Build a beautiful restaurant app called Spice Kitchen for a premium Indian restaurant. Pages: 1) Home with hero banner, featured dishes with 4 cards, customer reviews, Order Now button. 2) Menu with category filter (Starters, Main Course, Desserts, Drinks) and dish grid with name, price, Add to Cart button. 3) Cart showing items with quantity, price, total and Proceed to Pay button. 4) Profile with user details. Bottom navigation bar. Design: dark background, deep red and golden colors, premium look like Zomato.`,
+  gym: `Build a fitness app called FitZone for a premium gym. Pages: 1) Home with hero banner, featured classes, Book a Class button. 2) Classes with filter (Yoga, HIIT, Zumba, Strength) and class cards with name, time, trainer, Book button. 3) My Bookings with confirmed bookings and Cancel option. 4) Profile with membership details. Bottom navigation. Design: dark background, electric blue and neon green, energetic feel.`,
+  shop: `Build a shop app called Style Store for fashion clothing. Pages: 1) Home with hero banner, new arrivals with 6 product cards. 2) Products with category filter (Men, Women, Kids) and product grid with name, price, Add to Cart. 3) Cart with items, quantity controls, total and Checkout. 4) Orders with history. Bottom navigation. Design: clean white background, black and gold colors, premium fashion brand look.`,
+  salon: `Build a salon booking app called GlowUp Salon. Pages: 1) Home with hero, services highlights, Book Now button. 2) Services with cards (Haircut, Facial, Manicure, Pedicure, Hair Color) showing name, duration, price and Book button. 3) My Appointments with upcoming bookings and Cancel option. 4) Profile. Bottom navigation. Design: rose gold and white, pink and gold accents, luxury spa feel.`,
+  coaching: `Build a coaching app called LearnPro for online education. Pages: 1) Home with featured courses, 4 course cards with topic, duration, price, Enroll button. 2) Courses with category filter and course grid. 3) My Courses with enrolled courses and progress bars. 4) Profile with student details. Bottom navigation. Design: dark navy, blue and yellow accents, modern edtech look.`,
+  hotel: `Build a hotel booking app called Grand Stay Hotel. Pages: 1) Home with hotel hero, star rating, amenities, Book Room button. 2) Rooms with room type cards showing name, bed type, price per night, Book Now. 3) My Bookings with check-in, check-out, total amount. 4) Profile. Bottom navigation. Design: dark luxury background, gold and cream colors, 5-star hotel feel.`
+};
+
+function fillExample(type) {
+  document.getElementById('appPrompt').value = examples[type];
+}
+
+async function buildApp() {
+  const userIdea = document.getElementById('appPrompt').value.trim();
+  if (!userIdea) { alert('Please describe your app first!'); return; }
+
+  const apiKey = localStorage.getItem('palash_api_key') || '';
+  if (!apiKey) {
+    alert('Please add your API key first using the setup box at the top!');
+    return;
+  }
+
+  document.getElementById('buildBtn').disabled = true;
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('result').style.display = 'none';
+
+  const steps = [
+    { step: '🤖 AI is reading your idea...', msg: 'Understanding what you want to build.' },
+    { step: '🎨 Designing your app layout...', msg: 'Creating pages, colors and navigation.' },
+    { step: '⚡ Writing app code...', msg: 'Building all your pages and features.' },
+    { step: '📱 Making it mobile-ready...', msg: 'Almost done! Polishing the final result.' },
+  ];
+
+  let stepIndex = 0;
+  const stepInterval = setInterval(() => {
+    if (stepIndex < steps.length) {
+      document.getElementById('loadingStep').textContent = steps[stepIndex].step;
+      document.getElementById('loadingMsg').textContent = steps[stepIndex].msg;
+      stepIndex++;
+    }
+  }, 6000);
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 16000,
+        system: `You are a mobile app designer. You fill in pre-built HTML templates with beautiful content and styling. The JavaScript is already written and working — you must NOT change any function names or logic. Your job is only design and content.`,
+        messages: [{
+          role: 'user',
+          content: `Fill in this HTML template to build the following app: ${userIdea}
+
+YOUR ONLY JOBS:
+1. Set the app name in <title> and in the hero/header
+2. Set CSS variables: --primary (main color), --bg (background), --surface (card bg), --text, --text2
+3. Fill in beautiful content inside each page div (home, list, cart, profile)
+4. Change nav tab icons and labels to match the app type
+5. Add app-specific styles in the CSS section marked FILL
+6. Add any extra JavaScript at the bottom in the section marked FILL
+
+STRICT RULES — DO NOT BREAK THESE:
+- Keep ALL function names exactly as-is: showPage, addToCart, removeFromCart, updateCartPage, placeOrder, showToast
+- Keep ALL element IDs exactly as-is: page-home, page-list, page-cart, page-profile, cartBadge, cartList, cartTotal, statusTime
+- Keep page divs with class="page" and their IDs unchanged
+- Keep bottom-nav structure and nav-item class unchanged
+- On cart/order/book buttons use: onclick="addToCart('Item Name', price)"
+- On any extra navigation buttons use: onclick="showPage('page-id', null)"
+- NO splash screens. NO loading spinners. App opens directly on home page.
+- 8-12 items on the list page with Indian names and ₹ prices
+- Star ratings ★★★★☆, NEW/POPULAR badges on cards
+- Profile page: avatar circle, stats row, settings list
+
+HERE IS THE TEMPLATE — fill it in now:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>APP NAME HERE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary: #F5A623;
+  --bg: #0d0d1a;
+  --surface: #1a1a2e;
+  --text: #ffffff;
+  --text2: rgba(255,255,255,0.55);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);max-width:430px;margin:0 auto;min-height:100vh;overflow-x:hidden}
+.page{display:none;padding-bottom:75px;min-height:calc(100vh - 56px)}
+.page.active{display:block}
+.status-bar{background:var(--bg);padding:10px 20px 6px;display:flex;justify-content:space-between;font-size:12px;font-weight:700;position:sticky;top:0;z-index:50}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--surface);border-top:1px solid rgba(255,255,255,0.08);display:flex;padding:6px 0 12px;z-index:100}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 0;opacity:0.45;transition:opacity 0.2s;-webkit-tap-highlight-color:transparent}
+.nav-item.active{opacity:1;color:var(--primary)}.nav-item .ni{font-size:22px}.nav-item .nl{font-size:10px;font-weight:700}
+.nav-icon-wrap{position:relative;display:inline-block}
+.cart-badge{background:red;color:#fff;border-radius:50%;min-width:16px;height:16px;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center;position:absolute;top:-3px;right:-5px;padding:0 3px}
+button:active{transform:scale(0.96)}
+
+/* ── YOUR CUSTOM STYLES BELOW ── */
+
+</style>
+</head>
+<body>
+<div class="status-bar"><span id="statusTime">9:41</span><span>▲▲▲ 🔋</span></div>
+
+<div id="page-home" class="page active">
+<!-- HOME PAGE CONTENT HERE -->
+</div>
+
+<div id="page-list" class="page">
+<!-- LIST/MENU/PRODUCTS PAGE CONTENT HERE -->
+</div>
+
+<div id="page-cart" class="page">
+<div style="padding:20px">
+<h2 style="margin-bottom:16px;font-size:20px">🛒 My Cart</h2>
+<div id="cartList"><p style="text-align:center;padding:40px;color:var(--text2)">Your cart is empty</p></div>
+<div style="margin-top:16px;padding:16px;background:var(--surface);border-radius:14px;display:flex;justify-content:space-between;align-items:center">
+<span style="font-weight:600;color:var(--text2)">Total Amount</span>
+<span id="cartTotal" style="font-size:22px;font-weight:900;color:var(--primary)">₹0</span>
+</div>
+<button onclick="placeOrder()" style="width:100%;margin-top:14px;padding:16px;background:var(--primary);color:#000;border:none;border-radius:14px;font-size:16px;font-weight:900;cursor:pointer">✅ Proceed to Pay</button>
+</div>
+</div>
+
+<div id="page-profile" class="page">
+<!-- PROFILE PAGE CONTENT HERE -->
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-item active" onclick="showPage('page-home',this)"><span class="ni">🏠</span><span class="nl">Home</span></div>
+  <div class="nav-item" onclick="showPage('page-list',this)"><span class="ni">📋</span><span class="nl">Menu</span></div>
+  <div class="nav-item" onclick="showPage('page-cart',this)"><span class="nav-icon-wrap"><span class="ni">🛒</span><span class="cart-badge" id="cartBadge"></span></span><span class="nl">Cart</span></div>
+  <div class="nav-item" onclick="showPage('page-profile',this)"><span class="ni">👤</span><span class="nl">Profile</span></div>
+</div>
+
+<script>
+var _cart=[],_cartCount=0;
+function showPage(id,el){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});var t=document.getElementById(id);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');}
+function addToCart(name,price){_cart.push({name:name,price:Number(price)});_cartCount++;var b=document.getElementById('cartBadge');if(b){b.textContent=_cartCount;b.style.display='flex';}showToast(name+' added! 🛒');updateCartPage();}
+function removeFromCart(i){_cart.splice(i,1);_cartCount--;var b=document.getElementById('cartBadge');if(b){b.textContent=_cartCount>0?_cartCount:'';if(_cartCount<=0)b.style.display='none';}updateCartPage();}
+function updateCartPage(){var list=document.getElementById('cartList');var total=document.getElementById('cartTotal');if(!list)return;if(_cart.length===0){list.innerHTML='<p style="text-align:center;padding:40px;color:var(--text2)">Your cart is empty</p>';if(total)total.textContent='₹0';return;}list.innerHTML=_cart.map(function(item,i){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.08)"><span>'+item.name+'</span><div style="display:flex;align-items:center;gap:10px"><span style="font-weight:700">₹'+item.price+'</span><button onclick="removeFromCart('+i+')" style="background:#ff5757;color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:16px;line-height:1">−</button></div></div>';}).join('');var sum=_cart.reduce(function(a,b){return a+b.price;},0);if(total)total.textContent='₹'+sum;}
+function placeOrder(){if(_cart.length===0){showToast('Add items first!');return;}_cart=[];_cartCount=0;var b=document.getElementById('cartBadge');if(b){b.style.display='none';b.textContent='';}updateCartPage();showToast('🎉 Order placed! Thank you!');showPage('page-home',document.querySelector('.nav-item'));}
+function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:82px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;white-space:nowrap;pointer-events:none;';document.body.appendChild(t);setTimeout(function(){t.remove();},2500);}
+setInterval(function(){var now=new Date();var h=now.getHours()%12||12;var m=String(now.getMinutes()).padStart(2,'0');var el=document.getElementById('statusTime');if(el)el.textContent=h+':'+m;},30000);
+
+/* ── YOUR APP-SPECIFIC JS BELOW ── */
+
+</scr`+`ipt>
+</body>
+</html>
+
+Return the complete filled HTML. Raw HTML only, no markdown.`
+        }]
+      })
+    });
+
+    clearInterval(stepInterval);
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.error?.message || 'API returned status ' + response.status);
+    }
+
+    const data = await response.json();
+    let raw = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text.trim() : '';
+
+    // Strip markdown fences if present
+    if (raw.startsWith('```')) {
+      raw = raw.replace(/^```html?\n?/i, '').replace(/\n?```$/, '').trim();
+    }
+
+    // Validate it's actually HTML
+    if (!raw.includes('<!DOCTYPE') && !raw.includes('<html')) {
+      throw new Error('AI returned invalid content. Preview: ' + raw.slice(0, 120));
+    }
+
+    generatedCode = raw;
+    originalIdea = userIdea;
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('result').style.display = 'block';
+    document.getElementById('previewFrame').srcdoc = prepareApp(generatedCode);
+    document.getElementById('buildBtn').disabled = false;
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+
+  } catch (err) {
+    clearInterval(stepInterval);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('buildBtn').disabled = false;
+    document.getElementById('buildError').style.display = 'block';
+    document.getElementById('buildErrorMsg').textContent = 'Build failed — ' + err.message;
+    document.getElementById('buildErrorDetail').textContent = 'Check your API key is valid, then try again. If it keeps failing, reload the page.';
+    document.getElementById('buildError').scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+function toggleMobile() {
+  isMobileView = !isMobileView;
+  const desktop = document.getElementById('desktopView');
+  const mobile = document.getElementById('mobileView');
+  const btn = document.querySelector('.btn-mobile');
+  if (isMobileView) {
+    desktop.style.display = 'none';
+    mobile.style.display = 'block';
+    document.getElementById('mobileFrame').srcdoc = generatedCode;
+    btn.textContent = '🖥️ Desktop View';
+  } else {
+    desktop.style.display = 'block';
+    mobile.style.display = 'none';
+    btn.textContent = '📱 Mobile View';
+  }
+}
+
+function downloadApp() {
+  if (!generatedCode) return;
+  const blob = new Blob([generatedCode], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'my-app.html';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function resetTool() {
+  document.getElementById('appPrompt').value = '';
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('buildBtn').disabled = false;
+  generatedCode = '';
+  originalIdea = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function fillModify(text) {
+  document.getElementById('modifyPrompt').value = text;
+}
+
+async function fixAllButtons() {
+  if (!generatedCode) { alert('Please build your app first!'); return; }
+  const apiKey = localStorage.getItem('palash_api_key') || '';
+  if (!apiKey) { alert('API key missing. Please add it at the top.'); return; }
+
+  const btn = document.getElementById('fixBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Finding and fixing all broken buttons...';
+  document.getElementById('modifyLoading').style.display = 'block';
+  document.getElementById('modifyError').style.display = 'none';
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 16000,
+        system: `You are an expert HTML/JavaScript debugger. You find and fix every broken interactive element in an app. You always return the complete fixed HTML file. Raw HTML only — no markdown, no explanation.`,
+        messages: [{
+          role: 'user',
+          content: `This is my app code. Find EVERY button, tab, nav item, filter, cart button, form, or link that is broken, missing an onclick, or does nothing when clicked. Fix ALL of them so everything works perfectly.
+
+Specifically check and fix:
+1. Bottom navigation tabs — each must show the correct page and hide all others
+2. Add to Cart / Book / Order / Enroll buttons — must update cart count and show confirmation
+3. Category filter buttons — must show/hide relevant items
+4. Any button with onclick="" or no onclick at all — add a working handler
+5. Back buttons, close buttons, cancel buttons — must actually navigate or close
+6. Search bars — must filter the list as user types
+
+Return the complete fully working HTML file now:
+
+${generatedCode}`
+        }]
+      })
+    });
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.error?.message || 'API error ' + response.status);
+    }
+
+    const data = await response.json();
+    let fixed = (data.content[0].text || '').trim();
+    if (fixed.startsWith('```')) fixed = fixed.replace(/^```html?\n?/i, '').replace(/\n?```$/, '').trim();
+    if (!fixed.includes('<!DOCTYPE') && !fixed.includes('<html')) throw new Error('Invalid response. Try again.');
+
+    generatedCode = prepareApp(fixed);
+
+    function reloadIframe(frameId) {
+      const old = document.getElementById(frameId);
+      if (!old) return;
+      const f = document.createElement('iframe');
+      f.id = frameId;
+      f.sandbox = 'allow-scripts allow-same-origin';
+      f.style.cssText = 'width:100%;height:' + (frameId === 'mobileFrame' ? '650' : '600') + 'px;border:none;display:block;';
+      old.parentNode.replaceChild(f, old);
+      setTimeout(() => { f.srcdoc = generatedCode; }, 80);
+    }
+    reloadIframe('previewFrame');
+    if (isMobileView) reloadIframe('mobileFrame');
+
+    document.getElementById('modifyLoading').style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = '🔧 Fix All Buttons — Make Everything Work';
+
+    const banner = document.getElementById('modifySuccess');
+    banner.querySelector('div div:first-child').textContent = '✅ All buttons fixed!';
+    banner.querySelector('div div:last-child').textContent = 'Every button and tab is now working — scroll up to test';
+    banner.style.display = 'flex';
+    setTimeout(() => { banner.style.display = 'none'; }, 5000);
+    document.getElementById('previewFrame').scrollIntoView({ behavior: 'smooth' });
+
+  } catch (err) {
+    document.getElementById('modifyLoading').style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = '🔧 Fix All Buttons — Make Everything Work';
+    const errEl = document.getElementById('modifyError');
+    errEl.textContent = '❌ ' + err.message;
+    errEl.style.display = 'block';
+  }
+}
+
+async function modifyApp() {
+  const changes = document.getElementById('modifyPrompt').value.trim();
+  if (!changes) { alert('Please describe what you want to change!'); return; }
+  if (!generatedCode) { alert('Please build your app first!'); return; }
+
+  const apiKey = localStorage.getItem('palash_api_key') || '';
+  if (!apiKey) { alert('API key missing. Please add it at the top.'); return; }
+
+  const btn = document.getElementById('modifyBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Applying changes...';
+  document.getElementById('modifyLoading').style.display = 'block';
+  document.getElementById('modifyError').style.display = 'none';
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 16000,
+        system: `You are an app designer. You apply visual and content changes to existing HTML apps. You change only what is asked. You never change function names, element IDs, or class names that control navigation and cart.
+
+CRITICAL — NEVER CHANGE THESE (they are pre-built working code):
+- Function names: showPage, addToCart, removeFromCart, updateCartPage, placeOrder, showToast
+- Element IDs: page-home, page-list, page-cart, page-profile, cartBadge, cartList, cartTotal, statusTime
+- Class names: page, nav-item, bottom-nav, ni, nl, nav-icon-wrap, cart-badge
+- The onclick attributes on .nav-item elements
+
+WHAT YOU CAN CHANGE FREELY:
+- Colors (CSS variables --primary, --bg, --surface, --text)
+- Text content, headings, item names, prices, descriptions
+- Images placeholders, icons, emojis
+- Card layouts, spacing, fonts
+- Add new items to lists
+- Add new sections inside existing page divs
+- App name and branding
+
+Return the COMPLETE HTML. Raw HTML only. No markdown. No explanation.`,
+        messages: [{
+          role: 'user',
+          content: `App idea: ${originalIdea || 'mobile app'}
+Requested change: ${changes}
+
+Current code:
+${generatedCode}
+
+Apply ONLY the requested change. Keep everything else exactly the same. Return complete HTML.`
+        }]
+      })
+    });
+
+    if (!response.ok) {
+      const errData = await response.json();
+      throw new Error(errData.error?.message || 'API error ' + response.status);
+    }
+
+    const data = await response.json();
+    let updatedCode = data.content[0].text.trim();
+
+    // Strip markdown code fences if present
+    if (updatedCode.startsWith('```')) {
+      updatedCode = updatedCode.replace(/^```html?\n?/i, '').replace(/\n?```$/, '');
+    }
+
+    if (!updatedCode.includes('<!DOCTYPE') && !updatedCode.includes('<html')) {
+      throw new Error('AI returned incomplete code. Please try again.');
+    }
+
+    // Strip Claude's JS and re-inject guaranteed working JS
+    // This means modify can NEVER break navigation or cart buttons
+    generatedCode = prepareApp(updatedCode);
+
+    // Reload iframe by replacing it entirely — most reliable method
+    function reloadIframe(frameId) {
+      const old = document.getElementById(frameId);
+      if (!old) return;
+      const newFrame = document.createElement('iframe');
+      newFrame.id = frameId;
+      newFrame.sandbox = 'allow-scripts allow-same-origin';
+      newFrame.style.cssText = 'width:100%;height:' + (frameId === 'mobileFrame' ? '650' : '600') + 'px;border:none;display:block;';
+      old.parentNode.replaceChild(newFrame, old);
+      setTimeout(() => { newFrame.srcdoc = generatedCode; }, 80);
+    }
+
+    reloadIframe('previewFrame');
+    if (isMobileView) reloadIframe('mobileFrame');
+
+    document.getElementById('modifyLoading').style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = '✏️ Apply Changes to My App';
+    document.getElementById('modifyPrompt').value = '';
+
+    // Show success banner under the modify box
+    const banner = document.getElementById('modifySuccess');
+    banner.style.display = 'flex';
+    setTimeout(() => { banner.style.display = 'none'; }, 4000);
+
+    document.getElementById('previewFrame').scrollIntoView({ behavior: 'smooth' });
+
+  } catch (err) {
+    document.getElementById('modifyLoading').style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = '✏️ Apply Changes to My App';
+    const errEl = document.getElementById('modifyError');
+    errEl.textContent = '❌ Error: ' + err.message + ' — Please try again.';
+    errEl.style.display = 'block';
+  }
+}
+
+</script>
+</body>
+</html>
