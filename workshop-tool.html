@@ -459,7 +459,7 @@ async function buildApp() {
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5',
+        model: 'claude-3-5-haiku-20241022',
         max_tokens: 5000,
         system: `You are a mobile app designer. You fill in pre-built HTML templates with beautiful content and styling. The JavaScript is already written and working — you must NOT change any function names or logic. Your job is only design and content.`,
         messages: [{
@@ -692,7 +692,7 @@ async function fixAllButtons() {
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5',
+        model: 'claude-3-5-haiku-20241022',
         max_tokens: 5000,
         system: `You are an expert HTML/JavaScript debugger. You find and fix every broken interactive element in an app. You always return the complete fixed HTML file. Raw HTML only — no markdown, no explanation.`,
         messages: [{
@@ -784,7 +784,7 @@ async function modifyApp() {
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5',
+        model: 'claude-3-5-haiku-20241022',
         max_tokens: 5000,
         system: `You are a mobile app designer. You fill in pre-built HTML templates with beautiful content and styling. The JavaScript is already written and working — you must NOT change any function names or logic. Your job is only design and content.`,
         messages: [{
