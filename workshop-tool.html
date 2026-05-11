@@ -665,6 +665,11 @@ function downloadApp() {
   URL.revokeObjectURL(url);
 }
 
+function showModifyError(msg) {
+  const el = document.getElementById('modifyError');
+  if (el) { el.textContent = msg; el.style.display = 'block'; el.scrollIntoView({behavior:'smooth'}); }
+}
+
 function resetTool() {
   document.getElementById('appPrompt').value = '';
   document.getElementById('result').style.display = 'none';
@@ -830,14 +835,18 @@ Return the complete updated HTML. Raw HTML only, no markdown.`
       updatedCode = updatedCode.replace(/^```html?\n?/i, '').replace(/\n?```$/, '');
     }
 
-    if (!updatedCode.includes('<!DOCTYPE') && !updatedCode.includes('<html')) {
-      throw new Error('AI returned incomplete code. Please try again.');
+    // Strong validation — must have all required elements or we keep previous version
+    const required = ['<html', 'page-home', 'page-list', 'bottom-nav', '</body>'];
+    const missing = required.filter(function(r){ return !updatedCode.includes(r); });
+    if (missing.length > 0) {
+      throw new Error('AI returned incomplete HTML (missing: ' + missing.join(', ') + '). Your previous app is unchanged — please try again.');
     }
 
-    // Store raw code — CORE_JS injected only at display time, never sent to Claude
+    // Save backup in case something looks wrong
+    const previousCode = generatedCode;
     generatedCode = updatedCode;
 
-    // Reload iframe by replacing it entirely — most reliable method
+    // Reload iframe — if body looks empty, restore previous version
     function reloadIframe(frameId) {
       const old = document.getElementById(frameId);
       if (!old) return;
@@ -846,7 +855,18 @@ Return the complete updated HTML. Raw HTML only, no markdown.`
       newFrame.sandbox = 'allow-scripts allow-same-origin';
       newFrame.style.cssText = 'width:100%;height:' + (frameId === 'mobileFrame' ? '650' : '600') + 'px;border:none;display:block;';
       old.parentNode.replaceChild(newFrame, old);
-      setTimeout(() => { newFrame.srcdoc = prepareApp(generatedCode); }, 80);
+      newFrame.srcdoc = prepareApp(generatedCode);
+      // Fallback: if iframe body is empty after 3s, restore previous working version
+      setTimeout(function() {
+        try {
+          const body = newFrame.contentDocument && newFrame.contentDocument.body;
+          if (body && body.innerHTML.trim().length < 100) {
+            generatedCode = previousCode;
+            newFrame.srcdoc = prepareApp(generatedCode);
+            showModifyError('Screen was blank — restored your previous working app. Please try the change again.');
+          }
+        } catch(e) {}
+      }, 3000);
     }
 
     reloadIframe('previewFrame');
