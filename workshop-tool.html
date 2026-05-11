@@ -367,10 +367,10 @@ onAuthStateChanged(_auth,function(user){if(user){_currentUser=user;document.getE
 // Inject Firebase module + CORE_JS before </body> — never sent to Claude (saves ~100 lines of tokens per call)
 function prepareApp(html) {
   const C = String.fromCharCode;
-  const openMod = C(60,115,99,114,105,112,116,32,116,121,112,101,61,34,109,111,100,117,108,101,34,62); // <script type="module">
-  const open  = C(60,115,99,114,105,112,116,62);        // <script>
-  const close = C(60,47,115,99,114,105,112,116,62);     // </script>
-  const bodyC = C(60,47,98,111,100,121,62);             // </body>
+  const openMod = C(60,115,99,114,105,112,116,32,116,121,112,101,61,34,109,111,100,117,108,101,34,62); // builds: [script type=module]
+  const open  = C(60,115,99,114,105,112,116,62);        // builds: [script]
+  const close = C(60,47,115,99,114,105,112,116,62);     // builds: [/script]
+  const bodyC = C(60,47,98,111,100,121,62);             // builds: [/body]
   const fbTag   = openMod + FIREBASE_JS + close;
   const coreTag = open + CORE_JS + close;
   const inject  = fbTag + '\n' + coreTag;
