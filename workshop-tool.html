@@ -510,183 +510,54 @@ async function buildApp() {
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
         max_tokens: 12000,
-        system: `You are an expert mobile app developer. You build complete, beautiful, fully functional mobile web apps with real working JavaScript. You choose the right architecture based on the app description and write every line of code needed.`,
+        system: `You are a world-class mobile app developer and UI designer. You build stunning, fully functional mobile web apps as complete single HTML files. Every button works. Every feature works. You write clean, bug-free JavaScript. You think like both a designer and an engineer. You never use placeholder content — you write real, complete, working code every time.`,
         messages: [{
           role: 'user',
-          content: `Build this app: ${userIdea}
+          content: `Build a complete, fully working mobile app for: ${userIdea}
 
-STEP 1 — DECIDE which template to use:
-• TEMPLATE A (Simple/localStorage): single-user apps — food ordering, bookings, portfolio, fitness, catalogue, to-do, tracker, any app one person uses alone
-• TEMPLATE B (Firebase/multi-user): apps where DIFFERENT people share data — marketplace, shop+customer platform, delivery platform, social app, admin+user panel, any app with multiple user types who see each other's data
+ARCHITECTURE — choose automatically:
+• If the app needs MULTIPLE DIFFERENT USERS sharing data (marketplace, shop+customer, delivery platform, social, admin panel) → use Firebase Auth + Firestore (multi-user)
+• For everything else (food ordering, booking, fitness, catalogue, portfolio, tracker) → use localStorage (single-user)
 
-STEP 2 — Fill the chosen template completely with beautiful, working code.
+━━━ FOR ALL APPS ━━━
+- Complete single HTML file
+- Mobile-first, max-width 430px, centered on desktop
+- Beautiful premium UI — think Zomato / Swiggy / Uber quality
+- Choose colors that perfectly match the app type
+- Bottom navigation bar with 4 relevant tabs
+- Status bar at top showing time
+- Every single button must have a working onclick handler
+- 8-12 items/products/listings with realistic Indian names and ₹ prices
+- Star ratings ★★★★☆, NEW and POPULAR badges on cards
+- Smooth animations, card shadows, gradient accents
+- NO placeholder text like "Content here" — write real content
 
-══════════════════════════════════════════════
-TEMPLATE A — SIMPLE APP (Single user, saves to device)
-══════════════════════════════════════════════
-Rules:
-- Keep ALL these function names exactly: showPage, addToCart, removeFromCart, updateCartPage, placeOrder, showToast, getMyOrders, showMyOrders
-- Keep ALL these element IDs exactly: page-home, page-list, page-cart, page-profile, cartBadge, cartList, cartTotal, statusTime
-- Keep page divs with class="page", keep bottom-nav structure
-- Add to cart buttons: onclick="addToCart('Name', price)"
-- Navigation buttons: onclick="showPage('page-id', null)"
-- NO splash screens. Opens directly on home page.
-- 8-12 items with Indian names and rupee prices
-- Star ratings, NEW/POPULAR badges
-- Profile page with avatar circle, stats, settings list
+━━━ FOR SINGLE-USER APPS (localStorage) ━━━
+These exact function names MUST exist (framework depends on them):
+  showPage(pageId, navElement) — shows a page, hides others, updates nav active state
+  addToCart(itemName, price) — adds item to cart array, updates badge, shows toast
+  removeFromCart(index) — removes item from cart, updates badge
+  updateCartPage() — renders cart items and total
+  placeOrder() — saves order to localStorage, clears cart, shows confirmation
+  showToast(message) — shows bottom popup message for 2.5 seconds
+  showMyOrders() — renders saved orders in #ordersList element
+These exact element IDs MUST exist: page-home, page-list, page-cart, page-profile, cartBadge, cartList, cartTotal, statusTime
 
-TEMPLATE A HTML:
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>APP NAME HERE</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<style>
-:root{ --primary:#F5A623; --bg:#0d0d1a; --surface:#1a1a2e; --text:#ffffff; --text2:rgba(255,255,255,0.55); }
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);max-width:430px;margin:0 auto;min-height:100vh;overflow-x:hidden}
-.page{display:none;padding-bottom:75px;min-height:calc(100vh - 56px)}.page.active{display:block}
-.status-bar{background:var(--bg);padding:10px 20px 6px;display:flex;justify-content:space-between;font-size:12px;font-weight:700;position:sticky;top:0;z-index:50}
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--surface);border-top:1px solid rgba(255,255,255,0.08);display:flex;padding:6px 0 12px;z-index:100}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 0;opacity:0.45;transition:opacity 0.2s;-webkit-tap-highlight-color:transparent}
-.nav-item.active{opacity:1;color:var(--primary)}.nav-item .ni{font-size:22px}.nav-item .nl{font-size:10px;font-weight:700}
-.nav-icon-wrap{position:relative;display:inline-block}
-.cart-badge{background:red;color:#fff;border-radius:50%;min-width:16px;height:16px;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center;position:absolute;top:-3px;right:-5px;padding:0 3px}
-button:active{transform:scale(0.96)}
-/* YOUR CUSTOM STYLES HERE */
-</style>
-</head>
-<body>
-<div class="status-bar"><span id="statusTime">9:41</span><span>▲▲▲ 🔋</span></div>
-<div id="page-home" class="page active"><!-- HOME PAGE CONTENT HERE --></div>
-<div id="page-list" class="page"><!-- LIST/MENU PAGE CONTENT HERE --></div>
-<div id="page-cart" class="page">
-<div style="padding:20px"><h2 style="margin-bottom:16px;font-size:20px">🛒 My Cart</h2>
-<div id="cartList"><p style="text-align:center;padding:40px;color:var(--text2)">Your cart is empty</p></div>
-<div style="margin-top:16px;padding:16px;background:var(--surface);border-radius:14px;display:flex;justify-content:space-between;align-items:center">
-<span style="font-weight:600;color:var(--text2)">Total</span><span id="cartTotal" style="font-size:22px;font-weight:900;color:var(--primary)">₹0</span></div>
-<button onclick="placeOrder()" style="width:100%;margin-top:14px;padding:16px;background:var(--primary);color:#000;border:none;border-radius:14px;font-size:16px;font-weight:900;cursor:pointer">✅ Proceed to Pay</button>
-</div></div>
-<div id="page-profile" class="page"><!-- PROFILE PAGE CONTENT HERE --></div>
-<div class="bottom-nav">
-<div class="nav-item active" onclick="showPage('page-home',this)"><span class="ni">🏠</span><span class="nl">Home</span></div>
-<div class="nav-item" onclick="showPage('page-list',this)"><span class="ni">📋</span><span class="nl">Menu</span></div>
-<div class="nav-item" onclick="showPage('page-cart',this)"><span class="nav-icon-wrap"><span class="ni">🛒</span><span class="cart-badge" id="cartBadge"></span></span><span class="nl">Cart</span></div>
-<div class="nav-item" onclick="showPage('page-profile',this)"><span class="ni">👤</span><span class="nl">Profile</span></div>
-</div>
-</body></html>
-
-══════════════════════════════════════════════
-TEMPLATE B — FIREBASE APP (Multi-user, real database)
-══════════════════════════════════════════════
-Rules:
-- Firebase config is PRE-FILLED — do NOT change it
-- Write COMPLETE working JavaScript — every function must actually work
-- Auth: signup with role selection (2 user types), login, logout — all working
+━━━ FOR MULTI-USER APPS (Firebase) ━━━
+Use these CDN scripts (compat versions, not modules):
+  firebase-app-compat.js, firebase-auth-compat.js, firebase-firestore-compat.js
+  (from https://www.gstatic.com/firebasejs/10.12.0/)
+Firebase config — use exactly this, do not change:
+  apiKey:"AIzaSyDJC8ijJ-SknWzBUub7GTXSJ3EFeRfHC6c", authDomain:"build-my-app-3c629.firebaseapp.com",
+  projectId:"build-my-app-3c629", storageBucket:"build-my-app-3c629.firebasestorage.app",
+  messagingSenderId:"823433789308", appId:"1:823433789308:web:5a953ee43cd5cf2548aef9"
+- Beautiful auth screen shown first — role selection (2 user types) + email/password + login/signup
 - Save user role to Firestore users collection on signup
-- Each role gets its OWN complete set of screens with bottom navigation
-- Use onSnapshot() for real-time live updates (orders, products, etc.)
-- All Firestore operations must be complete and working (add, read, update)
-- Beautiful premium UI for every screen
-- Role 1 users see data created by Role 2 users and vice versa
+- Each role gets its complete own set of screens
+- Use onSnapshot() for real-time live data updates
+- All Firestore CRUD operations must be complete and working
 
-TEMPLATE B HTML:
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>APP NAME HERE</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js">< /script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js">< /script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js">< /script>
-<style>
-:root{ --primary:#FILL; --bg:#FILL; --surface:#FILL; --text:#fff; --text2:rgba(255,255,255,0.6); }
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);max-width:430px;margin:0 auto;min-height:100vh;overflow-x:hidden}
-.screen{display:none;padding-bottom:80px;min-height:100vh}.screen.active{display:block}
-#authWrap{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--surface);border-top:1px solid rgba(255,255,255,0.08);display:flex;padding:6px 0 12px;z-index:100}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 0;opacity:0.45;transition:opacity 0.2s}
-.nav-item.active{opacity:1;color:var(--primary)}.nav-item .ni{font-size:22px}.nav-item .nl{font-size:10px;font-weight:700}
-button:active{transform:scale(0.96)}
-/* FILL: All your custom styles */
-</style>
-</head>
-<body>
-
-<!-- AUTH SCREEN — always shown first, hides after login -->
-<div id="authWrap">
-<!-- FILL: Beautiful auth UI with role selection -->
-<!-- Include: app logo+name, role picker (e.g. "I am a Customer" vs "I am a Shop Owner"), email+password inputs, login+signup buttons, error display -->
-<div id="authErr" style="color:#ff5757;font-size:12px;margin:8px 0;display:none"></div>
-</div>
-
-<!-- ROLE 1 APP (e.g. Customer) — hidden until logged in as role1 -->
-<div id="app-role1" style="display:none">
-<!-- FILL: Complete app for role1 user -->
-<!-- Multiple screens: <div class="screen active" id="screen-home"> ... </div> -->
-<!-- Bottom nav for role1 -->
-</div>
-
-<!-- ROLE 2 APP (e.g. Shop Owner) — hidden until logged in as role2 -->
-<div id="app-role2" style="display:none">
-<!-- FILL: Complete app for role2 user -->
-<!-- Multiple screens, dashboard, manage products/orders etc. -->
-<!-- Bottom nav for role2 -->
-</div>
-
-<script>
-// ── Firebase (DO NOT CHANGE THIS CONFIG) ───────────────────────
-const _fb = firebase.initializeApp({apiKey:"AIzaSyDJC8ijJ-SknWzBUub7GTXSJ3EFeRfHC6c",authDomain:"build-my-app-3c629.firebaseapp.com",projectId:"build-my-app-3c629",storageBucket:"build-my-app-3c629.firebasestorage.app",messagingSenderId:"823433789308",appId:"1:823433789308:web:5a953ee43cd5cf2548aef9"});
-const _auth = firebase.auth();
-const _db = firebase.firestore();
-let _user = null, _userData = null;
-
-// ── Helpers ─────────────────────────────────────────────────────
-function showToast(msg,ms){var t=document.createElement('div');t.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.92);color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:600;z-index:99999;pointer-events:none;';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove();},ms||2500);}
-function showScreen(id,navEl){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});var s=document.getElementById(id);if(s)s.classList.add('active');document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});if(navEl)navEl.classList.add('active');}
-function showAuthErr(msg){var e=document.getElementById('authErr');e.textContent=msg;e.style.display='block';}
-
-// ── Auth state listener ──────────────────────────────────────────
-_auth.onAuthStateChanged(function(user){
-  if(user){
-    _user=user;
-    document.getElementById('authWrap').style.display='none';
-    _db.collection('users').doc(user.uid).get().then(function(doc){
-      _userData=doc.exists?doc.data():{role:'role1'};
-      var role=_userData.role||'role1';
-      document.getElementById('app-role1').style.display=(role==='role1')?'block':'none';
-      document.getElementById('app-role2').style.display=(role==='role2')?'block':'none';
-      if(typeof onUserReady==='function') onUserReady(user,_userData);
-    });
-  } else {
-    _user=null;_userData=null;
-    document.getElementById('authWrap').style.display='flex';
-    document.getElementById('app-role1').style.display='none';
-    document.getElementById('app-role2').style.display='none';
-  }
-});
-
-// FILL: Complete working code below ──────────────────────────────
-// 1. Auth functions:
-//    fbLogin(email,pass) — _auth.signInWithEmailAndPassword(email,pass)
-//    fbSignup(email,pass,name,role) — createUserWithEmailAndPassword then _db.collection('users').doc(uid).set({name,email,role,...})
-//    fbLogout() — _auth.signOut()
-//
-// 2. Firestore operations (examples):
-//    Add: _db.collection('products').add({name,price,shopId:_user.uid,shopName:_userData.shopName,...})
-//    Read all: _db.collection('products').get().then(snap=>{snap.docs.forEach(d=>{...d.data()...})})
-//    Real-time: _db.collection('orders').where('shopId','==',_user.uid).onSnapshot(snap=>{snap.docs.forEach(d=>{...})})
-//    Update: _db.collection('orders').doc(orderId).update({status:'Delivered'})
-//
-// 3. UI: all render functions, event handlers, form submissions
-// 4. Call onUserReady to load initial data after login
-
-[END TEMPLATE B — close the script tag and body/html tags in your output]
-
-Return ONLY the complete filled HTML. Raw HTML only, no markdown, no explanation.`
+Return the complete HTML file only. No markdown. No explanation. No code fences.`
         }]
       })
     });
@@ -892,22 +763,21 @@ async function modifyApp() {
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
         max_tokens: 12000,
-        system: `You are an expert mobile app developer and code editor. You receive a complete HTML app and make ONLY the specific change requested. You return the complete HTML with just that one change applied — everything else stays exactly the same. You write real, working JavaScript.`,
+        system: `You are a world-class mobile app developer. You receive a complete HTML app and apply the requested change perfectly. You write real, working JavaScript — every button, every feature works after your change. You never break existing functionality.`,
         messages: [{
           role: 'user',
-          content: `Here is a complete mobile app HTML. Make ONLY this change: ${changes}
+          content: `Here is my app. Apply this change: ${changes}
 
-STRICT RULES:
-- Keep ALL existing content, colors, items, names, prices exactly as they are
-- Keep ALL function names exactly as-is: showPage, addToCart, removeFromCart, updateCartPage, placeOrder, showToast, getMyOrders, showMyOrders
-- Keep ALL element IDs exactly as-is: page-home, page-list, page-cart, page-profile, cartBadge, cartList, cartTotal, statusTime
-- Keep page divs with class="page" and bottom-nav structure unchanged
-- Do NOT add splash screens or loading spinners
-- Return the COMPLETE HTML with ONLY the requested change applied
+RULES:
+- Apply the requested change completely and correctly — make it actually work
+- Keep all existing content, items, names, prices, colors that are NOT part of the change
+- Every button and interactive element must work after your change
+- If adding a new feature (login, search, filter, page, form) — write the complete working JavaScript for it
+- If fixing buttons — find every broken onclick and fix it properly
+- Return the COMPLETE updated HTML file
 - Raw HTML only, no markdown, no code fences
 
-HERE IS THE CURRENT APP:
-
+CURRENT APP CODE:
 ${generatedCode}`
         }]
       })
