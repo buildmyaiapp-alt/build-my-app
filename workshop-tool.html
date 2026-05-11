@@ -95,7 +95,7 @@
     <!-- Step 1: Password -->
     <div id="step1">
       <div class="pw-sub">Enter the workshop password given by Palash</div>
-      <input type="password" class="pw-input" id="pwInput" placeholder="Enter password..." onkeydown="if(event.key==='Enter')checkPassword()"/>
+      <input type="password" class="pw-input" id="pwInput" placeholder="Enter password..." autocomplete="off" onkeydown="if(event.key==='Enter')checkPassword()"/>
       <button class="pw-btn" onclick="checkPassword()">🔓 Unlock Tool</button>
       <div class="pw-err" id="pwErr">❌ Wrong password. Please try again.</div>
       <div class="pw-hint">Password is shared during the live workshop only</div>
