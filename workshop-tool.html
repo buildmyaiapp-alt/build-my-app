@@ -332,7 +332,22 @@ function removeFromCart(i){_cart.splice(i,1);_cartCount--;var b=document.getElem
 function updateCartPage(){var list=document.getElementById('cartList');var total=document.getElementById('cartTotal');if(!list)return;if(_cart.length===0){list.innerHTML='<p style="text-align:center;padding:40px;opacity:0.5">Cart is empty</p>';if(total)total.textContent='₹0';return;}list.innerHTML=_cart.map(function(item,i){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid rgba(128,128,128,0.2)"><span>'+item.name+'</span><div style="display:flex;align-items:center;gap:10px"><span style="font-weight:700">₹'+item.price+'</span><button onclick="removeFromCart('+i+')" style="background:#ff5757;color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:15px;line-height:1">−</button></div></div>';}).join('');var sum=_cart.reduce(function(a,b){return a+b.price;},0);if(total)total.textContent='₹'+sum;}
 function placeOrder(){if(_cart.length===0){showToast('Add items first!');return;}_cart=[];_cartCount=0;var b=document.getElementById('cartBadge');if(b){b.style.display='none';b.textContent='';}updateCartPage();showToast('\u{1F389} Order placed! Thank you!');var firstNav=document.querySelector('.nav-item');showPage('page-home',firstNav);}
 function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:82px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;white-space:nowrap;pointer-events:none;';document.body.appendChild(t);setTimeout(function(){t.remove();},2500);}
-setInterval(function(){var now=new Date();var h=now.getHours()%12||12;var m=String(now.getMinutes()).padStart(2,'0');var el=document.getElementById('statusTime');if(el)el.textContent=h+':'+m;},30000);`;
+setInterval(function(){var now=new Date();var h=now.getHours()%12||12;var m=String(now.getMinutes()).padStart(2,'0');var el=document.getElementById('statusTime');if(el)el.textContent=h+':'+m;},30000);
+window.addEventListener('load',function(){
+  var pages=document.querySelectorAll('.page');
+  var navs=document.querySelectorAll('.nav-item');
+  if(!document.querySelector('.page.active')&&pages.length>0){pages[0].classList.add('active');}
+  if(!document.querySelector('.nav-item.active')&&navs.length>0){navs[0].classList.add('active');}
+  navs.forEach(function(nav){
+    var oc=nav.getAttribute('onclick')||'';
+    var m=oc.match(/['"](page-[^'"]+)['"]/);
+    if(m&&document.getElementById(m[1])){
+      (function(pid){nav.onclick=function(){showPage(pid,nav);};})(m[1]);
+    } else if(!m && nav.dataset.page){
+      (function(pid){nav.onclick=function(){showPage(pid,nav);};})(nav.dataset.page);
+    }
+  });
+});`;
 
 // Append override functions AFTER Claude's code
 // Keeps Claude's app-specific JS (filters, search etc.) but overrides nav/cart
