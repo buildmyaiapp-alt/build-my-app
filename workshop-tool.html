@@ -350,17 +350,32 @@ window.addEventListener('load',function(){
   });
 });`;
 
-// Append override functions AFTER Claude's code
-// Keeps Claude's app-specific JS (filters, search etc.) but overrides nav/cart
+// Firebase JS — injected automatically, never sent to Claude (saves tokens)
+const FIREBASE_JS = `import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+const firebaseConfig={apiKey:"AIzaSyDJC8ijJ-SknWzBUub7GTXSJ3EFeRfHC6c",authDomain:"build-my-app-3c629.firebaseapp.com",projectId:"build-my-app-3c629",storageBucket:"build-my-app-3c629.firebasestorage.app",messagingSenderId:"823433789308",appId:"1:823433789308:web:5a953ee43cd5cf2548aef9"};
+const _app=initializeApp(firebaseConfig);const _auth=getAuth(_app);const _db=getFirestore(_app);
+let _fbMode='login',_currentUser=null;
+window.fbToggle=function(){_fbMode=_fbMode==='login'?'signup':'login';if(_fbMode==='signup'){document.getElementById('fbAuthTitle').textContent='Create Account';document.getElementById('fbAuthSub').textContent='Sign up to get started';document.getElementById('fbName').style.display='block';document.getElementById('fbMainBtn').textContent='Sign Up';document.getElementById('fbToggleBtn').textContent='Already have an account? Login';}else{document.getElementById('fbAuthTitle').textContent='Welcome Back!';document.getElementById('fbAuthSub').textContent='Login to continue';document.getElementById('fbName').style.display='none';document.getElementById('fbMainBtn').textContent='Login';document.getElementById('fbToggleBtn').textContent="Don't have an account? Sign Up";}};
+window.fbSubmit=async function(){const email=document.getElementById('fbEmail').value.trim();const pass=document.getElementById('fbPass').value.trim();const name=document.getElementById('fbName').value.trim();const errEl=document.getElementById('fbErr');errEl.style.display='none';if(!email||!pass){errEl.textContent='Please fill all fields';errEl.style.display='block';return;}try{if(_fbMode==='signup'){const cred=await createUserWithEmailAndPassword(_auth,email,pass);await updateProfile(cred.user,{displayName:name||email.split('@')[0]});await addDoc(collection(_db,'users'),{uid:cred.user.uid,name:name||email.split('@')[0],email,createdAt:serverTimestamp()});}else{await signInWithEmailAndPassword(_auth,email,pass);}}catch(e){errEl.textContent=e.message.replace('Firebase: ','').replace(/\(auth[^)]*\)/,'');errEl.style.display='block';}};
+window.fbLogout=async function(){await signOut(_auth);};
+window.saveOrder=async function(items,total){if(!_currentUser)return;await addDoc(collection(_db,'orders'),{uid:_currentUser.uid,userName:_currentUser.displayName,userEmail:_currentUser.email,items,total,status:'Pending',createdAt:serverTimestamp()});showToast('Order saved! ✅');};
+window.getMyOrders=async function(){if(!_currentUser)return[];const q=query(collection(_db,'orders'),where('uid','==',_currentUser.uid));const snap=await getDocs(q);return snap.docs.map(d=>({id:d.id,...d.data()}));};
+onAuthStateChanged(_auth,function(user){if(user){_currentUser=user;document.getElementById('fbAuthScreen').style.display='none';const bar=document.getElementById('userBar');bar.style.display='flex';document.getElementById('userGreet').textContent='👋 Hi, '+(user.displayName||user.email.split('@')[0])+'!';}else{_currentUser=null;document.getElementById('fbAuthScreen').style.display='flex';document.getElementById('userBar').style.display='none';}});`;
+
+// Inject Firebase module + CORE_JS before </body> — never sent to Claude (saves ~100 lines of tokens per call)
 function prepareApp(html) {
-  // Use charCode so the closing script tag never appears literally in this source file
   const C = String.fromCharCode;
-  const open  = C(60,115,99,114,105,112,116,62);        // builds: [script]
-  const close = C(60,47,115,99,114,105,112,116,62);     // builds: [/script]
+  const openMod = C(60,115,99,114,105,112,116,32,116,121,112,101,61,34,109,111,100,117,108,101,34,62); // <script type="module">
+  const open  = C(60,115,99,114,105,112,116,62);        // <script>
+  const close = C(60,47,115,99,114,105,112,116,62);     // </script>
   const bodyC = C(60,47,98,111,100,121,62);             // </body>
-  const tag = open + CORE_JS + close;
-  if (html.includes(bodyC)) return html.replace(bodyC, tag + '\n' + bodyC);
-  return html + tag;
+  const fbTag   = openMod + FIREBASE_JS + close;
+  const coreTag = open + CORE_JS + close;
+  const inject  = fbTag + '\n' + coreTag;
+  if (html.includes(bodyC)) return html.replace(bodyC, inject + '\n' + bodyC);
+  return html + inject;
 }
 
 
@@ -444,8 +459,8 @@ async function buildApp() {
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
-        max_tokens: 16000,
+        model: 'claude-haiku-4-5',
+        max_tokens: 5000,
         system: `You are a mobile app designer. You fill in pre-built HTML templates with beautiful content and styling. The JavaScript is already written and working — you must NOT change any function names or logic. Your job is only design and content.`,
         messages: [{
           role: 'user',
@@ -567,114 +582,6 @@ button:active{transform:scale(0.96)}
   <div class="nav-item" onclick="showPage('page-profile',this)"><span class="ni">👤</span><span class="nl">Profile</span></div>
 </div>
 
-<!-- FIREBASE SDK -->
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDJC8ijJ-SknWzBUub7GTXSJ3EFeRfHC6c",
-  authDomain: "build-my-app-3c629.firebaseapp.com",
-  projectId: "build-my-app-3c629",
-  storageBucket: "build-my-app-3c629.firebasestorage.app",
-  messagingSenderId: "823433789308",
-  appId: "1:823433789308:web:5a953ee43cd5cf2548aef9"
-};
-
-const _app = initializeApp(firebaseConfig);
-const _auth = getAuth(_app);
-const _db = getFirestore(_app);
-let _fbMode = 'login';
-let _currentUser = null;
-
-window.fbToggle = function() {
-  _fbMode = _fbMode === 'login' ? 'signup' : 'login';
-  if (_fbMode === 'signup') {
-    document.getElementById('fbAuthTitle').textContent = 'Create Account';
-    document.getElementById('fbAuthSub').textContent = 'Sign up to get started';
-    document.getElementById('fbName').style.display = 'block';
-    document.getElementById('fbMainBtn').textContent = 'Sign Up';
-    document.getElementById('fbToggleBtn').textContent = 'Already have an account? Login';
-  } else {
-    document.getElementById('fbAuthTitle').textContent = 'Welcome Back!';
-    document.getElementById('fbAuthSub').textContent = 'Login to continue';
-    document.getElementById('fbName').style.display = 'none';
-    document.getElementById('fbMainBtn').textContent = 'Login';
-    document.getElementById('fbToggleBtn').textContent = "Don't have an account? Sign Up";
-  }
-};
-
-window.fbSubmit = async function() {
-  const email = document.getElementById('fbEmail').value.trim();
-  const pass = document.getElementById('fbPass').value.trim();
-  const name = document.getElementById('fbName').value.trim();
-  const errEl = document.getElementById('fbErr');
-  errEl.style.display = 'none';
-  if (!email || !pass) { errEl.textContent = 'Please fill all fields'; errEl.style.display = 'block'; return; }
-  try {
-    if (_fbMode === 'signup') {
-      const cred = await createUserWithEmailAndPassword(_auth, email, pass);
-      await updateProfile(cred.user, { displayName: name || email.split('@')[0] });
-      await addDoc(collection(_db, 'users'), { uid: cred.user.uid, name: name || email.split('@')[0], email, createdAt: serverTimestamp() });
-    } else {
-      await signInWithEmailAndPassword(_auth, email, pass);
-    }
-  } catch(e) {
-    errEl.textContent = e.message.replace('Firebase: ','').replace(/\(auth.*\)/,'');
-    errEl.style.display = 'block';
-  }
-};
-
-window.fbLogout = async function() {
-  await signOut(_auth);
-};
-
-window.saveOrder = async function(items, total) {
-  if (!_currentUser) return;
-  await addDoc(collection(_db, 'orders'), {
-    uid: _currentUser.uid, userName: _currentUser.displayName,
-    userEmail: _currentUser.email, items, total,
-    status: 'Pending', createdAt: serverTimestamp()
-  });
-  showToast('Order saved! ✅');
-};
-
-window.getMyOrders = async function() {
-  if (!_currentUser) return [];
-  const q = query(collection(_db, 'orders'), where('uid','==',_currentUser.uid));
-  const snap = await getDocs(q);
-  return snap.docs.map(d => ({id:d.id,...d.data()}));
-};
-
-onAuthStateChanged(_auth, function(user) {
-  if (user) {
-    _currentUser = user;
-    document.getElementById('fbAuthScreen').style.display = 'none';
-    const bar = document.getElementById('userBar');
-    bar.style.display = 'flex';
-    document.getElementById('userGreet').textContent = '👋 Hi, ' + (user.displayName || user.email.split('@')[0]) + '!';
-  } else {
-    _currentUser = null;
-    document.getElementById('fbAuthScreen').style.display = 'flex';
-    document.getElementById('userBar').style.display = 'none';
-  }
-});
-${'<'+'/script>'}
-
-<script>
-var _cart=[],_cartCount=0;
-function showPage(id,el){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});var t=document.getElementById(id);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');}
-function addToCart(name,price){_cart.push({name:name,price:Number(price)});_cartCount++;var b=document.getElementById('cartBadge');if(b){b.textContent=_cartCount;b.style.display='flex';}showToast(name+' added! 🛒');updateCartPage();}
-function removeFromCart(i){_cart.splice(i,1);_cartCount--;var b=document.getElementById('cartBadge');if(b){b.textContent=_cartCount>0?_cartCount:'';if(_cartCount<=0)b.style.display='none';}updateCartPage();}
-function updateCartPage(){var list=document.getElementById('cartList');var total=document.getElementById('cartTotal');if(!list)return;if(_cart.length===0){list.innerHTML='<p style="text-align:center;padding:40px;color:var(--text2)">Your cart is empty</p>';if(total)total.textContent='₹0';return;}list.innerHTML=_cart.map(function(item,i){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.08)"><span>'+item.name+'</span><div style="display:flex;align-items:center;gap:10px"><span style="font-weight:700">₹'+item.price+'</span><button onclick="removeFromCart('+i+')" style="background:#ff5757;color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:16px;line-height:1">−</button></div></div>';}).join('');var sum=_cart.reduce(function(a,b){return a+b.price;},0);if(total)total.textContent='₹'+sum;}
-function placeOrder(){if(_cart.length===0){showToast('Add items first!');return;}var items=[..._cart];var total=_cart.reduce(function(a,b){return a+b.price;},0);_cart=[];_cartCount=0;var b=document.getElementById('cartBadge');if(b){b.style.display='none';b.textContent='';}updateCartPage();if(window.saveOrder)saveOrder(items,total);else showToast('🎉 Order placed! Thank you!');showPage('page-home',document.querySelector('.nav-item'));}
-function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:82px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;white-space:nowrap;pointer-events:none;';document.body.appendChild(t);setTimeout(function(){t.remove();},2500);}
-setInterval(function(){var now=new Date();var h=now.getHours()%12||12;var m=String(now.getMinutes()).padStart(2,'0');var el=document.getElementById('statusTime');if(el)el.textContent=h+':'+m;},30000);
-
-/* ── YOUR APP-SPECIFIC JS BELOW ── */
-
-</scr`+`ipt>
 </body>
 </html>
 
@@ -785,8 +692,8 @@ async function fixAllButtons() {
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
-        max_tokens: 16000,
+        model: 'claude-haiku-4-5',
+        max_tokens: 5000,
         system: `You are an expert HTML/JavaScript debugger. You find and fix every broken interactive element in an app. You always return the complete fixed HTML file. Raw HTML only — no markdown, no explanation.`,
         messages: [{
           role: 'user',
@@ -877,8 +784,8 @@ async function modifyApp() {
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
-        max_tokens: 16000,
+        model: 'claude-haiku-4-5',
+        max_tokens: 5000,
         system: `You are a mobile app designer. You fill in pre-built HTML templates with beautiful content and styling. The JavaScript is already written and working — you must NOT change any function names or logic. Your job is only design and content.`,
         messages: [{
           role: 'user',
