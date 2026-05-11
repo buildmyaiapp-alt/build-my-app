@@ -372,15 +372,45 @@ window.saveOrder=async function(items,total){if(!_currentUser)return;await addDo
 window.getMyOrders=async function(){if(!_currentUser)return[];const q=query(collection(_db,'orders'),where('uid','==',_currentUser.uid));const snap=await getDocs(q);return snap.docs.map(d=>({id:d.id,...d.data()}));};
 onAuthStateChanged(_auth,function(user){if(user){_currentUser=user;document.getElementById('fbAuthScreen').style.display='none';const bar=document.getElementById('userBar');bar.style.display='flex';document.getElementById('userGreet').textContent='👋 Hi, '+(user.displayName||user.email.split('@')[0])+'!';}else{_currentUser=null;document.getElementById('fbAuthScreen').style.display='flex';document.getElementById('userBar').style.display='none';}});`;
 
-// Inject Firebase module + CORE_JS before </body> — never sent to Claude (saves ~100 lines of tokens per call)
+// PREVIEW: only CORE_JS (localStorage) — works perfectly in tool, no black screen
 function prepareApp(html) {
   const C = String.fromCharCode;
-  const open  = C(60,115,99,114,105,112,116,62);        // builds: [script]
-  const close = C(60,47,115,99,114,105,112,116,62);     // builds: [/script]
-  const bodyC = C(60,47,98,111,100,121,62);             // builds: [/body]
+  const open  = C(60,115,99,114,105,112,116,62);
+  const close = C(60,47,115,99,114,105,112,116,62);
+  const bodyC = C(60,47,98,111,100,121,62);
   const coreTag = open + CORE_JS + close;
   if (html.includes(bodyC)) return html.replace(bodyC, coreTag + '\n' + bodyC);
   return html + coreTag;
+}
+
+// DOWNLOAD: full Firebase compat (works on mobile, saves to cloud, login/signup)
+function prepareDownload(html) {
+  const C = String.fromCharCode;
+  const open  = C(60,115,99,114,105,112,116,62);
+  const close = C(60,47,115,99,114,105,112,116,62);
+  const bodyC = C(60,47,98,111,100,121,62);
+
+  const fbSrc1 = C(60,115,99,114,105,112,116,32,115,114,99,61,34); // <script src="
+  const fbSrc2 = C(34,62); // ">
+  const fbSDK =
+    fbSrc1 + 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js' + fbSrc2 + close + '\n' +
+    fbSrc1 + 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js' + fbSrc2 + close + '\n' +
+    fbSrc1 + 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js' + fbSrc2 + close;
+
+  const fbInit = open + `
+var _fbApp=firebase.initializeApp({apiKey:"AIzaSyDJC8ijJ-SknWzBUub7GTXSJ3EFeRfHC6c",authDomain:"build-my-app-3c629.firebaseapp.com",projectId:"build-my-app-3c629",storageBucket:"build-my-app-3c629.firebasestorage.app",messagingSenderId:"823433789308",appId:"1:823433789308:web:5a953ee43cd5cf2548aef9"});
+var _auth=firebase.auth(_fbApp),_db=firebase.firestore(_fbApp),_fbMode='login',_currentUser=null;
+window.fbToggle=function(){_fbMode=_fbMode==='login'?'signup':'login';if(_fbMode==='signup'){document.getElementById('fbAuthTitle').textContent='Create Account';document.getElementById('fbName').style.display='block';document.getElementById('fbMainBtn').textContent='Sign Up';document.getElementById('fbToggleBtn').textContent='Already have an account? Login';}else{document.getElementById('fbAuthTitle').textContent='Welcome Back!';document.getElementById('fbName').style.display='none';document.getElementById('fbMainBtn').textContent='Login';document.getElementById('fbToggleBtn').textContent="Don't have an account? Sign Up";}};
+window.fbSubmit=function(){var email=document.getElementById('fbEmail').value.trim(),pass=document.getElementById('fbPass').value.trim(),name=document.getElementById('fbName').value.trim(),err=document.getElementById('fbErr');err.style.display='none';if(!email||!pass){err.textContent='Please fill all fields';err.style.display='block';return;}if(_fbMode==='signup'){_auth.createUserWithEmailAndPassword(email,pass).then(function(c){return c.user.updateProfile({displayName:name||email.split('@')[0]});}).catch(function(e){err.textContent=e.message;err.style.display='block';});}else{_auth.signInWithEmailAndPassword(email,pass).catch(function(e){err.textContent=e.message;err.style.display='block';});}};
+window.fbLogout=function(){_auth.signOut();};
+window.saveOrder=function(items,total){if(!_currentUser)return;_db.collection('orders').add({uid:_currentUser.uid,userName:_currentUser.displayName,userEmail:_currentUser.email,items:items,total:total,status:'Confirmed',createdAt:new Date()}).then(function(){showToast('Order saved to cloud! ☁️');});};
+_auth.onAuthStateChanged(function(user){if(user){_currentUser=user;document.getElementById('fbAuthScreen').style.display='none';var bar=document.getElementById('userBar');bar.style.display='flex';document.getElementById('userGreet').textContent='👋 Hi, '+(user.displayName||user.email.split('@')[0])+'!';}else{_currentUser=null;document.getElementById('fbAuthScreen').style.display='flex';document.getElementById('userBar').style.display='none';}});
+` + close;
+
+  const coreTag = open + CORE_JS + close;
+  const inject = FIREBASE_HTML + '\n' + fbSDK + '\n' + fbInit + '\n' + coreTag;
+  if (html.includes(bodyC)) return html.replace(bodyC, inject + '\n' + bodyC);
+  return html + inject;
 }
 
 
@@ -626,7 +656,7 @@ function toggleMobile() {
 
 function downloadApp() {
   if (!generatedCode) return;
-  const blob = new Blob([prepareApp(generatedCode)], { type: 'text/html' });
+  const blob = new Blob([prepareDownload(generatedCode)], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
