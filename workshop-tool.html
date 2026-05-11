@@ -801,23 +801,102 @@ async function modifyApp() {
         system: `You are a mobile app designer. You fill in pre-built HTML templates with beautiful content and styling. The JavaScript is already written and working — you must NOT change any function names or logic. Your job is only design and content.`,
         messages: [{
           role: 'user',
-          content: `You are updating an existing app. Apply this change: ${changes}
+          content: `Fill in this HTML template for the following app: ${originalIdea || 'mobile app'}
 
-App idea: ${originalIdea || 'mobile app'}
+IMPORTANT CHANGE TO APPLY: ${changes}
 
-STRICT RULES — same as when you built it:
-- Keep ALL function names exactly: showPage, addToCart, removeFromCart, updateCartPage, placeOrder, showToast
-- Keep ALL element IDs exactly: page-home, page-list, page-cart, page-profile, cartBadge, cartList, cartTotal, statusTime
-- Keep ALL page divs with class="page" and their IDs unchanged
+YOUR ONLY JOBS:
+1. Set the app name in <title> and in the hero/header
+2. Set CSS variables: --primary (main color), --bg (background), --surface (card bg), --text, --text2
+3. Fill in beautiful content inside each page div (home, list, cart, profile)
+4. Change nav tab icons and labels to match the app type
+5. Add app-specific styles in the CSS section marked FILL
+6. Add any extra JavaScript at the bottom in the section marked FILL
+
+STRICT RULES — DO NOT BREAK THESE:
+- Keep ALL function names exactly as-is: showPage, addToCart, removeFromCart, updateCartPage, placeOrder, showToast, getMyOrders, showMyOrders
+- Data saves automatically to device storage — on the orders/bookings page call showMyOrders() on page load to display saved orders
+- Keep ALL element IDs exactly as-is: page-home, page-list, page-cart, page-profile, cartBadge, cartList, cartTotal, statusTime
+- Keep page divs with class="page" and their IDs unchanged
 - Keep bottom-nav structure and nav-item class unchanged
 - On cart/order/book buttons use: onclick="addToCart('Item Name', price)"
-- On navigation buttons use: onclick="showPage('page-id', null)"
-- NO splash screens. NO loading spinners.
+- On any extra navigation buttons use: onclick="showPage('page-id', null)"
+- NO splash screens. NO loading spinners. App opens directly on home page.
+- 8-12 items on the list page with Indian names and ₹ prices
+- Star ratings ★★★★☆, NEW/POPULAR badges on cards
+- Profile page: avatar circle, stats row, settings list
 
-CURRENT APP CODE — apply the change to this:
-${generatedCode}
+HERE IS THE TEMPLATE — fill it in now:
 
-Return the complete updated HTML. Raw HTML only, no markdown.`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>APP NAME HERE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary: #F5A623;
+  --bg: #0d0d1a;
+  --surface: #1a1a2e;
+  --text: #ffffff;
+  --text2: rgba(255,255,255,0.55);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);max-width:430px;margin:0 auto;min-height:100vh;overflow-x:hidden}
+.page{display:none;padding-bottom:75px;min-height:calc(100vh - 56px)}
+.page.active{display:block}
+.status-bar{background:var(--bg);padding:10px 20px 6px;display:flex;justify-content:space-between;font-size:12px;font-weight:700;position:sticky;top:0;z-index:50}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--surface);border-top:1px solid rgba(255,255,255,0.08);display:flex;padding:6px 0 12px;z-index:100}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 0;opacity:0.45;transition:opacity 0.2s;-webkit-tap-highlight-color:transparent}
+.nav-item.active{opacity:1;color:var(--primary)}.nav-item .ni{font-size:22px}.nav-item .nl{font-size:10px;font-weight:700}
+.nav-icon-wrap{position:relative;display:inline-block}
+.cart-badge{background:red;color:#fff;border-radius:50%;min-width:16px;height:16px;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center;position:absolute;top:-3px;right:-5px;padding:0 3px}
+button:active{transform:scale(0.96)}
+
+/* ── YOUR CUSTOM STYLES BELOW ── */
+
+</style>
+</head>
+<body>
+
+<div class="status-bar"><span id="statusTime">9:41</span><span>▲▲▲ 🔋</span></div>
+
+<div id="page-home" class="page active">
+<!-- HOME PAGE CONTENT HERE -->
+</div>
+
+<div id="page-list" class="page">
+<!-- LIST/MENU/PRODUCTS PAGE CONTENT HERE -->
+</div>
+
+<div id="page-cart" class="page">
+<div style="padding:20px">
+<h2 style="margin-bottom:16px;font-size:20px">🛒 My Cart</h2>
+<div id="cartList"><p style="text-align:center;padding:40px;color:var(--text2)">Your cart is empty</p></div>
+<div style="margin-top:16px;padding:16px;background:var(--surface);border-radius:14px;display:flex;justify-content:space-between;align-items:center">
+<span style="font-weight:600;color:var(--text2)">Total Amount</span>
+<span id="cartTotal" style="font-size:22px;font-weight:900;color:var(--primary)">₹0</span>
+</div>
+<button onclick="placeOrder()" style="width:100%;margin-top:14px;padding:16px;background:var(--primary);color:#000;border:none;border-radius:14px;font-size:16px;font-weight:900;cursor:pointer">✅ Proceed to Pay</button>
+</div>
+</div>
+
+<div id="page-profile" class="page">
+<!-- PROFILE PAGE CONTENT HERE -->
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-item active" onclick="showPage('page-home',this)"><span class="ni">🏠</span><span class="nl">Home</span></div>
+  <div class="nav-item" onclick="showPage('page-list',this)"><span class="ni">📋</span><span class="nl">Menu</span></div>
+  <div class="nav-item" onclick="showPage('page-cart',this)"><span class="nav-icon-wrap"><span class="ni">🛒</span><span class="cart-badge" id="cartBadge"></span></span><span class="nl">Cart</span></div>
+  <div class="nav-item" onclick="showPage('page-profile',this)"><span class="ni">👤</span><span class="nl">Profile</span></div>
+</div>
+
+</body>
+</html>
+
+Return the complete filled HTML. Raw HTML only, no markdown.`
         }]
       })
     });
