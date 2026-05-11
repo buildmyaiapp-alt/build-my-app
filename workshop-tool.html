@@ -315,9 +315,10 @@ function saveWorkshopKey() {
   document.getElementById('passwordScreen').style.display = 'none';
 }
 
-// Skip password screen if already unlocked this session
+// Skip password screen if API key already saved in browser
 window.addEventListener('DOMContentLoaded', function() {
-  if (sessionStorage.getItem('workshop_unlocked') === '1') {
+  const savedKey = localStorage.getItem('palash_api_key');
+  if (savedKey && savedKey.startsWith('sk-ant-')) {
     document.getElementById('passwordScreen').style.display = 'none';
   }
 });
