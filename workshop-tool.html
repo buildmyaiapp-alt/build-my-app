@@ -509,8 +509,9 @@ async function buildApp() {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
-        max_tokens: 12000,
-        system: `You are a world-class mobile app developer and UI designer. You build stunning, fully functional mobile web apps as complete single HTML files. Every button works. Every feature works. You write clean, bug-free JavaScript. You think like both a designer and an engineer. You never use placeholder content — you write real, complete, working code every time.`,
+        max_tokens: 16000,
+        thinking: { type: 'enabled', budget_tokens: 8000 },
+        system: `You are an expert software engineer — you operate like Claude Code. Before writing any code you think deeply: plan the full architecture, all screens, all state, all user interactions, all data flows, every edge case. Then you write complete, production-quality code where every single feature works perfectly. You never write TODO comments. You never use placeholder content. Every button has a real working onclick. Every form submits correctly. Every page renders real data. You think like an engineer building a real product.`,
         messages: [{
           role: 'user',
           content: `Build a complete, fully working mobile app for: ${userIdea}
@@ -570,7 +571,9 @@ Return the complete HTML file only. No markdown. No explanation. No code fences.
     }
 
     const data = await response.json();
-    let raw = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text.trim() : '';
+    // With extended thinking, content array has a thinking block then a text block
+    const textBlock = data.content && data.content.find(function(b){ return b.type === 'text'; });
+    let raw = textBlock ? textBlock.text.trim() : '';
 
     // Strip markdown fences if present
     if (raw.startsWith('```')) {
@@ -670,8 +673,9 @@ async function fixAllButtons() {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
-        max_tokens: 12000,
-        system: `You are an expert HTML/JavaScript debugger. You find and fix every broken interactive element in an app. You always return the complete fixed HTML file. Raw HTML only — no markdown, no explanation.`,
+        max_tokens: 16000,
+        thinking: { type: 'enabled', budget_tokens: 5000 },
+        system: `You are an expert software engineer — you operate like Claude Code. You systematically read every line of code, trace exactly why each button is broken, then fix every single issue completely. You return the complete fixed HTML. Raw HTML only — no markdown, no explanation.`,
         messages: [{
           role: 'user',
           content: `This is my app code. Find EVERY button, tab, nav item, filter, cart button, form, or link that is broken, missing an onclick, or does nothing when clicked. Fix ALL of them so everything works perfectly.
@@ -697,7 +701,8 @@ ${generatedCode}`
     }
 
     const data = await response.json();
-    let fixed = (data.content[0].text || '').trim();
+    const textBlock3 = data.content && data.content.find(function(b){ return b.type === 'text'; });
+    let fixed = (textBlock3 ? textBlock3.text : '').trim();
     if (fixed.startsWith('```')) fixed = fixed.replace(/^```html?\n?/i, '').replace(/\n?```$/, '').trim();
     if (!fixed.includes('<!DOCTYPE') && !fixed.includes('<html')) throw new Error('Invalid response. Try again.');
 
@@ -762,18 +767,20 @@ async function modifyApp() {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
-        max_tokens: 12000,
-        system: `You are a world-class mobile app developer. You receive a complete HTML app and apply the requested change perfectly. You write real, working JavaScript — every button, every feature works after your change. You never break existing functionality.`,
+        max_tokens: 16000,
+        thinking: { type: 'enabled', budget_tokens: 6000 },
+        system: `You are an expert software engineer — you operate like Claude Code. You carefully read the existing code, understand exactly how it works, plan your change precisely, then implement it completely. Every button works. Every feature works. You never break existing functionality. You never use placeholders.`,
         messages: [{
           role: 'user',
           content: `Here is my app. Apply this change: ${changes}
 
 RULES:
-- Apply the requested change completely and correctly — make it actually work
+- Read the existing code carefully and understand it fully before changing anything
+- Apply the requested change completely — make it fully work, not just visually
 - Keep all existing content, items, names, prices, colors that are NOT part of the change
 - Every button and interactive element must work after your change
 - If adding a new feature (login, search, filter, page, form) — write the complete working JavaScript for it
-- If fixing buttons — find every broken onclick and fix it properly
+- If fixing buttons — trace why they are broken and fix the root cause
 - Return the COMPLETE updated HTML file
 - Raw HTML only, no markdown, no code fences
 
@@ -789,7 +796,8 @@ ${generatedCode}`
     }
 
     const data = await response.json();
-    let updatedCode = data.content[0].text.trim();
+    const textBlock2 = data.content && data.content.find(function(b){ return b.type === 'text'; });
+    let updatedCode = textBlock2 ? textBlock2.text.trim() : '';
 
     // Strip markdown code fences if present
     if (updatedCode.startsWith('```')) {
