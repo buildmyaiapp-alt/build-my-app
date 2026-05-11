@@ -345,26 +345,16 @@ setInterval(function(){var now=new Date();var h=now.getHours()%12||12;var m=Stri
 const FIREBASE_HTML = `<div id="fbAuthScreen" style="position:fixed;inset:0;background:#0d0d1a;display:flex;align-items:center;justify-content:center;z-index:9999;padding:24px;font-family:Inter,sans-serif;"><div style="background:#1a1a2e;border-radius:20px;padding:32px 24px;width:100%;max-width:360px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.5);"><div style="font-size:44px;margin-bottom:10px">🔐</div><div id="fbAuthTitle" style="font-size:22px;font-weight:900;color:#fff;margin-bottom:6px;">Welcome Back!</div><div id="fbAuthSub" style="font-size:13px;color:rgba(255,255,255,0.55);margin-bottom:20px;">Login to continue</div><div id="fbErr" style="color:#ff5757;font-size:12px;margin-bottom:8px;display:none;"></div><input id="fbName" placeholder="Your Name" style="display:none;width:100%;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:13px 16px;color:#fff;font-size:14px;outline:none;margin-bottom:10px;box-sizing:border-box;"/><input id="fbEmail" type="email" placeholder="Email address" style="width:100%;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:13px 16px;color:#fff;font-size:14px;outline:none;margin-bottom:10px;box-sizing:border-box;"/><input id="fbPass" type="password" placeholder="Password" style="width:100%;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:13px 16px;color:#fff;font-size:14px;outline:none;margin-bottom:14px;box-sizing:border-box;"/><button id="fbMainBtn" onclick="fbSubmit()" style="width:100%;padding:14px;background:#F5A623;color:#000;border:none;border-radius:10px;font-size:16px;font-weight:900;cursor:pointer;margin-bottom:10px;">Login</button><button id="fbToggleBtn" onclick="fbToggle()" style="background:none;border:none;color:#F5A623;font-size:13px;cursor:pointer;">Don't have an account? Sign Up</button></div></div>
 <div id="userBar" style="display:none;background:#1a1a2e;padding:8px 16px;justify-content:space-between;align-items:center;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.1);font-family:Inter,sans-serif;"><span id="userGreet" style="font-weight:700;color:#F5A623;"></span><button onclick="fbLogout()" style="background:rgba(255,87,87,0.15);color:#ff5757;border:1px solid rgba(255,87,87,0.3);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;">Logout</button></div>`;
 
-// Firebase JS — injected automatically, never sent to Claude (saves tokens)
-const FIREBASE_JS = `import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-const firebaseConfig={apiKey:"AIzaSyDJC8ijJ-SknWzBUub7GTXSJ3EFeRfHC6c",authDomain:"build-my-app-3c629.firebaseapp.com",projectId:"build-my-app-3c629",storageBucket:"build-my-app-3c629.firebasestorage.app",messagingSenderId:"823433789308",appId:"1:823433789308:web:5a953ee43cd5cf2548aef9"};
-const _app=initializeApp(firebaseConfig);const _auth=getAuth(_app);const _db=getFirestore(_app);
-let _fbMode='login',_currentUser=null;
-window.fbToggle=function(){_fbMode=_fbMode==='login'?'signup':'login';if(_fbMode==='signup'){document.getElementById('fbAuthTitle').textContent='Create Account';document.getElementById('fbAuthSub').textContent='Sign up to get started';document.getElementById('fbName').style.display='block';document.getElementById('fbMainBtn').textContent='Sign Up';document.getElementById('fbToggleBtn').textContent='Already have an account? Login';}else{document.getElementById('fbAuthTitle').textContent='Welcome Back!';document.getElementById('fbAuthSub').textContent='Login to continue';document.getElementById('fbName').style.display='none';document.getElementById('fbMainBtn').textContent='Login';document.getElementById('fbToggleBtn').textContent="Don't have an account? Sign Up";}};
-window.fbSubmit=async function(){const email=document.getElementById('fbEmail').value.trim();const pass=document.getElementById('fbPass').value.trim();const name=document.getElementById('fbName').value.trim();const errEl=document.getElementById('fbErr');errEl.style.display='none';if(!email||!pass){errEl.textContent='Please fill all fields';errEl.style.display='block';return;}try{if(_fbMode==='signup'){const cred=await createUserWithEmailAndPassword(_auth,email,pass);await updateProfile(cred.user,{displayName:name||email.split('@')[0]});await addDoc(collection(_db,'users'),{uid:cred.user.uid,name:name||email.split('@')[0],email,createdAt:serverTimestamp()});}else{await signInWithEmailAndPassword(_auth,email,pass);}}catch(e){errEl.textContent=e.message.replace('Firebase: ','').replace(/\(auth[^)]*\)/,'');errEl.style.display='block';}};
-window.fbLogout=async function(){await signOut(_auth);};
-window.saveOrder=async function(items,total){if(!_currentUser)return;await addDoc(collection(_db,'orders'),{uid:_currentUser.uid,userName:_currentUser.displayName,userEmail:_currentUser.email,items,total,status:'Pending',createdAt:serverTimestamp()});showToast('Order saved! ✅');};
-window.getMyOrders=async function(){if(!_currentUser)return[];const q=query(collection(_db,'orders'),where('uid','==',_currentUser.uid));const snap=await getDocs(q);return snap.docs.map(d=>({id:d.id,...d.data()}));};
-onAuthStateChanged(_auth,function(user){if(user){_currentUser=user;document.getElementById('fbAuthScreen').style.display='none';const bar=document.getElementById('userBar');bar.style.display='flex';document.getElementById('userGreet').textContent='👋 Hi, '+(user.displayName||user.email.split('@')[0])+'!';}else{_currentUser=null;document.getElementById('fbAuthScreen').style.display='flex';document.getElementById('userBar').style.display='none';}});`;
+// FIREBASE_JS kept for reference but not used — all apps are built with compat SDK by Claude directly.
 
-// PREVIEW: inject CORE_JS for simple apps; Firebase apps already have their own JS
+// PREVIEW: all apps now use Firebase compat SDK built by Claude — return as-is.
+// CORE_JS fallback is still injected only for rare non-Firebase apps.
 function prepareApp(html) {
-  // Firebase apps have their own complete JS — don't inject CORE_JS (would conflict)
+  // Firebase apps (all apps now) have their own complete JS — don't inject CORE_JS
   if (html.includes('firebase-app-compat') || html.includes('firebase.initializeApp')) {
     return html;
   }
+  // Rare non-Firebase fallback: inject CORE_JS
   const C = String.fromCharCode;
   const open  = C(60,115,99,114,105,112,116,62);
   const close = C(60,47,115,99,114,105,112,116,62);
@@ -374,38 +364,20 @@ function prepareApp(html) {
   return html + coreTag;
 }
 
-// DOWNLOAD: Firebase apps already have everything — return as-is. Simple apps get Firebase injected.
+// DOWNLOAD: All apps now use Firebase compat SDK built directly by Claude — return as-is.
 function prepareDownload(html) {
-  // Firebase apps generated by the new system already have Firebase compat built-in
+  // All new apps have Firebase compat built-in — return unchanged
   if (html.includes('firebase-app-compat') || html.includes('firebase.initializeApp')) {
     return html;
   }
+  // Rare non-Firebase fallback: inject CORE_JS only
   const C = String.fromCharCode;
   const open  = C(60,115,99,114,105,112,116,62);
   const close = C(60,47,115,99,114,105,112,116,62);
   const bodyC = C(60,47,98,111,100,121,62);
-
-  const fbSrc1 = C(60,115,99,114,105,112,116,32,115,114,99,61,34); // <script src="
-  const fbSrc2 = C(34,62); // ">
-  const fbSDK =
-    fbSrc1 + 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js' + fbSrc2 + close + '\n' +
-    fbSrc1 + 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js' + fbSrc2 + close + '\n' +
-    fbSrc1 + 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js' + fbSrc2 + close;
-
-  const fbInit = open + `
-var _fbApp=firebase.initializeApp({apiKey:"AIzaSyDJC8ijJ-SknWzBUub7GTXSJ3EFeRfHC6c",authDomain:"build-my-app-3c629.firebaseapp.com",projectId:"build-my-app-3c629",storageBucket:"build-my-app-3c629.firebasestorage.app",messagingSenderId:"823433789308",appId:"1:823433789308:web:5a953ee43cd5cf2548aef9"});
-var _auth=firebase.auth(_fbApp),_db=firebase.firestore(_fbApp),_fbMode='login',_currentUser=null;
-window.fbToggle=function(){_fbMode=_fbMode==='login'?'signup':'login';if(_fbMode==='signup'){document.getElementById('fbAuthTitle').textContent='Create Account';document.getElementById('fbName').style.display='block';document.getElementById('fbMainBtn').textContent='Sign Up';document.getElementById('fbToggleBtn').textContent='Already have an account? Login';}else{document.getElementById('fbAuthTitle').textContent='Welcome Back!';document.getElementById('fbName').style.display='none';document.getElementById('fbMainBtn').textContent='Login';document.getElementById('fbToggleBtn').textContent="Don't have an account? Sign Up";}};
-window.fbSubmit=function(){var email=document.getElementById('fbEmail').value.trim(),pass=document.getElementById('fbPass').value.trim(),name=document.getElementById('fbName').value.trim(),err=document.getElementById('fbErr');err.style.display='none';if(!email||!pass){err.textContent='Please fill all fields';err.style.display='block';return;}if(_fbMode==='signup'){_auth.createUserWithEmailAndPassword(email,pass).then(function(c){return c.user.updateProfile({displayName:name||email.split('@')[0]});}).catch(function(e){err.textContent=e.message;err.style.display='block';});}else{_auth.signInWithEmailAndPassword(email,pass).catch(function(e){err.textContent=e.message;err.style.display='block';});}};
-window.fbLogout=function(){_auth.signOut();};
-window.saveOrder=function(items,total){if(!_currentUser)return;_db.collection('orders').add({uid:_currentUser.uid,userName:_currentUser.displayName,userEmail:_currentUser.email,items:items,total:total,status:'Confirmed',createdAt:new Date()}).then(function(){showToast('Order saved to cloud! ☁️');});};
-_auth.onAuthStateChanged(function(user){if(user){_currentUser=user;document.getElementById('fbAuthScreen').style.display='none';var bar=document.getElementById('userBar');bar.style.display='flex';document.getElementById('userGreet').textContent='👋 Hi, '+(user.displayName||user.email.split('@')[0])+'!';}else{_currentUser=null;document.getElementById('fbAuthScreen').style.display='flex';document.getElementById('userBar').style.display='none';}});
-` + close;
-
   const coreTag = open + CORE_JS + close;
-  const inject = FIREBASE_HTML + '\n' + fbSDK + '\n' + fbInit + '\n' + coreTag;
-  if (html.includes(bodyC)) return html.replace(bodyC, inject + '\n' + bodyC);
-  return html + inject;
+  if (html.includes(bodyC)) return html.replace(bodyC, coreTag + '\n' + bodyC);
+  return html + coreTag;
 }
 
 
@@ -494,55 +466,79 @@ async function buildApp() {
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
         max_tokens: 16000,
-        thinking: { type: 'enabled', budget_tokens: 8000 },
-        system: `You are an expert software engineer — you operate like Claude Code. Before writing any code you think deeply: plan the full architecture, all screens, all state, all user interactions, all data flows, every edge case. Then you write complete, production-quality code where every single feature works perfectly. You never write TODO comments. You never use placeholder content. Every button has a real working onclick. Every form submits correctly. Every page renders real data. You think like an engineer building a real product.`,
+        thinking: { type: 'enabled', budget_tokens: 5000 },
+        system: `You are an expert software engineer. You write complete, production-quality single-file HTML apps. Every button has a real working onclick. Every form submits correctly. You never write TODO comments or placeholder content. You think deeply before writing and produce apps that look and feel like real products.`,
         messages: [{
           role: 'user',
-          content: `Build a complete, fully working mobile app for: ${userIdea}
+          content: `Build a complete, production-ready Firebase mobile app for: ${userIdea}
 
-ARCHITECTURE — choose automatically:
-• If the app needs MULTIPLE DIFFERENT USERS sharing data (marketplace, shop+customer, delivery platform, social, admin panel) → use Firebase Auth + Firestore (multi-user)
-• For everything else (food ordering, booking, fitness, catalogue, portfolio, tracker) → use localStorage (single-user)
+EVERY APP MUST HAVE:
 
-━━━ FOR ALL APPS ━━━
-- Complete single HTML file
-- Mobile-first, max-width 430px, centered on desktop
-- Beautiful premium UI — think Zomato / Swiggy / Uber quality
-- Choose colors that perfectly match the app type
-- Bottom navigation bar with 4 relevant tabs
-- Status bar at top showing time
-- Every single button must have a working onclick handler
-- 8-12 items/products/listings with realistic Indian names and ₹ prices
-- Star ratings ★★★★☆, NEW and POPULAR badges on cards
-- Smooth animations, card shadows, gradient accents
-- NO placeholder text like "Content here" — write real content
+━━ SCREEN 1: AUTH (shown first, covers full screen) ━━
+- Beautiful full-screen login/signup UI with dark premium background
+- Role selection buttons at top: "I am a Customer" and "I am a Shop Owner" (or relevant role for this app type)
+- When a role is selected, highlight it and store the choice
+- Name field (signup only), Email field, Password field
+- Login button that calls _auth.signInWithEmailAndPassword()
+- Sign Up button that calls _auth.createUserWithEmailAndPassword() and saves to Firestore users collection with role
+- Working inline error display (red text under fields)
+- Toggle between Login and Sign Up modes
 
-━━━ FOR SINGLE-USER APPS (localStorage) ━━━
-These exact function names MUST exist (framework depends on them):
-  showPage(pageId, navElement) — shows a page, hides others, updates nav active state
-  addToCart(itemName, price) — adds item to cart array, updates badge, shows toast
-  removeFromCart(index) — removes item from cart, updates badge
-  updateCartPage() — renders cart items and total
-  placeOrder() — saves order to localStorage, clears cart, shows confirmation
-  showToast(message) — shows bottom popup message for 2.5 seconds
-  showMyOrders() — renders saved orders in #ordersList element
-These exact element IDs MUST exist: page-home, page-list, page-cart, page-profile, cartBadge, cartList, cartTotal, statusTime
+━━ SCREEN 2: CUSTOMER APP (shown after customer login) ━━
+- Home tab: hero banner with app name, 4 featured items as cards with image emoji, name, price, Add to Cart button
+- Browse/Menu tab: all products from Firestore via onSnapshot() in real-time, each card has name, price, description, Add to Cart button
+- Cart tab: list of cart items, quantity, per-item total, grand total in ₹, Place Order button that writes to Firestore orders collection with status:'pending'
+- My Orders tab: customer's own orders fetched from Firestore with order date, items, total, status badge
+- Bottom navigation bar with 4 tabs: Home, Browse, Cart (with badge count), Orders
 
-━━━ FOR MULTI-USER APPS (Firebase) ━━━
-Use these CDN scripts (compat versions, not modules):
-  firebase-app-compat.js, firebase-auth-compat.js, firebase-firestore-compat.js
-  (from https://www.gstatic.com/firebasejs/10.12.0/)
-Firebase config — use exactly this, do not change:
-  apiKey:"AIzaSyDJC8ijJ-SknWzBUub7GTXSJ3EFeRfHC6c", authDomain:"build-my-app-3c629.firebaseapp.com",
-  projectId:"build-my-app-3c629", storageBucket:"build-my-app-3c629.firebasestorage.app",
-  messagingSenderId:"823433789308", appId:"1:823433789308:web:5a953ee43cd5cf2548aef9"
-- Beautiful auth screen shown first — role selection (2 user types) + email/password + login/signup
-- Save user role to Firestore users collection on signup
-- Each role gets its complete own set of screens
-- Use onSnapshot() for real-time live data updates
-- All Firestore CRUD operations must be complete and working
+━━ SCREEN 3: SHOP OWNER APP (shown after owner login) ━━
+- Dashboard tab: welcome card with shop name, total orders count, pending orders count (real-time from Firestore)
+- My Products tab: list of this owner's products from Firestore, Add Product form (name, price, description fields + Save button that writes to Firestore products collection)
+- Incoming Orders tab: real-time orders for this shop via onSnapshot(), each order shows customer name, items, total, status; Approve button updates status to 'approved' in Firestore
+- Profile tab: owner's name, shop name, email, logout button
+- Bottom navigation bar with 4 tabs: Dashboard, Products, Orders, Profile
 
-Return the complete HTML file only. No markdown. No explanation. No code fences.`
+FIREBASE CONFIG (use exactly this, compat SDK not modules):
+CDN scripts to include:
+  https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js
+  https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js
+  https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js
+
+Config object:
+  apiKey: "AIzaSyDJC8ijJ-SknWzBUub7GTXSJ3EFeRfHC6c"
+  authDomain: "build-my-app-3c629.firebaseapp.com"
+  projectId: "build-my-app-3c629"
+  storageBucket: "build-my-app-3c629.firebasestorage.app"
+  messagingSenderId: "823433789308"
+  appId: "1:823433789308:web:5a953ee43cd5cf2548aef9"
+
+FIRESTORE COLLECTIONS:
+- users: { uid, name, email, role ('customer' or 'owner'), shopName (owners only), createdAt }
+- products: { name, price, description, category, shopId, shopName, available: true, createdAt }
+- orders: { customerId, customerName, shopId, shopName, items (array of {name,price,qty}), total, status: 'pending' or 'approved', createdAt }
+
+DESIGN RULES:
+- Mobile-first, max-width 430px, centered on desktop with dark outer background
+- Beautiful premium UI matching the app type (restaurant = dark red+gold, gym = dark blue+neon, salon = rose+pink, etc.)
+- Real Indian content — realistic product/service names and ₹ prices
+- Status bar at top showing current time
+- Smooth CSS transitions on buttons and cards
+- Card shadows, gradient accents, rounded corners
+- Star ratings ★★★★☆ and badges (NEW, POPULAR, HOT) on product cards
+- No placeholder text, no TODO comments
+
+TECHNICAL RULES:
+- Use firebase-app-compat.js, firebase-auth-compat.js, firebase-firestore-compat.js (compat not modules)
+- Initialize with: const _app = firebase.initializeApp(config); const _auth = firebase.auth(_app); const _db = firebase.firestore(_app);
+- Use onSnapshot() for all real-time data (orders list, products list)
+- Use _auth.onAuthStateChanged() to detect login/logout and show correct screen
+- Every onclick attribute calls a real, fully-implemented function
+- Cart state lives in a JS array; add/remove functions update it and re-render the cart tab
+- Place Order writes to Firestore and clears local cart
+- Approve Order button calls _db.collection('orders').doc(id).update({status:'approved'})
+- Do NOT include the literal text closing-script-tag anywhere inside your response — close your script tags normally in the HTML
+
+Return complete HTML only. No markdown. No explanation. No code fences.`
         }]
       })
     });
@@ -564,8 +560,8 @@ Return the complete HTML file only. No markdown. No explanation. No code fences.
       raw = raw.replace(/^```html?\n?/i, '').replace(/\n?```$/, '').trim();
     }
 
-    // Validate it's actually HTML
-    if (!raw.includes('<!DOCTYPE') && !raw.includes('<html')) {
+    // Validate it's actually HTML — lenient check, just need opening tag and reasonable length
+    if ((!raw.includes('<!DOCTYPE') && !raw.includes('<html')) || raw.length < 500) {
       throw new Error('AI returned invalid content. Preview: ' + raw.slice(0, 120));
     }
 
@@ -752,21 +748,20 @@ async function modifyApp() {
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
         max_tokens: 16000,
-        thinking: { type: 'enabled', budget_tokens: 6000 },
-        system: `You are an expert software engineer — you operate like Claude Code. You carefully read the existing code, understand exactly how it works, plan your change precisely, then implement it completely. Every button works. Every feature works. You never break existing functionality. You never use placeholders.`,
+        thinking: { type: 'enabled', budget_tokens: 4000 },
+        system: `You are an expert software engineer. You carefully read the existing code, understand exactly how it works, then apply the requested change completely and correctly. You never break existing working Firebase code, auth flows, or Firestore operations. You never use placeholders or TODO comments. Every button works after your change.`,
         messages: [{
           role: 'user',
-          content: `Here is my app. Apply this change: ${changes}
+          content: `Here is my Firebase app. The user says: "${changes}"
 
-RULES:
-- Read the existing code carefully and understand it fully before changing anything
-- Apply the requested change completely — make it fully work, not just visually
-- Keep all existing content, items, names, prices, colors that are NOT part of the change
-- Every button and interactive element must work after your change
-- If adding a new feature (login, search, filter, page, form) — write the complete working JavaScript for it
-- If fixing buttons — trace why they are broken and fix the root cause
-- Return the COMPLETE updated HTML file
-- Raw HTML only, no markdown, no code fences
+Apply this change fully and correctly. Follow these rules:
+- Read the entire existing code before changing anything
+- Keep ALL existing Firebase config, auth code, onAuthStateChanged, onSnapshot listeners, and Firestore CRUD operations intact
+- If the user says "sign in not coming" or auth is broken — find the auth screen element and ensure it is shown by default, ensure onAuthStateChanged correctly shows/hides it, and ensure fbSubmit calls the right Firebase auth method
+- If the user says a button does not work — find it, trace the missing or broken function, and implement the complete working handler
+- Apply the visual or functional change the user asked for completely
+- Every onclick must call a real implemented function
+- Return the COMPLETE updated HTML file — raw HTML only, no markdown, no code fences
 
 CURRENT APP CODE:
 ${generatedCode}`
