@@ -327,35 +327,19 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 // ─────────────────────────────────────────────────────────────
 
-// The guaranteed-working core JS — injected into EVERY app load
-const CORE_JS = `var _cart=[],_cartCount=0;
-function showPage(id,el){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});var t=document.getElementById(id);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');}
-function addToCart(name,price){_cart.push({name:name,price:Number(price)});_cartCount++;var b=document.getElementById('cartBadge');if(b){b.textContent=_cartCount;b.style.display='flex';}showToast(name+' added! \u{1F6D2}');updateCartPage();}
-function removeFromCart(i){_cart.splice(i,1);_cartCount--;var b=document.getElementById('cartBadge');if(b){b.textContent=_cartCount>0?_cartCount:'';if(_cartCount<=0)b.style.display='none';}updateCartPage();}
-function updateCartPage(){var list=document.getElementById('cartList');var total=document.getElementById('cartTotal');if(!list)return;if(_cart.length===0){list.innerHTML='<p style="text-align:center;padding:40px;opacity:0.5">Cart is empty</p>';if(total)total.textContent='₹0';return;}list.innerHTML=_cart.map(function(item,i){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid rgba(128,128,128,0.2)"><span>'+item.name+'</span><div style="display:flex;align-items:center;gap:10px"><span style="font-weight:700">₹'+item.price+'</span><button onclick="removeFromCart('+i+')" style="background:#ff5757;color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:15px;line-height:1">−</button></div></div>';}).join('');var sum=_cart.reduce(function(a,b){return a+b.price;},0);if(total)total.textContent='₹'+sum;}
-function saveData(key,val){try{localStorage.setItem(key,JSON.stringify(val));}catch(e){}}
-function loadData(key){try{return JSON.parse(localStorage.getItem(key)||'null');}catch(e){return null;}}
-function placeOrder(){if(_cart.length===0){showToast('Add items first!');return;}var items=[..._cart];var total=_cart.reduce(function(a,b){return a+b.price;},0);var order={id:'ORD'+Date.now(),items:items,total:total,date:new Date().toLocaleString(),status:'✅ Confirmed'};var orders=loadData('my_orders')||[];orders.unshift(order);saveData('my_orders',orders.slice(0,50));_cart=[];_cartCount=0;var b=document.getElementById('cartBadge');if(b){b.style.display='none';b.textContent='';}updateCartPage();showToast('\u{1F389} Order #'+String(order.id).slice(-4)+' saved! ✅');var firstNav=document.querySelector('.nav-item');showPage('page-home',firstNav);}
-function getMyOrders(){return loadData('my_orders')||[];}
-function showMyOrders(){var orders=getMyOrders();var el=document.getElementById('ordersList');if(!el)return;if(orders.length===0){el.innerHTML='<p style="text-align:center;padding:30px;opacity:0.5">No orders yet</p>';return;}el.innerHTML=orders.map(function(o){return'<div style="background:rgba(255,255,255,0.07);border-radius:12px;padding:14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-weight:700">'+o.id.slice(-6)+'</span><span style="color:#4CAF50;font-weight:700">'+o.status+'</span></div><div style="font-size:12px;opacity:0.6;margin-bottom:4px">'+o.date+'</div><div style="font-size:13px">'+o.items.map(function(i){return i.name+' ₹'+i.price;}).join(', ')+'</div><div style="font-weight:800;margin-top:6px;color:var(--primary,#F5A623)">Total: ₹'+o.total+'</div></div>';}).join('');}
-function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:82px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;white-space:nowrap;pointer-events:none;';document.body.appendChild(t);setTimeout(function(){t.remove();},2500);}
+// Fallback core JS — only fills in functions Claude didn't write (uses typeof guards)
+const CORE_JS = `if(!window._coreLoaded){window._coreLoaded=true;
+if(typeof _cart==='undefined'){var _cart=[],_cartCount=0;}
+if(typeof showPage==='undefined'){window.showPage=function(id,el){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});var t=document.getElementById(id);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');};}
+if(typeof showToast==='undefined'){window.showToast=function(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:82px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;white-space:nowrap;pointer-events:none;';document.body.appendChild(t);setTimeout(function(){t.remove();},2500);};}
+if(typeof saveData==='undefined'){window.saveData=function(key,val){try{localStorage.setItem(key,JSON.stringify(val));}catch(e){}};window.loadData=function(key){try{return JSON.parse(localStorage.getItem(key)||'null');}catch(e){return null;}};}
+if(typeof addToCart==='undefined'){window.addToCart=function(name,price){_cart.push({name:name,price:Number(price)});_cartCount++;var b=document.getElementById('cartBadge');if(b){b.textContent=_cartCount;b.style.display='flex';}showToast(name+' added! \u{1F6D2}');if(typeof updateCartPage==='function')updateCartPage();};}
+if(typeof removeFromCart==='undefined'){window.removeFromCart=function(i){_cart.splice(i,1);_cartCount--;var b=document.getElementById('cartBadge');if(b){b.textContent=_cartCount>0?_cartCount:'';if(_cartCount<=0)b.style.display='none';}if(typeof updateCartPage==='function')updateCartPage();};}
+if(typeof updateCartPage==='undefined'){window.updateCartPage=function(){var list=document.getElementById('cartList');var total=document.getElementById('cartTotal');if(!list)return;if(_cart.length===0){list.innerHTML='<p style="text-align:center;padding:40px;opacity:0.5">Cart is empty</p>';if(total)total.textContent='₹0';return;}list.innerHTML=_cart.map(function(item,i){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid rgba(128,128,128,0.2)"><span>'+item.name+'</span><div style="display:flex;align-items:center;gap:10px"><span style="font-weight:700">₹'+item.price+'</span><button onclick="removeFromCart('+i+')" style="background:#ff5757;color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:15px;line-height:1">−</button></div></div>';}).join('');var sum=_cart.reduce(function(a,b){return a+b.price;},0);if(total)total.textContent='₹'+sum;};}
+if(typeof placeOrder==='undefined'){window.placeOrder=function(){if(_cart.length===0){showToast('Add items first!');return;}var items=[..._cart];var total=_cart.reduce(function(a,b){return a+b.price;},0);var order={id:'ORD'+Date.now(),items:items,total:total,date:new Date().toLocaleString(),status:'✅ Confirmed'};var orders=loadData('my_orders')||[];orders.unshift(order);saveData('my_orders',orders.slice(0,50));_cart=[];_cartCount=0;var b=document.getElementById('cartBadge');if(b){b.style.display='none';b.textContent='';}updateCartPage();showToast('\u{1F389} Order saved! ✅');};}
+if(typeof showMyOrders==='undefined'){window.showMyOrders=function(){var orders=(typeof loadData==='function'?loadData('my_orders'):null)||[];var el=document.getElementById('ordersList');if(!el)return;if(orders.length===0){el.innerHTML='<p style="text-align:center;padding:30px;opacity:0.5">No orders yet</p>';return;}el.innerHTML=orders.map(function(o){return'<div style="background:rgba(255,255,255,0.07);border-radius:12px;padding:14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-weight:700">#'+String(o.id).slice(-6)+'</span><span style="color:#4CAF50;font-weight:700">'+o.status+'</span></div><div style="font-size:12px;opacity:0.6;margin-bottom:4px">'+o.date+'</div><div style="font-weight:800;margin-top:6px;color:var(--primary,#F5A623)">Total: ₹'+o.total+'</div></div>';}).join('');};}
 setInterval(function(){var now=new Date();var h=now.getHours()%12||12;var m=String(now.getMinutes()).padStart(2,'0');var el=document.getElementById('statusTime');if(el)el.textContent=h+':'+m;},30000);
-window.addEventListener('load',function(){
-  var pages=Array.from(document.querySelectorAll('.page'));
-  var navs=Array.from(document.querySelectorAll('.nav-item'));
-  if(!document.querySelector('.page.active')&&pages.length){pages[0].classList.add('active');}
-  if(!document.querySelector('.nav-item.active')&&navs.length){navs[0].classList.add('active');}
-  navs.forEach(function(nav,i){
-    var page=pages[i];
-    if(!page)return;
-    nav.onclick=function(){
-      pages.forEach(function(p){p.classList.remove('active');});
-      navs.forEach(function(n){n.classList.remove('active');});
-      page.classList.add('active');
-      nav.classList.add('active');
-    };
-  });
-});`;
+}`;
 
 // Firebase HTML (auth screen + user bar) — fully inline styles, no CSS classes needed
 const FIREBASE_HTML = `<div id="fbAuthScreen" style="position:fixed;inset:0;background:#0d0d1a;display:flex;align-items:center;justify-content:center;z-index:9999;padding:24px;font-family:Inter,sans-serif;"><div style="background:#1a1a2e;border-radius:20px;padding:32px 24px;width:100%;max-width:360px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.5);"><div style="font-size:44px;margin-bottom:10px">🔐</div><div id="fbAuthTitle" style="font-size:22px;font-weight:900;color:#fff;margin-bottom:6px;">Welcome Back!</div><div id="fbAuthSub" style="font-size:13px;color:rgba(255,255,255,0.55);margin-bottom:20px;">Login to continue</div><div id="fbErr" style="color:#ff5757;font-size:12px;margin-bottom:8px;display:none;"></div><input id="fbName" placeholder="Your Name" style="display:none;width:100%;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:13px 16px;color:#fff;font-size:14px;outline:none;margin-bottom:10px;box-sizing:border-box;"/><input id="fbEmail" type="email" placeholder="Email address" style="width:100%;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:13px 16px;color:#fff;font-size:14px;outline:none;margin-bottom:10px;box-sizing:border-box;"/><input id="fbPass" type="password" placeholder="Password" style="width:100%;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:13px 16px;color:#fff;font-size:14px;outline:none;margin-bottom:14px;box-sizing:border-box;"/><button id="fbMainBtn" onclick="fbSubmit()" style="width:100%;padding:14px;background:#F5A623;color:#000;border:none;border-radius:10px;font-size:16px;font-weight:900;cursor:pointer;margin-bottom:10px;">Login</button><button id="fbToggleBtn" onclick="fbToggle()" style="background:none;border:none;color:#F5A623;font-size:13px;cursor:pointer;">Don't have an account? Sign Up</button></div></div>
@@ -804,11 +788,9 @@ ${generatedCode}`
       updatedCode = updatedCode.replace(/^```html?\n?/i, '').replace(/\n?```$/, '');
     }
 
-    // Validate core structure — must have the key elements
-    const coreRequired = ['<html', 'page-home', 'page-list', 'bottom-nav'];
-    const missing = coreRequired.filter(function(r){ return !updatedCode.includes(r); });
-    if (missing.length > 0) {
-      throw new Error('AI returned incomplete HTML (missing: ' + missing.join(', ') + '). Your previous app is unchanged — please try again.');
+    // Validate it's real HTML — just check for basic structure
+    if (!updatedCode.includes('<html') || updatedCode.length < 500) {
+      throw new Error('AI returned incomplete response. Your previous app is unchanged — please try again.');
     }
     // Auto-fix truncated response — if </body> or </html> missing, append them
     if (!updatedCode.includes('</body>')) updatedCode += '\n</body></html>';
