@@ -613,7 +613,7 @@ function toggleMobile() {
   if (isMobileView) {
     desktop.style.display = 'none';
     mobile.style.display = 'block';
-    document.getElementById('mobileFrame').srcdoc = generatedCode;
+    document.getElementById('mobileFrame').srcdoc = prepareApp(generatedCode);
     btn.textContent = '🖥️ Desktop View';
   } else {
     desktop.style.display = 'block';
