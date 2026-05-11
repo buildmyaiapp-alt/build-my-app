@@ -879,52 +879,26 @@ async function modifyApp() {
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
         max_tokens: 16000,
-        system: `You are an expert mobile app developer. You add fully working features to existing HTML apps. Every feature you add must actually work — no fake or placeholder functionality.
-
-PROTECTED — NEVER CHANGE THESE:
-- Function names: showPage, addToCart, removeFromCart, updateCartPage, placeOrder, showToast
-- Element IDs: page-home, page-list, page-cart, page-profile, cartBadge, cartList, cartTotal, statusTime
-- Class names: page, nav-item, bottom-nav, ni, nl, nav-icon-wrap, cart-badge
-- The onclick attributes on existing .nav-item elements
-
-WORKING FEATURE PATTERNS — use these when adding features:
-
-LOGIN/SIGNUP — use localStorage to save user, show/hide pages:
-function doLogin(){ var u=document.getElementById('loginUser').value; var p=document.getElementById('loginPass').value; if(u&&p){localStorage.setItem('loggedUser',u); showPage('page-home',document.querySelector('.nav-item')); showToast('Welcome '+u+'!');} else showToast('Fill all fields!'); }
-function doLogout(){ localStorage.removeItem('loggedUser'); showPage('page-login',null); }
-
-SEARCH/FILTER — filter visible cards by input text:
-function doSearch(q){ document.querySelectorAll('.item-card').forEach(function(c){ c.style.display=c.textContent.toLowerCase().includes(q.toLowerCase())?'':'none'; }); }
-
-BOOKING/FORM — save to localStorage array, show confirmation:
-function submitBooking(){ var d={}; document.querySelectorAll('#bookingForm input,#bookingForm select').forEach(function(i){d[i.name]=i.value;}); var b=JSON.parse(localStorage.getItem('bookings')||'[]'); b.push(d); localStorage.setItem('bookings',JSON.stringify(b)); showToast('Booking confirmed!'); showPage('page-home',document.querySelector('.nav-item')); }
-
-COUNTER/QUANTITY — increment/decrement with display update:
-function changeQty(id,delta){ var el=document.getElementById(id); var v=parseInt(el.textContent||0)+delta; if(v<0)v=0; el.textContent=v; }
-
-TOGGLE/FAVOURITE — toggle heart/star state:
-function toggleFav(btn){ btn.textContent=btn.textContent==='🤍'?'❤️':'🤍'; }
-
-RULES FOR NEW FEATURES:
-- Every button MUST have a working onclick
-- Forms MUST save data to localStorage and show toast confirmation
-- Login MUST actually check fields and save user to localStorage
-- Search MUST filter items in real time
-- New pages need class="page" and unique id, added to bottom-nav if needed
-- NEVER add a feature that does nothing when clicked
-
-Return the COMPLETE HTML. Raw HTML only. No markdown. No explanation.`,
+        system: `You are a mobile app designer. You fill in pre-built HTML templates with beautiful content and styling. The JavaScript is already written and working — you must NOT change any function names or logic. Your job is only design and content.`,
         messages: [{
           role: 'user',
-          content: `App idea: ${originalIdea || 'mobile app'}
-Requested change: ${changes}
+          content: `You are updating an existing app. Apply this change: ${changes}
 
-IMPORTANT: Make this feature FULLY WORKING. Use localStorage for data. Every button must do something real. No placeholder functions.
+App idea: ${originalIdea || 'mobile app'}
 
-Current code:
+STRICT RULES — same as when you built it:
+- Keep ALL function names exactly: showPage, addToCart, removeFromCart, updateCartPage, placeOrder, showToast
+- Keep ALL element IDs exactly: page-home, page-list, page-cart, page-profile, cartBadge, cartList, cartTotal, statusTime
+- Keep ALL page divs with class="page" and their IDs unchanged
+- Keep bottom-nav structure and nav-item class unchanged
+- On cart/order/book buttons use: onclick="addToCart('Item Name', price)"
+- On navigation buttons use: onclick="showPage('page-id', null)"
+- NO splash screens. NO loading spinners.
+
+CURRENT APP CODE — apply the change to this:
 ${generatedCode}
 
-Apply the requested change with fully working functionality. Return complete HTML.`
+Return the complete updated HTML. Raw HTML only, no markdown.`
         }]
       })
     });
