@@ -797,7 +797,7 @@ async function modifyApp() {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
-        max_tokens: 5000,
+        max_tokens: 8000,
         system: `You are a mobile app designer. You fill in pre-built HTML templates with beautiful content and styling. The JavaScript is already written and working — you must NOT change any function names or logic. Your job is only design and content.`,
         messages: [{
           role: 'user',
@@ -914,12 +914,15 @@ Return the complete filled HTML. Raw HTML only, no markdown.`
       updatedCode = updatedCode.replace(/^```html?\n?/i, '').replace(/\n?```$/, '');
     }
 
-    // Strong validation — must have all required elements or we keep previous version
-    const required = ['<html', 'page-home', 'page-list', 'bottom-nav', '</body>'];
-    const missing = required.filter(function(r){ return !updatedCode.includes(r); });
+    // Validate core structure — must have the key elements
+    const coreRequired = ['<html', 'page-home', 'page-list', 'bottom-nav'];
+    const missing = coreRequired.filter(function(r){ return !updatedCode.includes(r); });
     if (missing.length > 0) {
       throw new Error('AI returned incomplete HTML (missing: ' + missing.join(', ') + '). Your previous app is unchanged — please try again.');
     }
+    // Auto-fix truncated response — if </body> or </html> missing, append them
+    if (!updatedCode.includes('</body>')) updatedCode += '\n</body></html>';
+    else if (!updatedCode.includes('</html>')) updatedCode += '\n</html>';
 
     // Save backup in case something looks wrong
     const previousCode = generatedCode;
