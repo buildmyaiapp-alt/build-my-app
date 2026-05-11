@@ -117,7 +117,10 @@
 <div id="mobileWarning">⚠️ This tool is designed for Laptop / PC. Please open on a computer for the best experience.</div>
 <div class="header">
   <div class="logo">⚡ Build My <span>App</span></div>
-  <div class="badge">BY PALASH</div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <button onclick="document.getElementById('apiSetup').style.display=document.getElementById('apiSetup').style.display==='none'?'block':'none'" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 10px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600;">🔑 API Key</button>
+    <div class="badge">BY PALASH</div>
+  </div>
 </div>
 
 <div class="main">
@@ -423,6 +426,9 @@ window.onload = function() {
     document.getElementById('apiStatus').className = 'api-status ok';
     document.getElementById('apiStatus').textContent = '✅ API key is saved and ready!';
     document.getElementById('apiKeyInput').placeholder = 'Key saved — paste new one to update';
+  } else {
+    // No key saved yet — show the setup box automatically
+    document.getElementById('apiSetup').style.display = 'block';
   }
 };
 
