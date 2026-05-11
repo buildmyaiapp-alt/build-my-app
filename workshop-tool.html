@@ -601,7 +601,7 @@ function toggleMobile() {
 
 function downloadApp() {
   if (!generatedCode) return;
-  const blob = new Blob([generatedCode], { type: 'text/html' });
+  const blob = new Blob([prepareApp(generatedCode)], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -676,7 +676,7 @@ ${generatedCode}`
     if (fixed.startsWith('```')) fixed = fixed.replace(/^```html?\n?/i, '').replace(/\n?```$/, '').trim();
     if (!fixed.includes('<!DOCTYPE') && !fixed.includes('<html')) throw new Error('Invalid response. Try again.');
 
-    generatedCode = prepareApp(fixed);
+    generatedCode = fixed;
 
     function reloadIframe(frameId) {
       const old = document.getElementById(frameId);
@@ -686,7 +686,7 @@ ${generatedCode}`
       f.sandbox = 'allow-scripts allow-same-origin';
       f.style.cssText = 'width:100%;height:' + (frameId === 'mobileFrame' ? '650' : '600') + 'px;border:none;display:block;';
       old.parentNode.replaceChild(f, old);
-      setTimeout(() => { f.srcdoc = generatedCode; }, 80);
+      setTimeout(() => { f.srcdoc = prepareApp(generatedCode); }, 80);
     }
     reloadIframe('previewFrame');
     if (isMobileView) reloadIframe('mobileFrame');
@@ -805,9 +805,8 @@ Apply the requested change with fully working functionality. Return complete HTM
       throw new Error('AI returned incomplete code. Please try again.');
     }
 
-    // Strip Claude's JS and re-inject guaranteed working JS
-    // This means modify can NEVER break navigation or cart buttons
-    generatedCode = prepareApp(updatedCode);
+    // Store raw code — CORE_JS injected only at display time, never sent to Claude
+    generatedCode = updatedCode;
 
     // Reload iframe by replacing it entirely — most reliable method
     function reloadIframe(frameId) {
@@ -818,7 +817,7 @@ Apply the requested change with fully working functionality. Return complete HTM
       newFrame.sandbox = 'allow-scripts allow-same-origin';
       newFrame.style.cssText = 'width:100%;height:' + (frameId === 'mobileFrame' ? '650' : '600') + 'px;border:none;display:block;';
       old.parentNode.replaceChild(newFrame, old);
-      setTimeout(() => { newFrame.srcdoc = generatedCode; }, 80);
+      setTimeout(() => { newFrame.srcdoc = prepareApp(generatedCode); }, 80);
     }
 
     reloadIframe('previewFrame');
