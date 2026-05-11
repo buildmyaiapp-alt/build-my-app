@@ -350,6 +350,20 @@ window.addEventListener('load',function(){
   });
 });`;
 
+// Firebase HTML (auth screen + user bar) — injected automatically, Claude never sees it
+const FIREBASE_HTML = `<style>
+.fb-auth-screen{position:fixed;inset:0;background:var(--bg,#0d0d1a);display:flex;align-items:center;justify-content:center;z-index:9999;padding:24px;}
+.fb-card{background:var(--surface,#1a1a2e);border-radius:20px;padding:32px 24px;width:100%;max-width:360px;text-align:center;}
+.fb-title{font-size:22px;font-weight:900;margin-bottom:6px;color:var(--text,#fff);}
+.fb-sub{font-size:13px;color:var(--text2,rgba(255,255,255,0.55));margin-bottom:20px;}
+.fb-input{width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:13px 16px;color:var(--text,#fff);font-size:14px;font-family:inherit;outline:none;margin-bottom:10px;}
+.fb-btn{width:100%;padding:14px;background:var(--primary,#F5A623);color:#000;border:none;border-radius:10px;font-size:15px;font-weight:900;cursor:pointer;margin-bottom:8px;}
+.fb-link{color:var(--primary,#F5A623);font-size:13px;cursor:pointer;background:none;border:none;font-family:inherit;}
+.fb-err{color:#ff5757;font-size:12px;margin-bottom:8px;display:none;}
+</style>
+<div class="fb-auth-screen" id="fbAuthScreen"><div class="fb-card"><div style="font-size:40px;margin-bottom:8px">🔐</div><div class="fb-title" id="fbAuthTitle">Welcome Back!</div><div class="fb-sub" id="fbAuthSub">Login to continue</div><div class="fb-err" id="fbErr"></div><input class="fb-input" id="fbName" placeholder="Your Name" style="display:none"/><input class="fb-input" id="fbEmail" type="email" placeholder="Email address"/><input class="fb-input" id="fbPass" type="password" placeholder="Password"/><button class="fb-btn" id="fbMainBtn" onclick="fbSubmit()">Login</button><button class="fb-link" id="fbToggleBtn" onclick="fbToggle()">Don't have an account? Sign Up</button></div></div>
+<div id="userBar" style="display:none;background:var(--surface,#1a1a2e);padding:8px 16px;justify-content:space-between;align-items:center;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.08);"><span id="userGreet" style="font-weight:700;color:var(--primary,#F5A623)"></span><button onclick="fbLogout()" style="background:rgba(255,87,87,0.15);color:#ff5757;border:1px solid rgba(255,87,87,0.3);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;">Logout</button></div>`;
+
 // Firebase JS — injected automatically, never sent to Claude (saves tokens)
 const FIREBASE_JS = `import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
@@ -373,7 +387,7 @@ function prepareApp(html) {
   const bodyC = C(60,47,98,111,100,121,62);             // builds: [/body]
   const fbTag   = openMod + FIREBASE_JS + close;
   const coreTag = open + CORE_JS + close;
-  const inject  = fbTag + '\n' + coreTag;
+  const inject  = FIREBASE_HTML + '\n' + fbTag + '\n' + coreTag;
   if (html.includes(bodyC)) return html.replace(bodyC, inject + '\n' + bodyC);
   return html + inject;
 }
@@ -513,41 +527,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);max-w
 .nav-icon-wrap{position:relative;display:inline-block}
 .cart-badge{background:red;color:#fff;border-radius:50%;min-width:16px;height:16px;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center;position:absolute;top:-3px;right:-5px;padding:0 3px}
 button:active{transform:scale(0.96)}
-.fb-auth-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;padding:24px;}
-.fb-card{background:var(--surface);border-radius:20px;padding:32px 24px;width:100%;max-width:360px;text-align:center;}
-.fb-title{font-size:22px;font-weight:900;margin-bottom:6px;}
-.fb-sub{font-size:13px;color:var(--text2);margin-bottom:20px;}
-.fb-input{width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:13px 16px;color:var(--text);font-size:14px;font-family:inherit;outline:none;margin-bottom:10px;}
-.fb-btn{width:100%;padding:14px;background:var(--primary);color:#000;border:none;border-radius:10px;font-size:15px;font-weight:900;cursor:pointer;margin-bottom:8px;}
-.fb-link{color:var(--primary);font-size:13px;cursor:pointer;background:none;border:none;font-family:inherit;}
-.fb-err{color:#ff5757;font-size:12px;margin-bottom:8px;display:none;}
 
 /* ── YOUR CUSTOM STYLES BELOW ── */
 
 </style>
 </head>
 <body>
-
-<!-- FIREBASE AUTH SCREEN — shown until user logs in -->
-<div class="fb-auth-screen" id="fbAuthScreen">
-  <div class="fb-card">
-    <div style="font-size:40px;margin-bottom:8px">🔐</div>
-    <div class="fb-title" id="fbAuthTitle">Welcome Back!</div>
-    <div class="fb-sub" id="fbAuthSub">Login to continue</div>
-    <div class="fb-err" id="fbErr"></div>
-    <input class="fb-input" id="fbName" placeholder="Your Name" style="display:none"/>
-    <input class="fb-input" id="fbEmail" type="email" placeholder="Email address"/>
-    <input class="fb-input" id="fbPass" type="password" placeholder="Password"/>
-    <button class="fb-btn" id="fbMainBtn" onclick="fbSubmit()">Login</button>
-    <button class="fb-link" id="fbToggleBtn" onclick="fbToggle()">Don't have an account? Sign Up</button>
-  </div>
-</div>
-
-<!-- USER PROFILE BAR — shown when logged in -->
-<div id="userBar" style="display:none;background:var(--surface);padding:8px 16px;display:none;justify-content:space-between;align-items:center;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.08);">
-  <span id="userGreet" style="font-weight:700;color:var(--primary)"></span>
-  <button onclick="fbLogout()" style="background:rgba(255,87,87,0.15);color:#ff5757;border:1px solid rgba(255,87,87,0.3);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;">Logout</button>
-</div>
 
 <div class="status-bar"><span id="statusTime">9:41</span><span>▲▲▲ 🔋</span></div>
 
