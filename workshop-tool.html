@@ -621,13 +621,13 @@ EVERY APP MUST HAVE:
 - Home tab: hero banner with app name, 4 hardcoded featured item cards (emoji, name, price, Add to Cart button) — these are always visible even before owner adds products
 - Browse/Menu tab: loads ALL products from Firestore products collection via onSnapshot() — shows real-time cards with name, price, description, Add to Cart button. If no products yet, shows "No items yet — check back soon"
 - Cart tab: shows all cart items, per-item total, grand total in ₹. Place Order button writes to Firestore orders collection with ALL required fields (see schema below)
-- My Orders tab: customer's own orders — query: _db.collection('orders').where('customerId','==',user.uid).orderBy('createdAt','desc').onSnapshot() — shows order date, items list, total, status badge (🟡 Pending / ✅ Approved)
+- My Orders tab: customer's own orders — query: _db.collection('orders').where('customerId','==',user.uid).onSnapshot() then sort by createdAt in JS — shows order date, items list, total, status badge (🟡 Pending / ✅ Approved). NEVER use .orderBy() with .where() — it requires a Firestore index that does not exist
 - Bottom navigation bar with 4 tabs: Home, Browse, Cart (with live badge count), My Orders
 
 ━━ SCREEN 3: SHOP OWNER APP (shown after owner login) ━━
 - Dashboard tab: "Welcome [shopName]" card, real-time counts — Total Orders and Pending Orders fetched via _db.collection('orders').where('shopId','==',user.uid).onSnapshot()
 - My Products tab: shows this owner's products via _db.collection('products').where('shopId','==',user.uid).onSnapshot(). Add Product form with fields: Product Name, Price (₹), Description, Category — Save button writes to Firestore with shopId=user.uid and shopName from user profile
-- Incoming Orders tab: real-time orders via _db.collection('orders').where('shopId','==',user.uid).orderBy('createdAt','desc').onSnapshot() — each order card shows: customer name, order items list, total ₹, time, status badge. Approve button calls _db.collection('orders').doc(orderId).update({status:'approved'})
+- Incoming Orders tab: real-time orders via _db.collection('orders').where('shopId','==',user.uid).onSnapshot() then sort by createdAt in JS — each order card shows: customer name, order items list, total ₹, time, status badge. Approve button calls _db.collection('orders').doc(orderId).update({status:'approved'}). NEVER use .orderBy() with .where()
 - Profile tab: owner name, shop name, email, Logout button
 - Bottom navigation bar with 4 tabs: Dashboard, Products, Orders, Profile
 
@@ -684,9 +684,11 @@ STEP 4 — Customer places order (MUST write shopId to order):
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
 
-STEP 5 — Owner sees orders in real-time:
+STEP 5 — Owner sees orders in real-time (NO .orderBy — sort in JS instead):
   _db.collection('orders').where('shopId','==',_auth.currentUser.uid)
-    .orderBy('createdAt','desc').onSnapshot(snap => {
+    .onSnapshot(snap => {
+      const orders = snap.docs.map(d => ({id:d.id, ...d.data()}));
+      orders.sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
       // render order cards
     });
 
@@ -801,6 +803,7 @@ ABSOLUTE RULES:
 ❌ NO onclick anywhere in HTML — not even one
 ❌ NO wrapper div around all screens — screens go directly inside body or one outer div
 ❌ NO async or defer on Firebase script tags
+❌ NEVER use .orderBy() together with .where() in Firestore — no composite index exists, query will crash silently. Sort results in JavaScript after fetching.
 
 Return complete HTML only. No markdown. No explanation. No code fences.`
         }]
