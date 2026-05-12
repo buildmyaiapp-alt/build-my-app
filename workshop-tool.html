@@ -411,8 +411,10 @@ function repairButtonScope(html) {
     // direct eval() runs in the lexical scope where functions are defined
     var evalRebind = 'try{document.querySelectorAll("[onclick]").forEach(function(el){var oc=el.getAttribute("onclick");el.removeAttribute("onclick");el.addEventListener("click",function(e){try{eval(oc);}catch(ex){console.error("btn:",oc,ex);}});});}catch(_e){}';
 
-    // Brace-count to find the exact closing } of each __runWhenReady callback
-    var dclRe = /__runWhenReady\s*\(/g;
+    // Brace-count to find the exact closing } of each __runWhenReady CALL
+    // Use \(\s*function to match only calls like __runWhenReady(function(){...})
+    // This skips the helper definition itself: function __runWhenReady(fn){...}
+    var dclRe = /__runWhenReady\s*\(\s*function/g;
     var dclPos = [], dm;
     while ((dm = dclRe.exec(newBody)) !== null) dclPos.push(dm.index);
 
@@ -763,8 +765,8 @@ function toggleMobile() {
 
 function openFullApp() {
   if (!generatedCode) { alert('Build your app first!'); return; }
-  // Open in a real browser tab — no iframe sandbox, Firebase works 100%, all buttons work
-  const blob = new Blob([generatedCode], { type: 'text/html' });
+  // IMPORTANT: must call prepareApp() here — applies __runWhenReady fix so buttons work
+  const blob = new Blob([prepareApp(generatedCode)], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   window.open(url, '_blank');
   // Clean up after a delay
