@@ -593,21 +593,21 @@ EVERY APP MUST HAVE:
 - Toggle between Login and Sign Up modes
 
 ━━ SCREEN 2: CUSTOMER APP (shown after customer login) ━━
-- Home tab: hero banner with app name, 4 featured items as cards with image emoji, name, price, Add to Cart button
-- Browse/Menu tab: all products from Firestore via onSnapshot() in real-time, each card has name, price, description, Add to Cart button
-- Cart tab: list of cart items, quantity, per-item total, grand total in ₹, Place Order button that writes to Firestore orders collection with status:'pending'
-- My Orders tab: customer's own orders fetched from Firestore with order date, items, total, status badge
-- Bottom navigation bar with 4 tabs: Home, Browse, Cart (with badge count), Orders
+- Home tab: hero banner with app name, 4 hardcoded featured item cards (emoji, name, price, Add to Cart button) — these are always visible even before owner adds products
+- Browse/Menu tab: loads ALL products from Firestore products collection via onSnapshot() — shows real-time cards with name, price, description, Add to Cart button. If no products yet, shows "No items yet — check back soon"
+- Cart tab: shows all cart items, per-item total, grand total in ₹. Place Order button writes to Firestore orders collection with ALL required fields (see schema below)
+- My Orders tab: customer's own orders — query: _db.collection('orders').where('customerId','==',user.uid).orderBy('createdAt','desc').onSnapshot() — shows order date, items list, total, status badge (🟡 Pending / ✅ Approved)
+- Bottom navigation bar with 4 tabs: Home, Browse, Cart (with live badge count), My Orders
 
 ━━ SCREEN 3: SHOP OWNER APP (shown after owner login) ━━
-- Dashboard tab: welcome card with shop name, total orders count, pending orders count (real-time from Firestore)
-- My Products tab: list of this owner's products from Firestore, Add Product form (name, price, description fields + Save button that writes to Firestore products collection)
-- Incoming Orders tab: real-time orders for this shop via onSnapshot(), each order shows customer name, items, total, status; Approve button updates status to 'approved' in Firestore
-- Profile tab: owner's name, shop name, email, logout button
+- Dashboard tab: "Welcome [shopName]" card, real-time counts — Total Orders and Pending Orders fetched via _db.collection('orders').where('shopId','==',user.uid).onSnapshot()
+- My Products tab: shows this owner's products via _db.collection('products').where('shopId','==',user.uid).onSnapshot(). Add Product form with fields: Product Name, Price (₹), Description, Category — Save button writes to Firestore with shopId=user.uid and shopName from user profile
+- Incoming Orders tab: real-time orders via _db.collection('orders').where('shopId','==',user.uid).orderBy('createdAt','desc').onSnapshot() — each order card shows: customer name, order items list, total ₹, time, status badge. Approve button calls _db.collection('orders').doc(orderId).update({status:'approved'})
+- Profile tab: owner name, shop name, email, Logout button
 - Bottom navigation bar with 4 tabs: Dashboard, Products, Orders, Profile
 
 FIREBASE CONFIG (use exactly this, compat SDK not modules):
-CDN scripts to include:
+CDN scripts to include (NO async or defer):
   https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js
   https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js
   https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js
@@ -620,10 +620,53 @@ Config object:
   messagingSenderId: "823433789308"
   appId: "1:823433789308:web:5a953ee43cd5cf2548aef9"
 
-FIRESTORE COLLECTIONS:
-- users: { uid, name, email, role ('customer' or 'owner'), shopName (owners only), createdAt }
-- products: { name, price, description, category, shopId, shopName, available: true, createdAt }
-- orders: { customerId, customerName, shopId, shopName, items (array of {name,price,qty}), total, status: 'pending' or 'approved', createdAt }
+FIRESTORE COLLECTIONS — EXACT SCHEMA (follow precisely):
+- users: { uid, name, email, role ('customer' or 'owner'), shopName (owners only), createdAt: firebase.firestore.FieldValue.serverTimestamp() }
+- products: { name, price (number), description, category, shopId (= owner's Firebase UID), shopName, available: true, createdAt: serverTimestamp() }
+- orders: { customerId (= customer's Firebase UID), customerName, shopId (= owner's Firebase UID — MUST match the product's shopId), shopName, items: [{name, price, qty}], total (number), status: 'pending', createdAt: serverTimestamp() }
+
+━━ CRITICAL DATA FLOW — HOW CUSTOMER ORDER REACHES OWNER ━━
+This is the most important part. Follow exactly:
+
+STEP 1 — Owner adds product:
+  _db.collection('products').add({
+    name: productName, price: Number(price), description: desc,
+    shopId: _auth.currentUser.uid,        // ← owner's UID becomes shopId
+    shopName: currentUser.shopName,
+    available: true,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+STEP 2 — Customer browses products (sees ALL products):
+  _db.collection('products').where('available','==',true).onSnapshot(snap => {
+    // render all products regardless of shopId
+  });
+
+STEP 3 — Customer adds to cart (MUST store shopId with each item):
+  cart.push({ name, price, qty: 1, shopId: product.shopId, shopName: product.shopName });
+
+STEP 4 — Customer places order (MUST write shopId to order):
+  const shopId = cart[0].shopId;         // take shopId from first cart item
+  const shopName = cart[0].shopName;
+  _db.collection('orders').add({
+    customerId: _auth.currentUser.uid,
+    customerName: currentUserName,
+    shopId: shopId,                       // ← this links order to owner
+    shopName: shopName,
+    items: cart.map(i => ({name:i.name, price:i.price, qty:i.qty})),
+    total: cart.reduce((s,i) => s + i.price*i.qty, 0),
+    status: 'pending',
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+STEP 5 — Owner sees orders in real-time:
+  _db.collection('orders').where('shopId','==',_auth.currentUser.uid)
+    .orderBy('createdAt','desc').onSnapshot(snap => {
+      // render order cards
+    });
+
+STEP 6 — Owner approves order:
+  _db.collection('orders').doc(orderId).update({ status: 'approved' });
 
 DESIGN RULES:
 - Mobile-first, max-width 430px, centered on desktop with dark outer background
@@ -858,15 +901,23 @@ async function fixAllButtons() {
         system: `You are an expert software engineer — you operate like Claude Code. You systematically read every line of code, trace exactly why each button is broken, then fix every single issue completely. You return the complete fixed HTML. Raw HTML only — no markdown, no explanation.`,
         messages: [{
           role: 'user',
-          content: `This is my app code. Find EVERY button, tab, nav item, filter, cart button, form, or link that is broken, missing an onclick, or does nothing when clicked. Fix ALL of them so everything works perfectly.
+          content: `This is my app code. Find and fix EVERY broken thing — buttons, tabs, data flow, Firebase queries. Make it completely working end-to-end.
 
-Specifically check and fix:
-1. Bottom navigation tabs — each must show the correct page and hide all others
-2. Add to Cart / Book / Order / Enroll buttons — must update cart count and show confirmation
-3. Category filter buttons — must show/hide relevant items
-4. Any button with onclick="" or no onclick at all — add a working handler
-5. Back buttons, close buttons, cancel buttons — must actually navigate or close
-6. Search bars — must filter the list as user types
+CHECK AND FIX ALL OF THESE:
+
+1. NAVIGATION — bottom nav tabs must show correct screen and hide all others
+2. BUTTONS — every Add to Cart / Book / Order / Enroll / Save button must work
+3. CATEGORY FILTERS — must show/hide correct items
+4. FIREBASE DATA FLOW — this is critical:
+   - When owner adds a product, it MUST save shopId = owner's Firebase UID
+   - When customer places order, order MUST contain shopId from the product
+   - Owner's orders tab MUST query: _db.collection('orders').where('shopId','==',_auth.currentUser.uid).onSnapshot()
+   - Customer's orders tab MUST query: _db.collection('orders').where('customerId','==',_auth.currentUser.uid).onSnapshot()
+   - If these queries are wrong or missing, fix them completely
+5. AUTH SCREEN — must be visible (display:flex) on load, not hidden
+6. onAuthStateChanged — must show correct app screen (customer or owner) based on user's role from Firestore
+7. Approve Order button — must call _db.collection('orders').doc(id).update({status:'approved'})
+8. Cart — add/remove items must update count badge in real time
 
 Return the complete fully working HTML file now:
 
