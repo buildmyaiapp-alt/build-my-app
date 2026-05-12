@@ -402,8 +402,9 @@ function repairButtonScope(html) {
       '__runWhenReady('
     );
     // Now inject helper at very top (after replacement so it won't be touched)
+    // Use fn() directly (not setTimeout) so listeners attach synchronously on blob URLs
     if (!newBody.includes('function __runWhenReady')) {
-      var readyHelper = 'function __runWhenReady(fn){if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",fn);}else{setTimeout(fn,0);}}';
+      var readyHelper = 'function __runWhenReady(fn){if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",fn);}else{fn();}}';
       newBody = readyHelper + '\n' + newBody;
     }
 
@@ -432,52 +433,45 @@ function repairButtonScope(html) {
     // setTimeout fallback for apps that skip DOMContentLoaded entirely
     newBody += '\nsetTimeout(function(){' + evalRebind + '},300);';
 
-    // ── EMERGENCY BLANK-SCREEN FALLBACK ─────────────────────────────────────────
-    // If 2s after load the page is still blank, find and show the auth screen.
-    // Uses smart detection — finds auth screen by password/email inputs, not IDs.
-    var blankFix = [
-      'setTimeout(function(){',
+    // ── EMERGENCY BLANK-SCREEN REVEALER ─────────────────────────────────────────
+    // Claude sometimes wraps screens in divs with any class/id name (outer-wrapper,
+    // app-container, etc.) and all screens start display:none.
+    // This revealer runs IMMEDIATELY + at 300ms + at 1000ms.
+    // It uses 5 strategies to find the auth screen regardless of naming.
+    var revealFn = [
+      '(function _reveal(){',
       '  try{',
-      '    // Check if any meaningful content is visible',
-      '    var hasContent=false;',
-      '    var all=document.querySelectorAll("body *");',
-      '    for(var _i=0;_i<all.length;_i++){',
-      '      var _el=all[_i];',
-      '      if(_el.offsetHeight>40&&window.getComputedStyle(_el).display!=="none"&&_el.textContent.trim().length>3){hasContent=true;break;}',
-      '    }',
-      '    if(hasContent)return;', // already showing something, do nothing
-      '    // Find auth screen: first try by ID keywords',
-      '    var _auth=null;',
-      '    var _ids=["authScreen","loginScreen","auth-screen","login-screen","fbAuthScreen","signInScreen","welcomeScreen"];',
-      '    for(var _j=0;_j<_ids.length;_j++){var _t=document.getElementById(_ids[_j]);if(_t){_auth=_t;break;}}',
-      '    // If not found by ID, find the parent of the password/email input',
-      '    if(!_auth){',
-      '      var _inp=document.querySelector("input[type=password],input[type=email],#emailInput,#passInput,#fbEmail,#fbPass");',
-      '      if(_inp){',
-      '        // Walk up to find a div with an id (the screen container)',
-      '        var _p=_inp.parentElement;',
-      '        while(_p&&_p!==document.body){if(_p.id&&_p.tagName==="DIV"){_auth=_p;break;}_p=_p.parentElement;}',
-      '      }',
-      '    }',
-      '    // Fallback: show first direct child div of body or app container',
-      '    if(!_auth){',
-      '      var _wrap=document.getElementById("app-container")||document.getElementById("app")||document.getElementById("root")||document.body;',
-      '      _auth=_wrap.querySelector("div[id]")||_wrap.firstElementChild;',
-      '    }',
-      '    if(_auth){',
-      '      // Make auth screen visible',
-      '      _auth.style.cssText+=";display:flex!important;visibility:visible!important;opacity:1!important;position:relative!important;z-index:9999!important;";',
-      '      // Also ensure all parent elements are not hidden',
-      '      var _par=_auth.parentElement;',
+      '    // Already has visible content? Stop.',
+      '    var _els=document.querySelectorAll("body *");',
+      '    for(var _i=0;_i<_els.length;_i++){if(_els[_i].offsetHeight>50&&_els[_i].textContent.trim().length>2)return;}',
+      '    var _a=null;',
+      '    // Strategy 1: exact known IDs',
+      '    var _kn=["authScreen","loginScreen","auth-screen","login-screen","fbAuthScreen","signInScreen","splashScreen"];',
+      '    for(var _j=0;_j<_kn.length;_j++){if(document.getElementById(_kn[_j])){_a=document.getElementById(_kn[_j]);break;}}',
+      '    // Strategy 2: any element whose id OR class contains auth/login/sign',
+      '    if(!_a){var _q=document.querySelectorAll("[id*=auth],[id*=Auth],[id*=login],[id*=Login],[id*=signin],[id*=signIn],[class*=auth-screen],[class*=login-screen],[class*=auth_screen]");if(_q.length)_a=_q[0];}',
+      '    // Strategy 3: parent of the password or email input field',
+      '    if(!_a){var _in=document.querySelector("input[type=password],input[type=email]");if(_in){var _p=_in;while(_p&&_p.parentElement!==document.body)_p=_p.parentElement;if(_p)_a=_p;}}',
+      '    // Strategy 4: first child of any wrapper div (outer-wrapper, app-container, etc)',
+      '    if(!_a){var _w=document.body.firstElementChild;if(_w)_a=_w.firstElementChild||_w;}',
+      '    // Strategy 5: absolute last resort — show body itself',
+      '    if(!_a)_a=document.body;',
+      '    // Make found element and all its parents visible',
+      '    if(_a){',
+      '      _a.style.cssText+=";display:flex!important;visibility:visible!important;opacity:1!important;";',
+      '      var _par=_a.parentElement;',
       '      while(_par&&_par!==document.body){',
       '        if(window.getComputedStyle(_par).display==="none")_par.style.display="block";',
       '        _par=_par.parentElement;',
       '      }',
       '    }',
       '  }catch(_e){}',
-      '},2000);'
+      '})();'
     ].join('\n');
-    newBody += '\n' + blankFix;
+    // Run immediately (DOM already ready on blob URLs), also at 300ms and 1000ms
+    newBody += '\n' + revealFn;
+    newBody += '\nsetTimeout(function(){' + revealFn + '},300);';
+    newBody += '\nsetTimeout(function(){' + revealFn + '},1000);';
 
     return open + newBody + '\n' + close;
   });
