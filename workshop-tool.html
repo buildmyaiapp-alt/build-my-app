@@ -392,12 +392,28 @@ function repairButtonScope(html) {
       }
     );
 
-    // ── FIX 2: eval rebinder injected INSIDE every DOMContentLoaded ─────────────
+    // ── FIX 3: __runWhenReady helper — blob URLs load instantly so               ─
+    // document.readyState is ALREADY "complete" when the script runs.             ─
+    // DOMContentLoaded never fires again → addEventListener callback is MISSED.   ─
+    // Replace every addEventListener('DOMContentLoaded', fn) with                ─
+    // __runWhenReady(fn) which calls fn() immediately if DOM is already ready.    ─
+    var readyHelper = 'function __runWhenReady(fn){if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",fn);}else{setTimeout(fn,0);}}';
+    // Only inject helper once, at the very top of the script body
+    if (!newBody.includes('__runWhenReady')) {
+      newBody = readyHelper + '\n' + newBody;
+    }
+    // Replace all addEventListener('DOMContentLoaded', ...) patterns
+    newBody = newBody.replace(
+      /document\.addEventListener\s*\(\s*['"]DOMContentLoaded['"]\s*,\s*/g,
+      '__runWhenReady('
+    );
+
+    // ── FIX 2: eval rebinder injected INSIDE every __runWhenReady block ─────────
     // direct eval() runs in the lexical scope where functions are defined
     var evalRebind = 'try{document.querySelectorAll("[onclick]").forEach(function(el){var oc=el.getAttribute("onclick");el.removeAttribute("onclick");el.addEventListener("click",function(e){try{eval(oc);}catch(ex){console.error("btn:",oc,ex);}});});}catch(_e){}';
 
-    // Brace-count to find the exact closing } of each DOMContentLoaded callback
-    var dclRe = /addEventListener\s*\(\s*['"]DOMContentLoaded['"]/g;
+    // Brace-count to find the exact closing } of each __runWhenReady callback
+    var dclRe = /__runWhenReady\s*\(/g;
     var dclPos = [], dm;
     while ((dm = dclRe.exec(newBody)) !== null) dclPos.push(dm.index);
 
