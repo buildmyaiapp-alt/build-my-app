@@ -433,19 +433,48 @@ function repairButtonScope(html) {
     newBody += '\nsetTimeout(function(){' + evalRebind + '},300);';
 
     // ── EMERGENCY BLANK-SCREEN FALLBACK ─────────────────────────────────────────
-    // If 2 seconds after load nothing is visible (all screens display:none),
-    // force-show the auth screen so the user always sees something.
+    // If 2s after load the page is still blank, find and show the auth screen.
+    // Uses smart detection — finds auth screen by password/email inputs, not IDs.
     var blankFix = [
       'setTimeout(function(){',
       '  try{',
-      '    var hasVisible=false;',
-      '    var screens=document.querySelectorAll(".screen,.page,[id*=Screen],[id*=screen],[id*=App],[id*=app]");',
-      '    screens.forEach(function(el){if(el.offsetHeight>20)hasVisible=true;});',
-      '    if(!hasVisible&&screens.length>0){',
-      '      var authEl=document.getElementById("authScreen")||document.getElementById("loginScreen")||document.getElementById("fbAuthScreen")||screens[0];',
-      '      if(authEl){authEl.style.display="flex";authEl.style.visibility="visible";}',
+      '    // Check if any meaningful content is visible',
+      '    var hasContent=false;',
+      '    var all=document.querySelectorAll("body *");',
+      '    for(var _i=0;_i<all.length;_i++){',
+      '      var _el=all[_i];',
+      '      if(_el.offsetHeight>40&&window.getComputedStyle(_el).display!=="none"&&_el.textContent.trim().length>3){hasContent=true;break;}',
       '    }',
-      '  }catch(e){}',
+      '    if(hasContent)return;', // already showing something, do nothing
+      '    // Find auth screen: first try by ID keywords',
+      '    var _auth=null;',
+      '    var _ids=["authScreen","loginScreen","auth-screen","login-screen","fbAuthScreen","signInScreen","welcomeScreen"];',
+      '    for(var _j=0;_j<_ids.length;_j++){var _t=document.getElementById(_ids[_j]);if(_t){_auth=_t;break;}}',
+      '    // If not found by ID, find the parent of the password/email input',
+      '    if(!_auth){',
+      '      var _inp=document.querySelector("input[type=password],input[type=email],#emailInput,#passInput,#fbEmail,#fbPass");',
+      '      if(_inp){',
+      '        // Walk up to find a div with an id (the screen container)',
+      '        var _p=_inp.parentElement;',
+      '        while(_p&&_p!==document.body){if(_p.id&&_p.tagName==="DIV"){_auth=_p;break;}_p=_p.parentElement;}',
+      '      }',
+      '    }',
+      '    // Fallback: show first direct child div of body or app container',
+      '    if(!_auth){',
+      '      var _wrap=document.getElementById("app-container")||document.getElementById("app")||document.getElementById("root")||document.body;',
+      '      _auth=_wrap.querySelector("div[id]")||_wrap.firstElementChild;',
+      '    }',
+      '    if(_auth){',
+      '      // Make auth screen visible',
+      '      _auth.style.cssText+=";display:flex!important;visibility:visible!important;opacity:1!important;position:relative!important;z-index:9999!important;";',
+      '      // Also ensure all parent elements are not hidden',
+      '      var _par=_auth.parentElement;',
+      '      while(_par&&_par!==document.body){',
+      '        if(window.getComputedStyle(_par).display==="none")_par.style.display="block";',
+      '        _par=_par.parentElement;',
+      '      }',
+      '    }',
+      '  }catch(_e){}',
       '},2000);'
     ].join('\n');
     newBody += '\n' + blankFix;
@@ -688,12 +717,14 @@ TECHNICAL RULES:
 - Place Order writes to Firestore and clears local cart
 - Approve Order button calls _db.collection('orders').doc(id).update({status:'approved'})
 
-⚠️ SCREEN VISIBILITY — CRITICAL RULE:
-- The AUTH SCREEN must start VISIBLE: id="authScreen" style="display:flex" (NOT display:none)
-- ALL other screens (customerApp, ownerApp) start hidden: style="display:none"
-- onAuthStateChanged hides authScreen and shows the correct app screen when user logs in
-- NEVER set authScreen to display:none in HTML — users must see the login UI immediately on load
-- This ensures the app always shows something even if Firebase takes time to initialize
+⚠️ SCREEN IDs AND VISIBILITY — CRITICAL RULES:
+- Use EXACTLY these IDs for the 3 main screens: id="authScreen", id="customerApp", id="ownerApp"
+- Do NOT use "app-container", "app-wrapper", "main-screen" or any other wrapper div as a screen
+- The AUTH SCREEN must start VISIBLE in HTML: <div id="authScreen" style="display:flex;...">
+- customerApp and ownerApp start hidden: <div id="customerApp" style="display:none;">
+- onAuthStateChanged shows/hides the correct screen based on user role
+- NEVER wrap all screens in a container div — screens sit directly in body
+- This is critical: if authScreen starts as display:none the page will be completely blank
 
 ⚠️ BUTTONS — THIS IS THE MOST IMPORTANT RULE. READ CAREFULLY:
 
@@ -765,10 +796,14 @@ ABSOLUTE RULES:
 ✅ Every button has an id
 ✅ Every handler uses addEventListener inside DOMContentLoaded
 ✅ Functions defined and used in the same DOMContentLoaded scope
-✅ authScreen div starts with style="display:flex" — ALWAYS visible on load
-✅ customerApp and ownerApp divs start with style="display:none"
+✅ Use EXACTLY id="authScreen", id="customerApp", id="ownerApp" — no other names
+✅ authScreen starts with style="display:flex" — visible immediately on page load
+✅ customerApp and ownerApp start with style="display:none"
+✅ shopId in every product = owner's Firebase UID (auth.currentUser.uid)
+✅ shopId in every order = copied from product's shopId
+✅ Owner orders query: .where('shopId','==',user.uid) so owner sees customer orders
 ❌ NO onclick anywhere in HTML — not even one
-❌ NO window.X = function(){} needed — addEventListener handles scope correctly
+❌ NO wrapper div around all screens — screens go directly inside body or one outer div
 ❌ NO async or defer on Firebase script tags
 
 Return complete HTML only. No markdown. No explanation. No code fences.`
