@@ -347,63 +347,77 @@ const FIREBASE_HTML = `<div id="fbAuthScreen" style="position:fixed;inset:0;back
 
 // FIREBASE_JS kept for reference but not used — all apps are built with compat SDK by Claude directly.
 
-// AUTO-REPAIR: promote every function to window scope so onclick always works.
-// ROOT CAUSE: Claude defines functions inside DOMContentLoaded → they are trapped in that
-// closure → onclick="X()" fails because X is not on window.
-// FIX: use brace-counting to find the exact closing } of DOMContentLoaded, then inject
-// window.X = X; promotions INSIDE the callback (where the names are in scope).
-// Also add a setTimeout fallback for any top-level functions.
+// AUTO-REPAIR: make every onclick button work, no matter how Claude structured the code.
+//
+// TWO-PRONGED NUCLEAR FIX:
+//
+// FIX 1 — Transform every named function declaration to ALSO assign to window:
+//   function showTab(id) {   →   window.showTab = function showTab(id) {
+//   Works at any nesting depth. When the containing scope runs (DOMContentLoaded,
+//   onAuthStateChanged, etc.), window.X is set so onclick can reach it.
+//   Named function expressions keep their name for internal recursion.
+//
+// FIX 2 — Inject an eval-based onclick rebinder INSIDE DOMContentLoaded:
+//   eval() uses lexical (direct) scope, so it can see every local function
+//   even ones Claude defined as arrow functions / const that Fix 1 didn't catch.
+//   The rebinder re-registers all onclick attributes as proper event listeners.
+//
 function repairButtonScope(html) {
   var scriptRe = /(<script(?!\s+src)[^>]*>)([\s\S]*?)(<\/script>)/gi;
   return html.replace(scriptRe, function(fullTag, open, body, close) {
-    // Collect every named function/variable that could be an onclick target
-    var names = new Set();
-    var re1 = /\bfunction\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g;
-    var re2 = /\b(?:const|let|var)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=\s*(?:async\s+)?function/g;
-    var re3 = /\b(?:const|let|var)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=\s*(?:async\s+)?\([^)]*\)\s*=>/g;
-    var m;
-    while ((m = re1.exec(body)) !== null) names.add(m[1]);
-    while ((m = re2.exec(body)) !== null) names.add(m[1]);
-    while ((m = re3.exec(body)) !== null) names.add(m[1]);
-    if (names.size === 0) return fullTag;
-
-    // Build the promotion snippet
-    var promotionCode = '';
-    names.forEach(function(n) {
-      promotionCode += 'try{if(typeof ' + n + '!=="undefined")window.' + n + '=' + n + ';}catch(e){}';
-    });
-
     var newBody = body;
 
-    // === Strategy 1: inject INSIDE every DOMContentLoaded callback ===
-    // Use brace-counting so we find the exact closing } even with nested braces.
-    // Process all occurrences from right-to-left so string positions stay valid.
-    var dclRe = /addEventListener\s*\(\s*['"]DOMContentLoaded['"]/g;
-    var matches = [];
-    var dclMatch;
-    while ((dclMatch = dclRe.exec(body)) !== null) matches.push(dclMatch.index);
+    // ── FIX 1 ─────────────────────────────────────────────────────────────────
+    // "function X(" → "window.X = function X("
+    // Only matches NAMED functions (anonymous callbacks like function(user){ are skipped).
+    newBody = newBody.replace(
+      /\bfunction\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g,
+      'window.$1 = function $1('
+    );
 
-    // Process right-to-left
-    for (var mi = matches.length - 1; mi >= 0; mi--) {
-      var startIdx = matches[mi];
-      // Find the first { after the DOMContentLoaded keyword (the callback body open brace)
-      var braceStart = newBody.indexOf('{', startIdx);
-      if (braceStart === -1) continue;
-      // Count braces to find matching closing }
+    // ── FIX 2 ─────────────────────────────────────────────────────────────────
+    // eval-based onclick rebinder — catches anything Fix 1 missed (arrow fns, const fns).
+    // MUST use direct eval (not indirect) so it runs in the DOMContentLoaded scope
+    // where local functions are visible.
+    var evalRebind = [
+      'try{',
+        'document.querySelectorAll("[onclick]").forEach(function(el){',
+          'var oc=el.getAttribute("onclick");',
+          'el.removeAttribute("onclick");',
+          'el.addEventListener("click",function(e){',
+            'e.stopPropagation&&e.stopPropagation();',
+            'try{eval(oc);}catch(ex){console.error("onclick err:",oc,ex);}',
+          '});',
+        '});',
+      '}catch(e){}'
+    ].join('');
+
+    // Use brace-counting on NEWBODY (after Fix 1) to find the closing }
+    // of every DOMContentLoaded callback and inject the rebinder inside it.
+    var dclRe = /addEventListener\s*\(\s*['"]DOMContentLoaded['"]/g;
+    var dclPositions = [];
+    var dm;
+    while ((dm = dclRe.exec(newBody)) !== null) dclPositions.push(dm.index);
+
+    // Process right-to-left so earlier insertions don't shift later positions
+    for (var mi = dclPositions.length - 1; mi >= 0; mi--) {
+      var pos = dclPositions[mi];
+      var braceStart = newBody.indexOf('{', pos);
+      if (braceStart < 0) continue;
       var depth = 0, braceEnd = -1;
-      for (var i = braceStart; i < newBody.length; i++) {
-        if (newBody[i] === '{') depth++;
-        else if (newBody[i] === '}') { depth--; if (depth === 0) { braceEnd = i; break; } }
+      for (var ci = braceStart; ci < newBody.length; ci++) {
+        if (newBody[ci] === '{') depth++;
+        else if (newBody[ci] === '}') { if (--depth === 0) { braceEnd = ci; break; } }
       }
-      if (braceEnd === -1) continue;
-      // Inject promotions just before the closing }
-      newBody = newBody.slice(0, braceEnd) + '\n/*repair*/' + promotionCode + '\n' + newBody.slice(braceEnd);
+      if (braceEnd >= 0) {
+        newBody = newBody.slice(0, braceEnd) + '\n' + evalRebind + '\n' + newBody.slice(braceEnd);
+      }
     }
 
-    // === Strategy 2: setTimeout fallback for top-level functions ===
-    var fallback = 'setTimeout(function(){' + promotionCode + '},0);';
+    // Also run via setTimeout as a safety net for apps with no DOMContentLoaded
+    newBody += '\nsetTimeout(function(){' + evalRebind + '},200);';
 
-    return open + newBody + '\n' + fallback + '\n' + close;
+    return open + newBody + '\n' + close;
   });
 }
 
