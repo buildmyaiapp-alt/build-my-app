@@ -368,11 +368,21 @@ function repairButtonScope(html) {
     var newBody = body;
 
     // ── FIX 1 ─────────────────────────────────────────────────────────────────
-    // "function X(" → "window.X = function X("
-    // Only matches NAMED functions (anonymous callbacks like function(user){ are skipped).
+    // "function X("       → "var X = window.X = function X("
+    // "async function X(" → "var X = window.X = async function X("
+    //
+    // WHY var X: window.X = function X(){} removes the local variable binding.
+    // Any code that references X by name (addEventListener('click', X), callbacks, etc.)
+    // would throw ReferenceError: X is not defined — crashing the whole script.
+    // var X = window.X = function X(){} keeps BOTH: local var X works internally,
+    // window.X works for onclick="X()".
+    //
+    // Only named functions are matched. Anonymous functions like function(user){} are skipped.
     newBody = newBody.replace(
-      /\bfunction\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g,
-      'window.$1 = function $1('
+      /\b(async\s+)?function\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g,
+      function(match, asyncKw, name) {
+        return 'var ' + name + ' = window.' + name + ' = ' + (asyncKw || '') + 'function ' + name + '(';
+      }
     );
 
     // ── FIX 2 ─────────────────────────────────────────────────────────────────
