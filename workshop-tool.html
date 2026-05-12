@@ -186,11 +186,21 @@
         <button class="action-btn btn-rebuild" onclick="resetTool()">🔄 Build Another</button>
       </div>
     </div>
+
+    <!-- OPEN IN NEW TAB — fully working, no iframe restrictions -->
+    <div style="background:linear-gradient(135deg,rgba(245,166,35,0.15),rgba(245,166,35,0.05));border:2px solid rgba(245,166,35,0.5);border-radius:16px;padding:20px 24px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <div>
+        <div style="font-size:16px;font-weight:900;color:#F5A623;margin-bottom:4px;">🚀 Test Your Full App</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.6);">Opens in a new tab — all buttons, login, Firebase, everything works here</div>
+      </div>
+      <button onclick="openFullApp()" style="background:#F5A623;color:#000;border:none;padding:14px 28px;border-radius:12px;font-size:15px;font-weight:900;cursor:pointer;white-space:nowrap;">▶ Open Full App</button>
+    </div>
+
     <div id="desktopView">
       <div class="preview-wrap">
         <div class="preview-toolbar">
           <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
-          <div class="preview-url">your-app.buildmyapp.ai</div>
+          <div class="preview-url">Preview (limited) — use Open Full App for testing</div>
         </div>
         <iframe id="previewFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-popups-to-escape-sandbox"></iframe>
       </div>
@@ -734,6 +744,16 @@ function toggleMobile() {
     mobile.style.display = 'none';
     btn.textContent = '📱 Mobile View';
   }
+}
+
+function openFullApp() {
+  if (!generatedCode) { alert('Build your app first!'); return; }
+  // Open in a real browser tab — no iframe sandbox, Firebase works 100%, all buttons work
+  const blob = new Blob([generatedCode], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  window.open(url, '_blank');
+  // Clean up after a delay
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
 function downloadApp() {
