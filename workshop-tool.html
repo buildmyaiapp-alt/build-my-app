@@ -592,50 +592,85 @@ DESIGN RULES:
 
 TECHNICAL RULES:
 - Use firebase-app-compat.js, firebase-auth-compat.js, firebase-firestore-compat.js (compat not modules)
-- Initialize with: const _app = firebase.initializeApp(config); const _auth = firebase.auth(_app); const _db = firebase.firestore(_app);
+- Initialize Firebase ABOVE DOMContentLoaded: const _app = firebase.initializeApp(config); const _auth = firebase.auth(_app); const _db = firebase.firestore(_app);
 - Use onSnapshot() for all real-time data (orders list, products list)
 - Use _auth.onAuthStateChanged() to detect login/logout and show correct screen
-- Every onclick attribute calls a real, fully-implemented function
 - Cart state lives in a JS array; add/remove functions update it and re-render the cart tab
 - Place Order writes to Firestore and clears local cart
 - Approve Order button calls _db.collection('orders').doc(id).update({status:'approved'})
 
-⚠️ CRITICAL — HOW TO STRUCTURE YOUR JAVASCRIPT (buttons WILL break if wrong):
+⚠️ BUTTONS — THIS IS THE MOST IMPORTANT RULE. READ CAREFULLY:
 
-Write your JS block like this (top-level, NOT inside DOMContentLoaded):
+❌ NEVER use onclick attributes in HTML. This ALWAYS breaks buttons:
+  Wrong: <button onclick="doLogin()">Login</button>
 
-    // 1. Firebase init
-    const _app = firebase.initializeApp(config);
+✅ ALWAYS give buttons an id and use addEventListener inside DOMContentLoaded:
+  Correct HTML:  <button id="loginBtn">Login</button>
+  Correct JS:    document.getElementById('loginBtn').addEventListener('click', doLogin);
+
+WHY: addEventListener connects the button to the function inside the SAME scope where
+the function is defined. onclick tries to call from global scope and fails every time.
+
+REQUIRED SCRIPT STRUCTURE — follow this exactly:
+
+  [Firebase CDN script tags here]
+
+  [All HTML here]
+
+  [One script block at the bottom of body:]
+    // Firebase init — outside DOMContentLoaded
+    const firebaseConfig = { apiKey: "...", ... };
+    const _app = firebase.initializeApp(firebaseConfig);
     const _auth = firebase.auth(_app);
     const _db = firebase.firestore(_app);
-
-    // 2. State
     let currentRole = 'customer';
     let cart = [];
-    let currentUser = null;
 
-    // 3. ALL onclick functions — window.X at TOP LEVEL
-    window.selectRole = function(role) { /* full impl */ };
-    window.doLogin = function() { /* full impl */ };
-    window.doSignup = function() { /* full impl */ };
-    window.showTab = function(id) { /* full impl */ };
-    window.addToCart = function(name, price) { /* full impl */ };
-    window.placeOrder = function() { /* full impl */ };
-    window.approveOrder = function(orderId) { /* full impl */ };
-    window.doLogout = function() { /* full impl */ };
+    document.addEventListener('DOMContentLoaded', function() {
+      // ALL functions defined here
+      function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.style.display='none');
+        document.getElementById(id).style.display='block';
+      }
+      function showTab(id) {
+        document.querySelectorAll('.tab').forEach(t => t.style.display='none');
+        document.getElementById(id).style.display='block';
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector('[data-tab="'+id+'"]').classList.add('active');
+      }
+      function doLogin() {
+        var email = document.getElementById('emailInput').value;
+        var pass = document.getElementById('passInput').value;
+        _auth.signInWithEmailAndPassword(email, pass)
+          .catch(function(e){ document.getElementById('authError').textContent = e.message; });
+      }
+      function doSignup() { ... full implementation ... }
+      function addToCart(name, price) { ... }
+      function placeOrder() { ... }
+      function approveOrder(orderId) { ... }
 
-    // 4. Auth listener
-    _auth.onAuthStateChanged(function(user) {
-      if (user) { window.showAppScreen(user); }
-      else { window.showAuthScreen(); }
+      // ALL event listeners attached here — same scope as functions above
+      document.getElementById('loginBtn').addEventListener('click', doLogin);
+      document.getElementById('signupBtn').addEventListener('click', doSignup);
+      document.getElementById('memberBtn').addEventListener('click', function() { selectRole('customer'); });
+      document.getElementById('ownerBtn').addEventListener('click', function() { selectRole('owner'); });
+      document.querySelectorAll('.nav-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() { showTab(this.getAttribute('data-tab')); });
+      });
+
+      // Auth state
+      _auth.onAuthStateChanged(function(user) {
+        if (user) { showAppForUser(user); }
+        else { showScreen('authScreen'); }
+      });
     });
 
 ABSOLUTE RULES:
-✅ window.X = function() {}  ← ONLY correct way to define onclick functions
-✅ All onclick functions defined at script TOP LEVEL before any callbacks
-❌ NEVER put onclick functions inside DOMContentLoaded — they get trapped and buttons die
-❌ NEVER put onclick functions inside onAuthStateChanged — buttons die
-❌ NEVER use: document.addEventListener('DOMContentLoaded', function() { function X(){} })
+✅ Every button has an id
+✅ Every handler uses addEventListener inside DOMContentLoaded
+✅ Functions defined and used in the same DOMContentLoaded scope
+❌ NO onclick anywhere in HTML — not even one
+❌ NO window.X = function(){} needed — addEventListener handles scope correctly
 
 Return complete HTML only. No markdown. No explanation. No code fences.`
         }]
@@ -856,11 +891,13 @@ async function modifyApp() {
 Apply this change fully and correctly. Follow these rules:
 - Read the entire existing code before changing anything
 - Keep ALL existing Firebase config, auth code, onAuthStateChanged, onSnapshot listeners, and Firestore CRUD operations intact
-- If the user says "sign in not coming" or auth is broken — find the auth screen element and ensure it is shown by default, ensure onAuthStateChanged correctly shows/hides it, and ensure fbSubmit calls the right Firebase auth method
-- If the user says a button does not work — find it, trace the missing or broken function, and implement the complete working handler
 - Apply the visual or functional change the user asked for completely
-- Every onclick must call a real implemented function
 - Return the COMPLETE updated HTML file — raw HTML only, no markdown, no code fences
+
+CRITICAL — BUTTONS RULE (do not break this):
+- This app uses addEventListener for ALL buttons — NEVER add onclick attributes
+- If you add any new button, give it an id and attach its handler with addEventListener inside DOMContentLoaded
+- NEVER write onclick="..." anywhere — it will break the button immediately
 
 CURRENT APP CODE:
 ${generatedCode}`
