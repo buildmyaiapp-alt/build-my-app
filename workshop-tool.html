@@ -347,14 +347,16 @@ const FIREBASE_HTML = `<div id="fbAuthScreen" style="position:fixed;inset:0;back
 
 // FIREBASE_JS kept for reference but not used — all apps are built with compat SDK by Claude directly.
 
-// PREVIEW: all apps now use Firebase compat SDK built by Claude — return as-is.
-// AUTO-REPAIR: promote every function/variable to window scope so onclick always works.
-// Fixes the #1 button bug: Claude defines functions inside DOMContentLoaded → onclick can't reach them.
+// AUTO-REPAIR: promote every function to window scope so onclick always works.
+// ROOT CAUSE: Claude defines functions inside DOMContentLoaded → they are trapped in that
+// closure → onclick="X()" fails because X is not on window.
+// FIX: use brace-counting to find the exact closing } of DOMContentLoaded, then inject
+// window.X = X; promotions INSIDE the callback (where the names are in scope).
+// Also add a setTimeout fallback for any top-level functions.
 function repairButtonScope(html) {
-  // Extract inline script blocks
   var scriptRe = /(<script(?!\s+src)[^>]*>)([\s\S]*?)(<\/script>)/gi;
   return html.replace(scriptRe, function(fullTag, open, body, close) {
-    // Collect every named function and const/let/var assignment that could be an onclick target
+    // Collect every named function/variable that could be an onclick target
     var names = new Set();
     var re1 = /\bfunction\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g;
     var re2 = /\b(?:const|let|var)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=\s*(?:async\s+)?function/g;
@@ -364,14 +366,44 @@ function repairButtonScope(html) {
     while ((m = re2.exec(body)) !== null) names.add(m[1]);
     while ((m = re3.exec(body)) !== null) names.add(m[1]);
     if (names.size === 0) return fullTag;
-    // Append: after ALL code runs (setTimeout 0), promote every found name to window
-    // setTimeout ensures DOMContentLoaded callbacks have already run
-    var promotions = 'setTimeout(function(){';
+
+    // Build the promotion snippet
+    var promotionCode = '';
     names.forEach(function(n) {
-      promotions += 'try{if(typeof ' + n + '==="function"&&!window.' + n + ')window.' + n + '=' + n + ';}catch(e){}';
+      promotionCode += 'try{if(typeof ' + n + '!=="undefined")window.' + n + '=' + n + ';}catch(e){}';
     });
-    promotions += '},0);';
-    return open + body + '\n' + promotions + '\n' + close;
+
+    var newBody = body;
+
+    // === Strategy 1: inject INSIDE every DOMContentLoaded callback ===
+    // Use brace-counting so we find the exact closing } even with nested braces.
+    // Process all occurrences from right-to-left so string positions stay valid.
+    var dclRe = /addEventListener\s*\(\s*['"]DOMContentLoaded['"]/g;
+    var matches = [];
+    var dclMatch;
+    while ((dclMatch = dclRe.exec(body)) !== null) matches.push(dclMatch.index);
+
+    // Process right-to-left
+    for (var mi = matches.length - 1; mi >= 0; mi--) {
+      var startIdx = matches[mi];
+      // Find the first { after the DOMContentLoaded keyword (the callback body open brace)
+      var braceStart = newBody.indexOf('{', startIdx);
+      if (braceStart === -1) continue;
+      // Count braces to find matching closing }
+      var depth = 0, braceEnd = -1;
+      for (var i = braceStart; i < newBody.length; i++) {
+        if (newBody[i] === '{') depth++;
+        else if (newBody[i] === '}') { depth--; if (depth === 0) { braceEnd = i; break; } }
+      }
+      if (braceEnd === -1) continue;
+      // Inject promotions just before the closing }
+      newBody = newBody.slice(0, braceEnd) + '\n/*repair*/' + promotionCode + '\n' + newBody.slice(braceEnd);
+    }
+
+    // === Strategy 2: setTimeout fallback for top-level functions ===
+    var fallback = 'setTimeout(function(){' + promotionCode + '},0);';
+
+    return open + newBody + '\n' + fallback + '\n' + close;
   });
 }
 
