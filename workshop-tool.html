@@ -192,12 +192,12 @@
           <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
           <div class="preview-url">your-app.buildmyapp.ai</div>
         </div>
-        <iframe id="previewFrame" sandbox="allow-scripts allow-same-origin"></iframe>
+        <iframe id="previewFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-popups-to-escape-sandbox"></iframe>
       </div>
     </div>
     <div class="mobile-frame" id="mobileView">
       <div class="mobile-screen">
-        <iframe id="mobileFrame" sandbox="allow-scripts allow-same-origin"></iframe>
+        <iframe id="mobileFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-popups-to-escape-sandbox"></iframe>
       </div>
     </div>
     <!-- DOWNLOAD + APK -->
@@ -347,85 +347,63 @@ const FIREBASE_HTML = `<div id="fbAuthScreen" style="position:fixed;inset:0;back
 
 // FIREBASE_JS kept for reference but not used — all apps are built with compat SDK by Claude directly.
 
-// AUTO-REPAIR: make every onclick button work, no matter how Claude structured the code.
+// AUTO-REPAIR: make every onclick button work regardless of how Claude structured the code.
 //
-// TWO-PRONGED NUCLEAR FIX:
+// STRATEGY — Two layers:
 //
-// FIX 1 — Transform every named function declaration to ALSO assign to window:
-//   function showTab(id) {   →   window.showTab = function showTab(id) {
-//   Works at any nesting depth. When the containing scope runs (DOMContentLoaded,
-//   onAuthStateChanged, etc.), window.X is set so onclick can reach it.
-//   Named function expressions keep their name for internal recursion.
+// FIX 1 (multiline ^): Only transform STANDALONE function declarations — i.e. lines that
+//   START with optional whitespace then "function" or "async function".
+//   This deliberately skips:
+//     window.X = function X(){}   ← already on window, DON'T touch
+//     callback(function X(){})    ← expression, DON'T touch
+//     { method: function X(){} }  ← object method, DON'T touch
+//   But DOES transform:
+//     function showTab(id) {      → var showTab = window.showTab = function showTab(id) {
+//     async function loadData() { → var loadData = window.loadData = async function loadData() {
+//   var X preserves local variable so internal refs (addEventListener('click',X)) work.
+//   window.X makes onclick="X()" work from any scope.
 //
-// FIX 2 — Inject an eval-based onclick rebinder INSIDE DOMContentLoaded:
-//   eval() uses lexical (direct) scope, so it can see every local function
-//   even ones Claude defined as arrow functions / const that Fix 1 didn't catch.
-//   The rebinder re-registers all onclick attributes as proper event listeners.
+// FIX 2: Inject eval-based onclick rebinder INSIDE DOMContentLoaded.
+//   Catches arrow functions and const-assigned functions Fix 1 can't touch.
+//   eval() is DIRECT (lexical) so it sees DOMContentLoaded-scoped functions too.
 //
 function repairButtonScope(html) {
   var scriptRe = /(<script(?!\s+src)[^>]*>)([\s\S]*?)(<\/script>)/gi;
   return html.replace(scriptRe, function(fullTag, open, body, close) {
     var newBody = body;
 
-    // ── FIX 1 ─────────────────────────────────────────────────────────────────
-    // "function X("       → "var X = window.X = function X("
-    // "async function X(" → "var X = window.X = async function X("
-    //
-    // WHY var X: window.X = function X(){} removes the local variable binding.
-    // Any code that references X by name (addEventListener('click', X), callbacks, etc.)
-    // would throw ReferenceError: X is not defined — crashing the whole script.
-    // var X = window.X = function X(){} keeps BOTH: local var X works internally,
-    // window.X works for onclick="X()".
-    //
-    // Only named functions are matched. Anonymous functions like function(user){} are skipped.
+    // ── FIX 1: multiline ^ ensures only standalone declarations are transformed ─
+    // ^(\s*)  = start of line with optional indent
+    // This means "window.X = function X(" is NEVER matched (not at line start)
     newBody = newBody.replace(
-      /\b(async\s+)?function\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g,
-      function(match, asyncKw, name) {
-        return 'var ' + name + ' = window.' + name + ' = ' + (asyncKw || '') + 'function ' + name + '(';
+      /^(\s*)(async\s+)?function\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/gm,
+      function(match, indent, asyncKw, name) {
+        return indent + 'var ' + name + ' = window.' + name + ' = ' + (asyncKw || '') + 'function ' + name + '(';
       }
     );
 
-    // ── FIX 2 ─────────────────────────────────────────────────────────────────
-    // eval-based onclick rebinder — catches anything Fix 1 missed (arrow fns, const fns).
-    // MUST use direct eval (not indirect) so it runs in the DOMContentLoaded scope
-    // where local functions are visible.
-    var evalRebind = [
-      'try{',
-        'document.querySelectorAll("[onclick]").forEach(function(el){',
-          'var oc=el.getAttribute("onclick");',
-          'el.removeAttribute("onclick");',
-          'el.addEventListener("click",function(e){',
-            'e.stopPropagation&&e.stopPropagation();',
-            'try{eval(oc);}catch(ex){console.error("onclick err:",oc,ex);}',
-          '});',
-        '});',
-      '}catch(e){}'
-    ].join('');
+    // ── FIX 2: eval rebinder injected INSIDE every DOMContentLoaded ─────────────
+    // direct eval() runs in the lexical scope where functions are defined
+    var evalRebind = 'try{document.querySelectorAll("[onclick]").forEach(function(el){var oc=el.getAttribute("onclick");el.removeAttribute("onclick");el.addEventListener("click",function(e){try{eval(oc);}catch(ex){console.error("btn:",oc,ex);}});});}catch(_e){}';
 
-    // Use brace-counting on NEWBODY (after Fix 1) to find the closing }
-    // of every DOMContentLoaded callback and inject the rebinder inside it.
+    // Brace-count to find the exact closing } of each DOMContentLoaded callback
     var dclRe = /addEventListener\s*\(\s*['"]DOMContentLoaded['"]/g;
-    var dclPositions = [];
-    var dm;
-    while ((dm = dclRe.exec(newBody)) !== null) dclPositions.push(dm.index);
+    var dclPos = [], dm;
+    while ((dm = dclRe.exec(newBody)) !== null) dclPos.push(dm.index);
 
-    // Process right-to-left so earlier insertions don't shift later positions
-    for (var mi = dclPositions.length - 1; mi >= 0; mi--) {
-      var pos = dclPositions[mi];
-      var braceStart = newBody.indexOf('{', pos);
-      if (braceStart < 0) continue;
-      var depth = 0, braceEnd = -1;
-      for (var ci = braceStart; ci < newBody.length; ci++) {
+    for (var mi = dclPos.length - 1; mi >= 0; mi--) {
+      var bs = newBody.indexOf('{', dclPos[mi]);
+      if (bs < 0) continue;
+      var depth = 0, be = -1;
+      for (var ci = bs; ci < newBody.length; ci++) {
         if (newBody[ci] === '{') depth++;
-        else if (newBody[ci] === '}') { if (--depth === 0) { braceEnd = ci; break; } }
+        else if (newBody[ci] === '}') { if (--depth === 0) { be = ci; break; } }
       }
-      if (braceEnd >= 0) {
-        newBody = newBody.slice(0, braceEnd) + '\n' + evalRebind + '\n' + newBody.slice(braceEnd);
-      }
+      if (be >= 0) newBody = newBody.slice(0, be) + '\n' + evalRebind + '\n' + newBody.slice(be);
     }
 
-    // Also run via setTimeout as a safety net for apps with no DOMContentLoaded
-    newBody += '\nsetTimeout(function(){' + evalRebind + '},200);';
+    // setTimeout fallback for apps that skip DOMContentLoaded entirely
+    newBody += '\nsetTimeout(function(){' + evalRebind + '},300);';
 
     return open + newBody + '\n' + close;
   });
@@ -622,21 +600,42 @@ TECHNICAL RULES:
 - Place Order writes to Firestore and clears local cart
 - Approve Order button calls _db.collection('orders').doc(id).update({status:'approved'})
 
-⚠️ MOST IMPORTANT RULE — BUTTONS MUST WORK:
-Every function called from onclick MUST be defined at TOP LEVEL of the script — NOT inside DOMContentLoaded, NOT inside any other function or block.
+⚠️ CRITICAL — HOW TO STRUCTURE YOUR JAVASCRIPT (buttons WILL break if wrong):
 
-✅ CORRECT (buttons work):
-  window.doLogin = function() { ... }
-  window.showTab = function(id) { ... }
-  window.addToCart = function(name, price) { ... }
+Write your JS block like this (top-level, NOT inside DOMContentLoaded):
 
-❌ WRONG (buttons will be dead):
-  document.addEventListener('DOMContentLoaded', function() {
-    function doLogin() { ... }   ← TRAPPED IN CLOSURE, onclick cannot reach!
-  });
+    // 1. Firebase init
+    const _app = firebase.initializeApp(config);
+    const _auth = firebase.auth(_app);
+    const _db = firebase.firestore(_app);
 
-Rule: Put ALL window.X = function(){} definitions at the TOP of your script.
-Only put DOM-reading initialization code (like onAuthStateChanged) inside DOMContentLoaded.
+    // 2. State
+    let currentRole = 'customer';
+    let cart = [];
+    let currentUser = null;
+
+    // 3. ALL onclick functions — window.X at TOP LEVEL
+    window.selectRole = function(role) { /* full impl */ };
+    window.doLogin = function() { /* full impl */ };
+    window.doSignup = function() { /* full impl */ };
+    window.showTab = function(id) { /* full impl */ };
+    window.addToCart = function(name, price) { /* full impl */ };
+    window.placeOrder = function() { /* full impl */ };
+    window.approveOrder = function(orderId) { /* full impl */ };
+    window.doLogout = function() { /* full impl */ };
+
+    // 4. Auth listener
+    _auth.onAuthStateChanged(function(user) {
+      if (user) { window.showAppScreen(user); }
+      else { window.showAuthScreen(); }
+    });
+
+ABSOLUTE RULES:
+✅ window.X = function() {}  ← ONLY correct way to define onclick functions
+✅ All onclick functions defined at script TOP LEVEL before any callbacks
+❌ NEVER put onclick functions inside DOMContentLoaded — they get trapped and buttons die
+❌ NEVER put onclick functions inside onAuthStateChanged — buttons die
+❌ NEVER use: document.addEventListener('DOMContentLoaded', function() { function X(){} })
 
 Return complete HTML only. No markdown. No explanation. No code fences.`
         }]
@@ -793,7 +792,7 @@ ${generatedCode}`
       if (!old) return;
       const f = document.createElement('iframe');
       f.id = frameId;
-      f.sandbox = 'allow-scripts allow-same-origin';
+      f.sandbox = 'allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-popups-to-escape-sandbox';
       f.style.cssText = 'width:100%;height:' + (frameId === 'mobileFrame' ? '650' : '600') + 'px;border:none;display:block;';
       old.parentNode.replaceChild(f, old);
       setTimeout(() => { f.srcdoc = prepareApp(generatedCode); }, 80);
@@ -901,7 +900,7 @@ ${generatedCode}`
       if (!old) return;
       const newFrame = document.createElement('iframe');
       newFrame.id = frameId;
-      newFrame.sandbox = 'allow-scripts allow-same-origin';
+      newFrame.sandbox = 'allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-popups-to-escape-sandbox';
       newFrame.style.cssText = 'width:100%;height:' + (frameId === 'mobileFrame' ? '650' : '600') + 'px;border:none;display:block;';
       old.parentNode.replaceChild(newFrame, old);
       newFrame.srcdoc = prepareApp(generatedCode);
