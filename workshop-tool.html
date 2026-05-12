@@ -432,6 +432,24 @@ function repairButtonScope(html) {
     // setTimeout fallback for apps that skip DOMContentLoaded entirely
     newBody += '\nsetTimeout(function(){' + evalRebind + '},300);';
 
+    // ── EMERGENCY BLANK-SCREEN FALLBACK ─────────────────────────────────────────
+    // If 2 seconds after load nothing is visible (all screens display:none),
+    // force-show the auth screen so the user always sees something.
+    var blankFix = [
+      'setTimeout(function(){',
+      '  try{',
+      '    var hasVisible=false;',
+      '    var screens=document.querySelectorAll(".screen,.page,[id*=Screen],[id*=screen],[id*=App],[id*=app]");',
+      '    screens.forEach(function(el){if(el.offsetHeight>20)hasVisible=true;});',
+      '    if(!hasVisible&&screens.length>0){',
+      '      var authEl=document.getElementById("authScreen")||document.getElementById("loginScreen")||document.getElementById("fbAuthScreen")||screens[0];',
+      '      if(authEl){authEl.style.display="flex";authEl.style.visibility="visible";}',
+      '    }',
+      '  }catch(e){}',
+      '},2000);'
+    ].join('\n');
+    newBody += '\n' + blankFix;
+
     return open + newBody + '\n' + close;
   });
 }
@@ -619,12 +637,20 @@ DESIGN RULES:
 
 TECHNICAL RULES:
 - Use firebase-app-compat.js, firebase-auth-compat.js, firebase-firestore-compat.js (compat not modules)
+- Firebase CDN script tags must have NO async or defer attribute — they must load synchronously
 - Initialize Firebase ABOVE DOMContentLoaded: const _app = firebase.initializeApp(config); const _auth = firebase.auth(_app); const _db = firebase.firestore(_app);
 - Use onSnapshot() for all real-time data (orders list, products list)
 - Use _auth.onAuthStateChanged() to detect login/logout and show correct screen
 - Cart state lives in a JS array; add/remove functions update it and re-render the cart tab
 - Place Order writes to Firestore and clears local cart
 - Approve Order button calls _db.collection('orders').doc(id).update({status:'approved'})
+
+⚠️ SCREEN VISIBILITY — CRITICAL RULE:
+- The AUTH SCREEN must start VISIBLE: id="authScreen" style="display:flex" (NOT display:none)
+- ALL other screens (customerApp, ownerApp) start hidden: style="display:none"
+- onAuthStateChanged hides authScreen and shows the correct app screen when user logs in
+- NEVER set authScreen to display:none in HTML — users must see the login UI immediately on load
+- This ensures the app always shows something even if Firebase takes time to initialize
 
 ⚠️ BUTTONS — THIS IS THE MOST IMPORTANT RULE. READ CAREFULLY:
 
@@ -696,8 +722,11 @@ ABSOLUTE RULES:
 ✅ Every button has an id
 ✅ Every handler uses addEventListener inside DOMContentLoaded
 ✅ Functions defined and used in the same DOMContentLoaded scope
+✅ authScreen div starts with style="display:flex" — ALWAYS visible on load
+✅ customerApp and ownerApp divs start with style="display:none"
 ❌ NO onclick anywhere in HTML — not even one
 ❌ NO window.X = function(){} needed — addEventListener handles scope correctly
+❌ NO async or defer on Firebase script tags
 
 Return complete HTML only. No markdown. No explanation. No code fences.`
         }]
