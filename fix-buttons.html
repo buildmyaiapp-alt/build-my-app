@@ -50,13 +50,13 @@
 <div class="card">
   <label>📄 Upload or Paste Your App HTML</label>
 
-  <!-- UPLOAD BUTTON — easiest way, no editor needed -->
-  <div style="border:2px dashed rgba(245,166,35,0.5);border-radius:12px;padding:24px;text-align:center;margin-bottom:14px;cursor:pointer;transition:all 0.2s;" id="dropZone" onclick="document.getElementById('fileInput').click()" ondragover="event.preventDefault();this.style.borderColor='#F5A623'" ondrop="handleDrop(event)">
+  <!-- UPLOAD BUTTON — label-for approach works in ALL browsers including Safari -->
+  <input type="file" id="fileInput" accept=".html" style="display:none;" onchange="handleFile(event)"/>
+  <label for="fileInput" id="dropZone" ondragover="event.preventDefault();this.style.borderColor='#F5A623';this.style.background='rgba(245,166,35,0.08)'" ondragleave="this.style.borderColor='rgba(245,166,35,0.5)';this.style.background=''" ondrop="handleDrop(event)" style="display:block;border:2px dashed rgba(245,166,35,0.5);border-radius:12px;padding:24px;text-align:center;margin-bottom:14px;cursor:pointer;transition:all 0.2s;">
     <div style="font-size:36px;margin-bottom:8px;">📁</div>
-    <div style="font-size:15px;font-weight:800;color:#F5A623;margin-bottom:4px;">Click to Upload my-app.html</div>
+    <div id="dropZoneLabel" style="font-size:15px;font-weight:800;color:#F5A623;margin-bottom:4px;">Click to Upload my-app.html</div>
     <div style="font-size:12px;color:rgba(255,255,255,0.4);">Or drag and drop the file here</div>
-    <input type="file" id="fileInput" accept=".html" style="display:none;" onchange="handleFile(event)"/>
-  </div>
+  </label>
 
   <div style="text-align:center;color:rgba(255,255,255,0.3);font-size:12px;margin-bottom:10px;">— OR paste HTML manually below —</div>
   <textarea id="inputHtml" placeholder="Paste the full HTML of your downloaded app here..."></textarea>
@@ -239,13 +239,13 @@ function openFixed() {
 }
 
 // ── File upload handlers ─────────────────────────────────────────
-function handleFile(event) {
-  var file = event.target.files[0];
+function _loadFile(file) {
   if (!file) return;
   var dz = document.getElementById('dropZone');
   dz.style.borderColor = '#28c864';
-  var label = dz.querySelector('div:nth-child(2)');
-  if (label) label.textContent = '✅ ' + file.name + ' loaded!';
+  dz.style.background = 'rgba(40,200,100,0.08)';
+  var lbl = document.getElementById('dropZoneLabel');
+  if (lbl) lbl.textContent = '✅ ' + file.name + ' — loaded!';
   var reader = new FileReader();
   reader.onload = function(e) {
     document.getElementById('inputHtml').value = e.target.result;
@@ -254,25 +254,22 @@ function handleFile(event) {
   reader.readAsText(file);
 }
 
+function handleFile(event) {
+  _loadFile(event.target.files[0]);
+}
+
 function handleDrop(event) {
   event.preventDefault();
   var dz = document.getElementById('dropZone');
   dz.style.borderColor = 'rgba(245,166,35,0.5)';
+  dz.style.background = '';
   var file = event.dataTransfer.files[0];
   if (!file) return;
   if (!file.name.endsWith('.html') && file.type !== 'text/html') {
     alert('Please drop an HTML file (.html)');
     return;
   }
-  dz.style.borderColor = '#28c864';
-  var label = dz.querySelector('div:nth-child(2)');
-  if (label) label.textContent = '✅ ' + file.name + ' loaded!';
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    document.getElementById('inputHtml').value = e.target.result;
-    fixApp();
-  };
-  reader.readAsText(file);
+  _loadFile(file);
 }
 </script>
 </body>
