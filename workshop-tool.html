@@ -425,7 +425,8 @@ function repairButtonScope(html) {
     // MutationObserver: re-wire onclick buttons added dynamically AFTER login
     // (innerHTML set inside onAuthStateChanged fires AFTER the initial evalRebind pass)
     // _rw defined here so eval() inherits the same lexical scope as all app functions
-    var observerSetup = 'try{if(!window._moSetup){window._moSetup=true;var _rw=function(){try{document.querySelectorAll("[onclick]").forEach(function(el){if(el._ocDone)return;el._ocDone=true;var oc=el.getAttribute("onclick");el.removeAttribute("onclick");el.addEventListener("click",function(e){try{eval(oc);}catch(ex){console.error("btn:",oc,ex);}});});}catch(e){}};new MutationObserver(function(){setTimeout(_rw,30);}).observe(document.body,{childList:true,subtree:true});var _ri=0;var _rint=setInterval(function(){_rw();if(++_ri>10)clearInterval(_rint);},500);}}catch(_me){}';
+    // interval runs for 30 seconds (60 * 500ms) to cover slow Firebase auth
+    var observerSetup = 'try{if(!window._moSetup){window._moSetup=true;var _rw=function(){try{document.querySelectorAll("[onclick]").forEach(function(el){if(el._ocDone)return;el._ocDone=true;var oc=el.getAttribute("onclick");el.removeAttribute("onclick");el.addEventListener("click",function(e){try{eval(oc);}catch(ex){console.error("btn:",oc,ex);}});});}catch(e){}};if(document.body)new MutationObserver(function(){setTimeout(_rw,30);}).observe(document.body,{childList:true,subtree:true});var _ri=0;var _rint=setInterval(function(){_rw();if(++_ri>60)clearInterval(_rint);},500);}}catch(_me){}';
 
     // Brace-count to find the exact closing } of each __runWhenReady CALL
     // Matches __runWhenReady(function — skips the helper definition itself
@@ -444,8 +445,12 @@ function repairButtonScope(html) {
       if (be >= 0) newBody = newBody.slice(0, be) + '\n' + evalRebind + '\n' + observerSetup + '\n' + newBody.slice(be);
     }
 
-    // setTimeout fallback for apps that skip DOMContentLoaded entirely
-    newBody += '\nsetTimeout(function(){' + evalRebind + '},300);';
+    // GLOBAL FALLBACK: run observer setup even if app has no DOMContentLoaded pattern
+    // window._moSetup flag prevents duplicate setup if already done inside __runWhenReady
+    newBody += '\n' + observerSetup;
+    newBody += '\nsetTimeout(function(){' + evalRebind + '\n' + observerSetup + '},300);';
+    newBody += '\nsetTimeout(function(){' + evalRebind + '},1500);';
+    newBody += '\nsetTimeout(function(){' + evalRebind + '},4000);';
 
     // ── EMERGENCY BLANK-SCREEN REVEALER ─────────────────────────────────────────
     // KEY INSIGHT: Don't guess which element to show. Instead find the password/email
@@ -738,17 +743,14 @@ TECHNICAL RULES:
 - NEVER wrap all screens in a container div — screens sit directly in body
 - This is critical: if authScreen starts as display:none the page will be completely blank
 
-⚠️ BUTTONS — THIS IS THE MOST IMPORTANT RULE. READ CAREFULLY:
+⚠️ BUTTONS — CRITICAL RULE:
 
-❌ NEVER use onclick attributes in HTML. This ALWAYS breaks buttons:
-  Wrong: <button onclick="doLogin()">Login</button>
+✅ ALWAYS use onclick="functionName()" directly on buttons — this is required:
+  Correct: <button onclick="doLogin()">Login</button>
+  Correct: <button onclick="addToCart('item', 100)">Add to Cart</button>
+  Correct: <button onclick="showTab('home')">Home</button>
 
-✅ ALWAYS give buttons an id and use addEventListener inside DOMContentLoaded:
-  Correct HTML:  <button id="loginBtn">Login</button>
-  Correct JS:    document.getElementById('loginBtn').addEventListener('click', doLogin);
-
-WHY: addEventListener connects the button to the function inside the SAME scope where
-the function is defined. onclick tries to call from global scope and fails every time.
+✅ ALL functions MUST be defined at the TOP LEVEL of the script block — NOT inside DOMContentLoaded:
 
 REQUIRED SCRIPT STRUCTURE — follow this exactly:
 
@@ -757,64 +759,56 @@ REQUIRED SCRIPT STRUCTURE — follow this exactly:
   [All HTML here]
 
   [One script block at the bottom of body:]
-    // Firebase init — outside DOMContentLoaded
+    // Firebase init — at top level
     const firebaseConfig = { apiKey: "...", ... };
     const _app = firebase.initializeApp(firebaseConfig);
-    const _auth = firebase.auth(_app);
-    const _db = firebase.firestore(_app);
+    const _auth = firebase.auth();
+    const _db = firebase.firestore();
     let currentRole = 'customer';
     let cart = [];
 
+    // ALL functions defined at TOP LEVEL (not inside DOMContentLoaded)
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.style.display='none');
+      document.getElementById(id).style.display='flex';
+    }
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(t => t.style.display='none');
+      document.getElementById(tabId).style.display='block';
+    }
+    function doLogin() {
+      var email = document.getElementById('emailInput').value;
+      var pass = document.getElementById('passInput').value;
+      _auth.signInWithEmailAndPassword(email, pass)
+        .catch(function(e){ document.getElementById('authError').textContent = e.message; });
+    }
+    function doSignup() { ... full implementation ... }
+    function addToCart(name, price, shopId, shopName) { ... }
+    function placeOrder() { ... }
+    function approveOrder(orderId) { ... }
+
+    // DOMContentLoaded: only auth state setup here
     document.addEventListener('DOMContentLoaded', function() {
-      // ALL functions defined here
-      function showScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.style.display='none');
-        document.getElementById(id).style.display='block';
-      }
-      function showTab(id) {
-        document.querySelectorAll('.tab').forEach(t => t.style.display='none');
-        document.getElementById(id).style.display='block';
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.querySelector('[data-tab="'+id+'"]').classList.add('active');
-      }
-      function doLogin() {
-        var email = document.getElementById('emailInput').value;
-        var pass = document.getElementById('passInput').value;
-        _auth.signInWithEmailAndPassword(email, pass)
-          .catch(function(e){ document.getElementById('authError').textContent = e.message; });
-      }
-      function doSignup() { ... full implementation ... }
-      function addToCart(name, price) { ... }
-      function placeOrder() { ... }
-      function approveOrder(orderId) { ... }
-
-      // ALL event listeners attached here — same scope as functions above
-      document.getElementById('loginBtn').addEventListener('click', doLogin);
-      document.getElementById('signupBtn').addEventListener('click', doSignup);
-      document.getElementById('memberBtn').addEventListener('click', function() { selectRole('customer'); });
-      document.getElementById('ownerBtn').addEventListener('click', function() { selectRole('owner'); });
-      document.querySelectorAll('.nav-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() { showTab(this.getAttribute('data-tab')); });
-      });
-
-      // Auth state
       _auth.onAuthStateChanged(function(user) {
         if (user) { showAppForUser(user); }
         else { showScreen('authScreen'); }
       });
     });
 
+WHY onclick works: The tool automatically promotes all top-level functions to window scope,
+so onclick="functionName()" always finds them. addEventListener on dynamically-created
+buttons (inside innerHTML) fails because listeners are attached before the button exists.
+
 ABSOLUTE RULES:
-✅ Every button has an id
-✅ Every handler uses addEventListener inside DOMContentLoaded
-✅ Functions defined and used in the same DOMContentLoaded scope
+✅ Every button uses onclick="functionName()" — including buttons inside innerHTML strings
+✅ ALL functions defined at TOP LEVEL of script — never inside DOMContentLoaded
 ✅ Use EXACTLY id="authScreen", id="customerApp", id="ownerApp" — no other names
 ✅ authScreen starts with style="display:flex" — visible immediately on page load
 ✅ customerApp and ownerApp start with style="display:none"
 ✅ shopId in every product = owner's Firebase UID (auth.currentUser.uid)
 ✅ shopId in every order = copied from product's shopId
 ✅ Owner orders query: .where('shopId','==',user.uid) so owner sees customer orders
-❌ NO onclick anywhere in HTML — not even one
+❌ NO addEventListener for buttons — use onclick only
 ❌ NO wrapper div around all screens — screens go directly inside body or one outer div
 ❌ NO async or defer on Firebase script tags
 ❌ NEVER use .orderBy() together with .where() in Firestore — no composite index exists, query will crash silently. Sort results in JavaScript after fetching.
