@@ -1048,15 +1048,15 @@ function toggleMobile() {
 async function openFullApp() {
   if (!generatedCode) { alert('Build your app first!'); return; }
 
-  // ── MODE 1: LOCAL SERVER (perfect mode — no hacks, Firebase works 100%) ──────
-  // When running via "node server.js", POST the raw HTML to localhost.
-  // The server saves it as preview-app.html and returns the URL.
-  // Raw HTML (no prepareApp) is used here because a real HTTP server needs no fixes.
+  // ── MODE 1: LOCAL SERVER (best mode — real HTTP + all button fixes applied) ───
+  // prepareApp() is STILL applied because const/let functions declared in scripts
+  // are not on window and will fail in onclick handlers regardless of server type.
+  // prepareApp transforms them to var X = window.X = ... so onclick always works.
   try {
     const resp = await fetch('http://localhost:7823/save-preview', {
       method: 'POST',
       headers: { 'Content-Type': 'text/html' },
-      body: generatedCode
+      body: prepareApp(generatedCode)
     });
     if (resp.ok) {
       const data = await resp.json();
