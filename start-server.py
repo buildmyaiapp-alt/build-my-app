@@ -1,43 +1,60 @@
 #!/usr/bin/env python3
 """
-Build My App — Preview Server
-==============================
+Build My App -- Preview Server
+===============================
 
-Mac / Linux:
-    python3 start-server.py
+NO DOWNLOAD NEEDED. Paste one line in Terminal / Command Prompt:
 
-Windows:
-    Double-click  start-server.bat
-    (or open Terminal/CMD and run:  python start-server.py)
+  Mac:
+    curl -fsSL https://raw.githubusercontent.com/buildmyaiapp-alt/build-my-app/main/start-server.py | python3
 
-Then open the tool at:  http://localhost:7823/workshop-tool.html
-Or access from GitHub:  https://buildmyaiapp-alt.github.io/build-my-app/workshop-tool.html
+  Windows (Command Prompt):
+    curl -s https://raw.githubusercontent.com/buildmyaiapp-alt/build-my-app/main/start-server.py -o %TEMP%\bma.py && python %TEMP%\bma.py
 
-When you build an app in the tool, it will open as:
-    http://localhost:7823/preview-app.html   ← real HTTP, everything works
+  Windows (PowerShell):
+    python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/buildmyaiapp-alt/build-my-app/main/start-server.py').read().decode())"
+
+OR if you already downloaded this file:
+  Mac:      python3 start-server.py
+  Windows:  double-click start-server.bat
 """
 
 import http.server
 import json
 import os
-import webbrowser
 import sys
+import webbrowser
 
-PORT  = 7823
-DIR   = os.path.dirname(os.path.abspath(__file__))
+PORT = 7823
+
+# ── Work out where to save preview-app.html ──────────────────────────────────
+# When run as a file:   use the script's own directory
+# When piped from URL:  __file__ is missing → use Desktop, else Home
+try:
+    _here = os.path.dirname(os.path.abspath(__file__))
+    # If the script lives in a real directory (not stdin), use it
+    DIR = _here if os.path.isdir(_here) else None
+except NameError:
+    DIR = None
+
+if not DIR:
+    # Piped from URL — save to Desktop if it exists, otherwise Home
+    _desktop = os.path.join(os.path.expanduser('~'), 'Desktop')
+    DIR = _desktop if os.path.isdir(_desktop) else os.path.expanduser('~')
+
 
 class PreviewHandler(http.server.SimpleHTTPRequestHandler):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=DIR, **kwargs)
 
-    # ── CORS preflight ──────────────────────────────────────────────────────────
+    # ── CORS preflight ────────────────────────────────────────────────────────
     def do_OPTIONS(self):
         self.send_response(204)
-        self._add_cors()
+        self._cors()
         self.end_headers()
 
-    # ── POST /save-preview  — tool sends generated HTML here ───────────────────
+    # ── POST /save-preview  — workshop tool sends generated HTML here ─────────
     def do_POST(self):
         if self.path == '/save-preview':
             length = int(self.headers.get('Content-Length', 0))
@@ -45,63 +62,71 @@ class PreviewHandler(http.server.SimpleHTTPRequestHandler):
             dest   = os.path.join(DIR, 'preview-app.html')
             with open(dest, 'wb') as f:
                 f.write(html)
-            preview_url = f'http://localhost:{PORT}/preview-app.html'
+            preview_url = 'http://localhost:{}/preview-app.html'.format(PORT)
             self.send_response(200)
-            self._add_cors()
+            self._cors()
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
             self.wfile.write(json.dumps({'ok': True, 'url': preview_url}).encode())
-            print(f'\n✅  App saved  →  {preview_url}')
+            print('\n  App saved  ->  {}\n'.format(preview_url))
         else:
             self.send_response(404)
             self.end_headers()
 
-    # ── Inject CORS headers on every response ──────────────────────────────────
-    def _add_cors(self):
+    # ── Inject CORS on every response ─────────────────────────────────────────
+    def _cors(self):
         self.send_header('Access-Control-Allow-Origin',  '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
 
     def end_headers(self):
-        self._add_cors()
+        self._cors()
         super().end_headers()
 
-    # ── Clean log output ────────────────────────────────────────────────────────
     def log_message(self, fmt, *args):
-        pass   # suppress default Apache-style logs — we print our own
+        pass  # silence default access log
 
 
 def main():
     try:
         httpd = http.server.HTTPServer(('', PORT), PreviewHandler)
     except OSError:
-        print(f'\n❌  Port {PORT} is already in use.')
-        print(f'    Stop the other server (or close the terminal running it) and try again.\n')
+        print('\n  ERROR: Port {} is already in use.'.format(PORT))
+        print('  Close the other terminal window running the server and try again.\n')
         sys.exit(1)
 
-    tool_url    = f'http://localhost:{PORT}/workshop-tool.html'
-    preview_url = f'http://localhost:{PORT}/preview-app.html'
+    # If workshop-tool.html is in the same folder, open it locally.
+    # Otherwise open the GitHub Pages version.
+    local_tool = os.path.join(DIR, 'workshop-tool.html')
+    if os.path.exists(local_tool):
+        open_url = 'http://localhost:{}/workshop-tool.html'.format(PORT)
+    else:
+        open_url = 'https://buildmyaiapp-alt.github.io/build-my-app/workshop-tool.html'
+
+    preview_url = 'http://localhost:{}/preview-app.html'.format(PORT)
 
     print('')
-    print('╔══════════════════════════════════════════════════════╗')
-    print('║  ⚡  Build My App — Preview Server Running          ║')
-    print('╠══════════════════════════════════════════════════════╣')
-    print(f'║  Workshop Tool  →  {tool_url:<33}║')
-    print(f'║  Your App       →  {preview_url:<33}║')
-    print('╠══════════════════════════════════════════════════════╣')
-    print('║  Keep this window open while using the tool.        ║')
-    print('║  Press  Ctrl + C  to stop.                          ║')
-    print('╚══════════════════════════════════════════════════════╝')
+    print('  +--------------------------------------------------+')
+    print('  |   Build My App  --  Preview Server Running      |')
+    print('  +--------------------------------------------------+')
+    print('  |  Tool    ->  {}  |'.format(open_url.ljust(38)))
+    print('  |  App     ->  {}  |'.format(preview_url.ljust(38)))
+    print('  +--------------------------------------------------+')
+    print('  |  Keep this window OPEN while using the tool.    |')
+    print('  |  Press  Ctrl + C  to stop the server.           |')
+    print('  +--------------------------------------------------+')
     print('')
 
-    # Open the tool in the browser automatically
-    webbrowser.open(tool_url)
+    webbrowser.open(open_url)
 
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
-        print('\n\nServer stopped. Goodbye! 👋\n')
+        print('\n  Server stopped.\n')
 
 
 if __name__ == '__main__':
+    main()
+else:
+    # Script was exec()'d (e.g. piped via python -c "exec(...)") — run main()
     main()
