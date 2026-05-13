@@ -743,75 +743,105 @@ TECHNICAL RULES:
 - NEVER wrap all screens in a container div — screens sit directly in body
 - This is critical: if authScreen starts as display:none the page will be completely blank
 
-⚠️ BUTTONS — CRITICAL RULE:
+⚠️ HTML STRUCTURE — THE MOST CRITICAL RULE — READ CAREFULLY:
 
-✅ ALWAYS use onclick="functionName()" directly on buttons — this is required:
-  Correct: <button onclick="doLogin()">Login</button>
-  Correct: <button onclick="addToCart('item', 100)">Add to Cart</button>
-  Correct: <button onclick="showTab('home')">Home</button>
+✅ ALL screens and ALL tabs must be FULLY WRITTEN IN HTML from the start.
+✅ onAuthStateChanged ONLY shows/hides elements — it NEVER builds UI with innerHTML.
+✅ Tab switching ONLY shows/hides pre-written tab divs — never rebuilds them.
 
-✅ ALL functions MUST be defined at the TOP LEVEL of the script block — NOT inside DOMContentLoaded:
+This means:
+- customerApp div contains ALL 4 customer tabs fully written in HTML
+- ownerApp div contains ALL 4 owner tabs fully written in HTML
+- Products list, orders list = these CAN use innerHTML inside onSnapshot (data only, not structure)
+- ALL navigation, buttons, forms, layouts = written in HTML, never created dynamically
 
-REQUIRED SCRIPT STRUCTURE — follow this exactly:
+❌ NEVER do this — building UI after login:
+  onAuthStateChanged(user => {
+    customerApp.innerHTML = `<button>Home</button>...`; // WRONG — buttons won't work
+  })
 
-  [Firebase CDN script tags here]
+✅ ALWAYS do this — UI exists in HTML, just show it:
+  onAuthStateChanged(user => {
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('customerApp').style.display = 'block'; // just reveal it
+  })
 
-  [All HTML here]
+⚠️ BUTTONS — USE onclick ON EVERY BUTTON:
 
-  [One script block at the bottom of body:]
-    // Firebase init — at top level
-    const firebaseConfig = { apiKey: "...", ... };
-    const _app = firebase.initializeApp(firebaseConfig);
-    const _auth = firebase.auth();
-    const _db = firebase.firestore();
-    let currentRole = 'customer';
+✅ Every single button uses onclick="functionName()" — no exceptions:
+  <button onclick="doLogin()">Login</button>
+  <button onclick="addToCart('Burger', 199)">Add to Cart</button>
+  <button onclick="showTab('browseTab')">Browse</button>
+  <button onclick="approveOrder('orderId')">Approve</button>
+
+✅ ALL functions defined at TOP LEVEL of script — never inside DOMContentLoaded:
+
+REQUIRED SCRIPT STRUCTURE:
+
+  [Firebase CDN scripts — no async, no defer]
+  [Complete HTML body — all screens, all tabs, all buttons WRITTEN IN HTML]
+  <script>
+    // Firebase init at top level
+    const _app = firebase.initializeApp({...});
+    const _auth = firebase.auth(_app);
+    const _db = firebase.firestore(_app);
     let cart = [];
+    let currentUser = null;
 
-    // ALL functions defined at TOP LEVEL (not inside DOMContentLoaded)
-    function showScreen(id) {
-      document.querySelectorAll('.screen').forEach(s => s.style.display='none');
-      document.getElementById(id).style.display='flex';
-    }
+    // ALL functions at top level
     function showTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(t => t.style.display='none');
+      document.querySelectorAll('.c-tab').forEach(t => t.style.display='none');
       document.getElementById(tabId).style.display='block';
     }
-    function doLogin() {
-      var email = document.getElementById('emailInput').value;
-      var pass = document.getElementById('passInput').value;
-      _auth.signInWithEmailAndPassword(email, pass)
-        .catch(function(e){ document.getElementById('authError').textContent = e.message; });
-    }
-    function doSignup() { ... full implementation ... }
+    function doLogin() { ... }
     function addToCart(name, price, shopId, shopName) { ... }
     function placeOrder() { ... }
     function approveOrder(orderId) { ... }
+    function renderProducts(snap) {
+      // Only this kind of dynamic content is OK — filling a list inside a pre-existing div
+      document.getElementById('productsList').innerHTML = snap.docs.map(d => `
+        <div class="card">
+          <h3>${d.data().name}</h3>
+          <button onclick="addToCart('${d.data().name}', ${d.data().price}, '${d.data().shopId}', '${d.data().shopName}')">Add to Cart</button>
+        </div>`).join('');
+    }
 
-    // DOMContentLoaded: only auth state setup here
     document.addEventListener('DOMContentLoaded', function() {
       _auth.onAuthStateChanged(function(user) {
-        if (user) { showAppForUser(user); }
-        else { showScreen('authScreen'); }
+        if (user) {
+          // ONLY show/hide — never build UI here
+          document.getElementById('authScreen').style.display = 'none';
+          if (userRole === 'owner') {
+            document.getElementById('ownerApp').style.display = 'block';
+            loadOwnerData(user);
+          } else {
+            document.getElementById('customerApp').style.display = 'block';
+            loadCustomerData(user);
+          }
+        } else {
+          document.getElementById('authScreen').style.display = 'flex';
+          document.getElementById('customerApp').style.display = 'none';
+          document.getElementById('ownerApp').style.display = 'none';
+        }
       });
     });
-
-WHY onclick works: The tool automatically promotes all top-level functions to window scope,
-so onclick="functionName()" always finds them. addEventListener on dynamically-created
-buttons (inside innerHTML) fails because listeners are attached before the button exists.
+  </script>
 
 ABSOLUTE RULES:
-✅ Every button uses onclick="functionName()" — including buttons inside innerHTML strings
-✅ ALL functions defined at TOP LEVEL of script — never inside DOMContentLoaded
-✅ Use EXACTLY id="authScreen", id="customerApp", id="ownerApp" — no other names
-✅ authScreen starts with style="display:flex" — visible immediately on page load
+✅ ALL UI written in HTML — onAuthStateChanged only shows/hides, never builds
+✅ Every button uses onclick="functionName()" — no addEventListener
+✅ ALL functions at TOP LEVEL of script block
+✅ Use EXACTLY id="authScreen", id="customerApp", id="ownerApp"
+✅ authScreen starts with style="display:flex"
 ✅ customerApp and ownerApp start with style="display:none"
-✅ shopId in every product = owner's Firebase UID (auth.currentUser.uid)
+✅ shopId in every product = owner's Firebase UID
 ✅ shopId in every order = copied from product's shopId
-✅ Owner orders query: .where('shopId','==',user.uid) so owner sees customer orders
-❌ NO addEventListener for buttons — use onclick only
-❌ NO wrapper div around all screens — screens go directly inside body or one outer div
+✅ Owner orders query: .where('shopId','==',user.uid).onSnapshot()
+❌ NO innerHTML to build navigation, tabs, buttons, forms — only for data lists
+❌ NO addEventListener for buttons
+❌ NO wrapper div around all screens
 ❌ NO async or defer on Firebase script tags
-❌ NEVER use .orderBy() together with .where() in Firestore — no composite index exists, query will crash silently. Sort results in JavaScript after fetching.
+❌ NEVER use .orderBy() with .where() in Firestore — sort in JavaScript instead
 
 Return complete HTML only. No markdown. No explanation. No code fences.`
         }]
