@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fix My App Buttons — No API Needed</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Segoe UI',Inter,sans-serif;background:#060d2e;min-height:100vh;color:#fff;padding:32px 24px;}
+    h1{font-size:28px;font-weight:900;margin-bottom:6px;}
+    h1 span{color:#F5A623;}
+    .sub{color:rgba(255,255,255,0.5);font-size:14px;margin-bottom:28px;}
+    .card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:24px;margin-bottom:20px;}
+    label{display:block;font-size:12px;font-weight:800;color:#F5A623;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+    textarea{width:100%;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:14px;color:#fff;font-size:13px;font-family:monospace;resize:vertical;outline:none;min-height:200px;}
+    textarea:focus{border-color:#F5A623;}
+    textarea::placeholder{color:rgba(255,255,255,0.25);}
+    .btn{width:100%;padding:16px;border:none;border-radius:12px;font-size:17px;font-weight:900;cursor:pointer;margin-top:12px;}
+    .btn-fix{background:linear-gradient(135deg,#F5A623,#e8960f);color:#000;}
+    .btn-fix:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(245,166,35,0.4);}
+    .btn-copy{background:#28c864;color:#fff;}
+    .btn-dl{background:#0d1b6e;color:#fff;border:1px solid #F5A623;}
+    .btns{display:flex;gap:10px;margin-top:10px;}
+    .btns .btn{margin-top:0;}
+    .result-box{display:none;}
+    .badge-row{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0;}
+    .badge{background:rgba(40,200,100,0.15);border:1px solid rgba(40,200,100,0.35);color:#28c864;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;}
+    .howto{background:rgba(245,166,35,0.07);border:1px solid rgba(245,166,35,0.25);border-radius:12px;padding:16px 20px;margin-bottom:20px;}
+    .howto h3{color:#F5A623;font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
+    .howto ol{padding-left:18px;color:rgba(255,255,255,0.7);font-size:13px;line-height:2;}
+    .howto ol strong{color:#fff;}
+    .status{font-size:14px;color:#28c864;font-weight:700;margin-top:12px;display:none;}
+  </style>
+</head>
+<body>
+
+<h1>⚡ Fix My App <span>Buttons</span></h1>
+<p class="sub">No API key. No subscription. No credits. Paste your broken app HTML → get it fixed instantly.</p>
+
+<div class="howto">
+  <h3>📋 How to use</h3>
+  <ol>
+    <li><strong>Open your workshop tool</strong> → build or modify your app</li>
+    <li><strong>Click ⬇️ Download App</strong> → saves <code>my-app.html</code></li>
+    <li><strong>Open <code>my-app.html</code></strong> in Notepad / TextEdit → Select All → Copy</li>
+    <li><strong>Paste below</strong> → click Fix All Buttons → Download fixed file</li>
+  </ol>
+</div>
+
+<div class="card">
+  <label>📄 Paste your broken app HTML here</label>
+  <textarea id="inputHtml" placeholder="Paste the full HTML of your downloaded app here..."></textarea>
+  <button class="btn btn-fix" onclick="fixApp()">🔧 Fix All Buttons — Instant, No API Needed</button>
+  <div class="status" id="fixStatus">✅ Done! Scroll down to copy or download your fixed app.</div>
+</div>
+
+<div class="card result-box" id="resultBox">
+  <label>✅ Fixed App HTML — Ready to Use</label>
+  <div class="badge-row">
+    <div class="badge">✅ All functions on window.*</div>
+    <div class="badge">✅ new Function() global scope</div>
+    <div class="badge">✅ DOMContentLoaded fixed</div>
+    <div class="badge">✅ Dynamic buttons wired</div>
+    <div class="badge">✅ Error toast added</div>
+    <div class="badge">✅ window.onerror added</div>
+  </div>
+  <textarea id="outputHtml" style="margin-top:14px;min-height:180px;" readonly placeholder="Fixed HTML will appear here..."></textarea>
+  <div class="btns">
+    <button class="btn btn-copy" onclick="copyFixed()">📋 Copy Fixed HTML</button>
+    <button class="btn btn-dl"   onclick="downloadFixed()">⬇️ Download Fixed App</button>
+    <button class="btn btn-fix"  onclick="openFixed()" style="background:#7c3aed;">▶ Open Fixed App</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// repairButtonScope + prepareApp — exact same logic as workshop tool
+// ═══════════════════════════════════════════════════════════════
+function repairButtonScope(html) {
+  var scriptRe = /(<script(?!\s+src)[^>]*>)([\s\S]*?)(<\/script>)/gi;
+  return html.replace(scriptRe, function(fullTag, open, body, close) {
+    var newBody = body;
+
+    // FIX 1: standalone function declarations → var X = window.X = function X(
+    newBody = newBody.replace(
+      /^(\s*)(async\s+)?function\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/gm,
+      function(match, indent, asyncKw, name) {
+        return indent + 'var ' + name + ' = window.' + name + ' = ' + (asyncKw || '') + 'function ' + name + '(';
+      }
+    );
+
+    // FIX 1b: const/let X = [async] function(...)
+    newBody = newBody.replace(
+      /^(\s*)(?:const|let)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=\s*(async\s+)?function\s*(?:[a-zA-Z_$][a-zA-Z0-9_$]*)?\s*\(/gm,
+      function(match, indent, name, asyncKw) {
+        return indent + 'var ' + name + ' = window.' + name + ' = ' + (asyncKw || '') + 'function ' + name + '(';
+      }
+    );
+
+    // FIX 1c: const/let X = [async] (params) =>
+    newBody = newBody.replace(
+      /^(\s*)(?:const|let)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=\s*(async\s+)?\(([^)]*)\)\s*=>/gm,
+      function(match, indent, name, asyncKw, params) {
+        return indent + 'var ' + name + ' = window.' + name + ' = ' + (asyncKw || '') + '(' + params + ') =>';
+      }
+    );
+
+    // FIX 1d: const/let X = async? singleParam =>
+    newBody = newBody.replace(
+      /^(\s*)(?:const|let)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=\s*(async\s+)?([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=>/gm,
+      function(match, indent, name, asyncKw, param) {
+        if (/^[0-9"']/.test(param)) return match;
+        return indent + 'var ' + name + ' = window.' + name + ' = ' + (asyncKw || '') + param + ' =>';
+      }
+    );
+
+    // FIX 3: DOMContentLoaded / window.onload → __runWhenReady
+    newBody = newBody.replace(/document\.addEventListener\s*\(\s*['"]DOMContentLoaded['"]\s*,\s*/g, '__runWhenReady(');
+    newBody = newBody.replace(/window\.addEventListener\s*\(\s*['"]load['"]\s*,\s*/g, '__runWhenReady(');
+    newBody = newBody.replace(/window\.onload\s*=\s*function\s*/g, '__runWhenReady(function ');
+
+    // Inject helpers at very top
+    if (!newBody.includes('function __runWhenReady')) {
+      var readyHelper = 'function __runWhenReady(fn){if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",fn);}else{fn();}}';
+      var earlyErr    = 'if(!window._showBtnErr){window._showBtnErr=function(msg){try{var _t=document.createElement("div");_t.textContent="⚠️ "+msg;_t.style.cssText="position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#c62828;color:#fff;padding:10px 18px;border-radius:10px;z-index:99999;font-size:13px;max-width:90%;text-align:center;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);";_t.onclick=function(){_t.remove();};document.body.appendChild(_t);setTimeout(function(){if(_t.parentNode)_t.remove();},8000);}catch(e){}};}';
+      var earlyOnerror= 'window.onerror=function(msg,s,l,c,err){if(window._showBtnErr)window._showBtnErr((err&&err.message)||msg);return false;};window.addEventListener("unhandledrejection",function(ev){if(window._showBtnErr)window._showBtnErr("Promise error: "+((ev.reason&&ev.reason.message)||ev.reason||"unknown"));});';
+      newBody = readyHelper + '\n' + earlyErr + '\n' + earlyOnerror + '\n' + newBody;
+    }
+
+    // FIX 2: onclick rebinder using new Function (global scope — always finds window.*)
+    var errToast    = 'if(!window._showBtnErr){window._showBtnErr=function(msg){try{var _t=document.createElement("div");_t.textContent="⚠️ "+msg;_t.style.cssText="position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#c62828;color:#fff;padding:10px 18px;border-radius:10px;z-index:99999;font-size:13px;max-width:90%;text-align:center;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);";_t.onclick=function(){_t.remove();};document.body.appendChild(_t);setTimeout(function(){if(_t.parentNode)_t.remove();},8000);}catch(e){}};}';
+    var evalRebind  = errToast + 'try{document.querySelectorAll("[onclick]").forEach(function(el){if(el._ocDone)return;el._ocDone=true;var oc=el.getAttribute("onclick");el.removeAttribute("onclick");el.addEventListener("click",function(e){try{(new Function("event",oc)).call(el,e);}catch(ex){if(window._showBtnErr)window._showBtnErr(ex.message+" ["+oc.slice(0,40)+"]");console.error("btn-fail:",oc,ex);}});});}catch(_e){console.error("evalRebind crash",_e);}';
+    var observerSetup='try{if(!window._moSetup){window._moSetup=true;var _rw=function(){try{document.querySelectorAll("[onclick]").forEach(function(el){if(el._ocDone)return;el._ocDone=true;var oc=el.getAttribute("onclick");el.removeAttribute("onclick");el.addEventListener("click",function(e){try{(new Function("event",oc)).call(el,e);}catch(ex){if(window._showBtnErr)window._showBtnErr(ex.message+" ["+oc.slice(0,40)+"]");console.error("btn-fail:",oc,ex);}});});}catch(e){}};if(document.body)new MutationObserver(function(){setTimeout(_rw,30);}).observe(document.body,{childList:true,subtree:true});var _ri=0;var _rint=setInterval(function(){_rw();if(++_ri>60)clearInterval(_rint);},500);}}catch(_me){console.error("observerSetup crash",_me);}';
+
+    // Inject evalRebind inside every __runWhenReady block
+    var dclRe = /__runWhenReady\s*\(\s*(async\s+)?function/g;
+    var dclPos = [], dm;
+    while ((dm = dclRe.exec(newBody)) !== null) dclPos.push(dm.index);
+    for (var mi = dclPos.length - 1; mi >= 0; mi--) {
+      var bs = newBody.indexOf('{', dclPos[mi]);
+      if (bs < 0) continue;
+      var depth = 0, be = -1;
+      for (var ci = bs; ci < newBody.length; ci++) {
+        if (newBody[ci] === '{') depth++;
+        else if (newBody[ci] === '}') { if (--depth === 0) { be = ci; break; } }
+      }
+      if (be >= 0) newBody = newBody.slice(0, be) + '\n' + evalRebind + '\n' + observerSetup + '\n' + newBody.slice(be);
+    }
+
+    // Global fallbacks
+    newBody += '\n' + observerSetup;
+    newBody += '\nsetTimeout(function(){' + evalRebind + '\n' + observerSetup + '},300);';
+    newBody += '\nsetTimeout(function(){' + evalRebind + '},1500);';
+    newBody += '\nsetTimeout(function(){' + evalRebind + '},4000);';
+
+    // Emergency blank-screen revealer
+    var revealFn = '(function _reveal(){try{var _vis=false;var _all=document.querySelectorAll("body *");for(var _i=0;_i<_all.length;_i++){if(_all[_i].offsetHeight>50&&_all[_i].textContent.trim().length>2){_vis=true;break;}}if(_vis)return;var _inp=document.querySelector("input[type=password],input[type=email]");if(_inp){var _p=_inp.parentElement;while(_p&&_p!==document.body){if(window.getComputedStyle(_p).display==="none"||_p.style.display==="none")_p.style.cssText+=";display:flex!important;visibility:visible!important;";_p=_p.parentElement;}return;}var _a=null;var _kn=["authScreen","loginScreen","auth-screen","login-screen","fbAuthScreen","signInScreen"];for(var _j=0;_j<_kn.length;_j++){if(document.getElementById(_kn[_j])){_a=document.getElementById(_kn[_j]);break;}}if(!_a){var _q=document.querySelectorAll("[id*=auth],[id*=Auth],[id*=login],[id*=Login],[class*=auth],[class*=login]");if(_q.length)_a=_q[0];}if(!_a){var _w=document.body.firstElementChild;_a=(_w&&_w.firstElementChild)||_w||document.body;}if(_a){_a.style.cssText+=";display:flex!important;visibility:visible!important;";var _par=_a.parentElement;while(_par&&_par!==document.body){if(window.getComputedStyle(_par).display==="none")_par.style.display="flex";_par=_par.parentElement;}}}catch(_e){}})();';
+    newBody += '\n' + revealFn;
+    newBody += '\nsetTimeout(function(){' + revealFn + '},300);';
+    newBody += '\nsetTimeout(function(){' + revealFn + '},1000);';
+
+    return open + newBody + '\n' + close;
+  });
+}
+
+function prepareApp(html) {
+  html = repairButtonScope(html);
+  if (html.includes('firebase-app-compat') || html.includes('firebase.initializeApp')) return html;
+  var open  = '<script>';
+  var close = '<\/script>';
+  var bodyC = '<\/body>';
+  if (html.includes('</body>')) return html.replace('</body>', open + close + '\n</body>');
+  return html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UI logic
+// ═══════════════════════════════════════════════════════════════
+var fixedHtml = '';
+
+function fixApp() {
+  var input = document.getElementById('inputHtml').value.trim();
+  if (!input) { alert('Please paste your app HTML first!'); return; }
+  if (!input.includes('<html') && !input.includes('<!DOCTYPE')) {
+    alert('This doesn\'t look like HTML. Please paste the full content of your downloaded my-app.html file.');
+    return;
+  }
+
+  try {
+    fixedHtml = prepareApp(input);
+    document.getElementById('outputHtml').value = fixedHtml;
+    document.getElementById('resultBox').style.display = 'block';
+    document.getElementById('fixStatus').style.display = 'block';
+    document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth' });
+  } catch(e) {
+    alert('Error during fixing: ' + e.message);
+  }
+}
+
+function copyFixed() {
+  if (!fixedHtml) return;
+  navigator.clipboard.writeText(fixedHtml).then(function() {
+    var btn = document.querySelector('.btn-copy');
+    btn.textContent = '✅ Copied!';
+    setTimeout(function(){ btn.textContent = '📋 Copy Fixed HTML'; }, 2500);
+  }).catch(function() {
+    document.getElementById('outputHtml').select();
+    document.execCommand('copy');
+  });
+}
+
+function downloadFixed() {
+  if (!fixedHtml) return;
+  var blob = new Blob([fixedHtml], { type: 'text/html' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href = url;
+  a.download = 'my-app-fixed.html';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function openFixed() {
+  if (!fixedHtml) return;
+  var blob   = new Blob([fixedHtml], { type: 'text/html' });
+  var blobUrl = URL.createObjectURL(blob);
+  window.open(blobUrl, '_blank');
+  setTimeout(function(){ URL.revokeObjectURL(blobUrl); }, 60000);
+}
+</script>
+</body>
+</html>
