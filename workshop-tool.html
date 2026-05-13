@@ -79,12 +79,38 @@
 <div class="header">
   <div class="logo">⚡ Build My <span>App</span></div>
   <div style="display:flex;align-items:center;gap:8px;">
+    <div id="serverPill" style="display:flex;align-items:center;gap:5px;background:rgba(255,165,0,0.15);border:1px solid rgba(255,165,0,0.4);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;" onclick="document.getElementById('serverSetupBox').style.display=document.getElementById('serverSetupBox').style.display==='none'?'block':'none'">
+      <span id="serverDot" style="width:8px;height:8px;border-radius:50%;background:#F5A623;display:inline-block;"></span>
+      <span id="serverPillText" style="color:#F5A623;">Server: OFF</span>
+    </div>
     <button onclick="document.getElementById('apiSetup').style.display=document.getElementById('apiSetup').style.display==='none'?'block':'none'" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 10px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600;">🔑 API Key</button>
     <div class="badge">BY PALASH</div>
   </div>
 </div>
 
 <div class="main">
+
+  <!-- SERVER SETUP BOX — shown when server not running -->
+  <div id="serverSetupBox" style="background:rgba(245,166,35,0.08);border:2px solid rgba(245,166,35,0.5);border-radius:16px;padding:20px 24px;margin-bottom:20px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <span style="font-size:24px;">🖥️</span>
+      <div>
+        <div style="font-size:15px;font-weight:900;color:#F5A623;">Start Local Server — Apps Open as Localhost</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.5);">Without the server, apps open as a blob URL which can cause issues</div>
+      </div>
+      <button onclick="document.getElementById('serverSetupBox').style.display='none'" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.4);font-size:18px;cursor:pointer;">✕</button>
+    </div>
+    <div style="background:rgba(0,0,0,0.35);border-radius:10px;padding:14px 16px;margin-bottom:10px;">
+      <div style="font-size:11px;color:#F5A623;font-weight:800;letter-spacing:1px;margin-bottom:6px;">MAC — Paste in Terminal:</div>
+      <div style="font-family:monospace;font-size:13px;color:#fff;word-break:break-all;">curl -fsSL https://raw.githubusercontent.com/buildmyaiapp-alt/build-my-app/main/start-server.py | python3</div>
+    </div>
+    <div style="background:rgba(0,0,0,0.35);border-radius:10px;padding:14px 16px;margin-bottom:10px;">
+      <div style="font-size:11px;color:#F5A623;font-weight:800;letter-spacing:1px;margin-bottom:6px;">WINDOWS — Paste in Command Prompt:</div>
+      <div style="font-family:monospace;font-size:13px;color:#fff;word-break:break-all;">curl -s https://raw.githubusercontent.com/buildmyaiapp-alt/build-my-app/main/start-server.py -o %TEMP%\bma.py && python %TEMP%\bma.py</div>
+    </div>
+    <div id="serverCheckResult" style="font-size:13px;color:rgba(255,255,255,0.5);text-align:center;">Checking for server...</div>
+  </div>
+
   <!-- API KEY SETUP (hidden — workshop key is built in) -->
   <div class="api-setup" id="apiSetup" style="display:none;">
     <h3>🔑 Step 1 — Paste Your Claude API Key</h3>
@@ -521,7 +547,7 @@ function prepareDownload(html) {
 }
 
 
-// Check if API key already saved
+// Check if API key already saved + check server status on load
 window.onload = function() {
   const saved = _getKey();
   if (saved) {
@@ -535,6 +561,15 @@ window.onload = function() {
     document.getElementById('apiSetup').style.display = 'block';
     setTimeout(function(){ document.getElementById('apiKeyInput').focus(); }, 300);
   }
+
+  // ── SERVER STATUS CHECK ───────────────────────────────────────────────────────
+  // Check immediately, then every 5s so the pill updates as soon as server starts
+  async function pollServer() {
+    const online = await checkServerStatus();
+    updateServerPill(online);
+  }
+  pollServer();
+  setInterval(pollServer, 5000);
 };
 
 function saveApiKey() {
@@ -1050,13 +1085,36 @@ function toggleMobile() {
   }
 }
 
+async function checkServerStatus() {
+  try {
+    const r = await fetch('http://localhost:7823/', { method: 'GET', cache: 'no-store' });
+    return r.status < 500;
+  } catch (_e) {
+    return false;
+  }
+}
+
+function updateServerPill(online) {
+  const dot = document.getElementById('serverDot');
+  const txt = document.getElementById('serverPillText');
+  const box = document.getElementById('serverSetupBox');
+  const res = document.getElementById('serverCheckResult');
+  if (online) {
+    if (dot) { dot.style.background = '#28c864'; }
+    if (txt) { txt.style.color = '#28c864'; txt.textContent = 'Server: ON ✓'; }
+    if (box) box.style.display = 'none';
+    if (res) res.textContent = '✅ Server is running — apps will open as localhost!';
+  } else {
+    if (dot) { dot.style.background = '#F5A623'; }
+    if (txt) { txt.style.color = '#F5A623'; txt.textContent = 'Server: OFF'; }
+    if (res) res.textContent = '❌ Server not detected. Paste the command above in Terminal and keep that window open.';
+  }
+}
+
 async function openFullApp() {
   if (!generatedCode) { alert('Build your app first!'); return; }
 
-  // ── MODE 1: LOCAL SERVER (best mode — real HTTP + all button fixes applied) ───
-  // prepareApp() is STILL applied because const/let functions declared in scripts
-  // are not on window and will fail in onclick handlers regardless of server type.
-  // prepareApp transforms them to var X = window.X = ... so onclick always works.
+  // ── MODE 1: LOCAL SERVER (best — real HTTP, Firebase works, all buttons work) ──
   try {
     const resp = await fetch('http://localhost:7823/save-preview', {
       method: 'POST',
@@ -1066,18 +1124,40 @@ async function openFullApp() {
     if (resp.ok) {
       const data = await resp.json();
       if (data.url) {
-        // Show a small banner so user knows they're in local server mode
         const bar = document.getElementById('serverModeBanner');
         if (bar) { bar.style.display = 'flex'; bar.querySelector('a').href = data.url; }
+        updateServerPill(true);
         window.open(data.url, '_blank');
         return;
       }
     }
   } catch (_e) {
-    // Server not running — fall through to blob URL mode
+    // Server not running
   }
 
-  // ── MODE 2: BLOB URL (fallback — repairButtonScope fixes applied) ─────────────
+  // ── SERVER NOT RUNNING — show setup instructions clearly ─────────────────────
+  updateServerPill(false);
+  const box = document.getElementById('serverSetupBox');
+  if (box) {
+    box.style.display = 'block';
+    box.style.borderColor = 'rgba(255,95,87,0.6)';
+    box.style.background = 'rgba(255,95,87,0.08)';
+    box.scrollIntoView({ behavior: 'smooth' });
+    // Ask before opening blob fallback
+    const useFallback = confirm(
+      '⚠️ Local server is NOT running.\n\n' +
+      'Without the server, the app opens as a blob URL.\n' +
+      'Some features (Firebase login, buttons) may be less reliable.\n\n' +
+      'To fix: paste the terminal command shown on screen and keep that window open.\n\n' +
+      'Open as blob URL anyway?'
+    );
+    if (!useFallback) return;
+    // Restore box style
+    box.style.borderColor = 'rgba(245,166,35,0.5)';
+    box.style.background = 'rgba(245,166,35,0.08)';
+  }
+
+  // ── MODE 2: BLOB URL (fallback) ───────────────────────────────────────────────
   const blob = new Blob([prepareApp(generatedCode)], { type: 'text/html' });
   const blobUrl = URL.createObjectURL(blob);
   window.open(blobUrl, '_blank');
