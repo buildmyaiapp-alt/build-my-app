@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "landing-page",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "cd '/Users/palashrajak/Desktop/build my app' && python3 -m http.server 3456"],
+      "port": 3456
+    },
+    {
+      "name": "workshop",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "cd '/Users/palashrajak/Desktop/build my app' && node server.js"],
+      "port": 7823
+    }
+  ]
+}
