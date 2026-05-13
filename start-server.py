@@ -2,9 +2,13 @@
 """
 Build My App — Preview Server
 ==============================
-Run this ONE command before the workshop:
 
+Mac / Linux:
     python3 start-server.py
+
+Windows:
+    Double-click  start-server.bat
+    (or open Terminal/CMD and run:  python start-server.py)
 
 Then open the tool at:  http://localhost:7823/workshop-tool.html
 Or access from GitHub:  https://buildmyaiapp-alt.github.io/build-my-app/workshop-tool.html
