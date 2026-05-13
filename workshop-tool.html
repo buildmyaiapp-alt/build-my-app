@@ -420,7 +420,12 @@ function repairButtonScope(html) {
 
     // ── FIX 2: eval rebinder injected INSIDE every __runWhenReady block ─────────
     // direct eval() runs in the lexical scope where functions are defined
-    var evalRebind = 'try{document.querySelectorAll("[onclick]").forEach(function(el){var oc=el.getAttribute("onclick");el.removeAttribute("onclick");el.addEventListener("click",function(e){try{eval(oc);}catch(ex){console.error("btn:",oc,ex);}});});}catch(_e){}';
+    // _ocDone guard prevents double-wiring when element is re-scanned
+    var evalRebind = 'try{document.querySelectorAll("[onclick]").forEach(function(el){if(el._ocDone)return;el._ocDone=true;var oc=el.getAttribute("onclick");el.removeAttribute("onclick");el.addEventListener("click",function(e){try{eval(oc);}catch(ex){console.error("btn:",oc,ex);}});});}catch(_e){}';
+    // MutationObserver: re-wire onclick buttons added dynamically AFTER login
+    // (innerHTML set inside onAuthStateChanged fires AFTER the initial evalRebind pass)
+    // _rw defined here so eval() inherits the same lexical scope as all app functions
+    var observerSetup = 'try{if(!window._moSetup){window._moSetup=true;var _rw=function(){try{document.querySelectorAll("[onclick]").forEach(function(el){if(el._ocDone)return;el._ocDone=true;var oc=el.getAttribute("onclick");el.removeAttribute("onclick");el.addEventListener("click",function(e){try{eval(oc);}catch(ex){console.error("btn:",oc,ex);}});});}catch(e){}};new MutationObserver(function(){setTimeout(_rw,30);}).observe(document.body,{childList:true,subtree:true});var _ri=0;var _rint=setInterval(function(){_rw();if(++_ri>10)clearInterval(_rint);},500);}}catch(_me){}';
 
     // Brace-count to find the exact closing } of each __runWhenReady CALL
     // Matches __runWhenReady(function — skips the helper definition itself
@@ -436,7 +441,7 @@ function repairButtonScope(html) {
         if (newBody[ci] === '{') depth++;
         else if (newBody[ci] === '}') { if (--depth === 0) { be = ci; break; } }
       }
-      if (be >= 0) newBody = newBody.slice(0, be) + '\n' + evalRebind + '\n' + newBody.slice(be);
+      if (be >= 0) newBody = newBody.slice(0, be) + '\n' + evalRebind + '\n' + observerSetup + '\n' + newBody.slice(be);
     }
 
     // setTimeout fallback for apps that skip DOMContentLoaded entirely
