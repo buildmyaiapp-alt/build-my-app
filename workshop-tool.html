@@ -341,7 +341,8 @@ if (window._WEBINAR_MODE) {
 // Safari blocks localStorage for file:// URLs — use memory fallback
 function _saveKey(k) { try { localStorage.setItem('palash_api_key', k); } catch(e) {} window._memApiKey = k; }
 function _getKey() {
-  if (window._WEBINAR_MODE) return '__proxy__'; // webinar mode — use proxy
+  // Webinar mode: flag set by server injection OR detected by port 7824
+  if (window._WEBINAR_MODE || window.location.port === '7824') return '__proxy__';
   try { return localStorage.getItem('palash_api_key') || window._memApiKey || ''; } catch(e) { return window._memApiKey || ''; }
 }
 

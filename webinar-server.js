@@ -59,10 +59,11 @@ function proxyToClaude(body, res) {
     path:     '/v1/messages',
     method:   'POST',
     headers: {
-      'Content-Type':    'application/json',
-      'x-api-key':       API_KEY,
+      'Content-Type':      'application/json',
+      'x-api-key':         API_KEY,
       'anthropic-version': '2023-06-01',
-      'Content-Length':  Buffer.byteLength(body),
+      'anthropic-beta':    'interleaved-thinking-2025-05-14',
+      'Content-Length':    Buffer.byteLength(body),
     },
   };
 
