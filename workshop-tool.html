@@ -367,7 +367,7 @@ function repairButtonScope(html) {
       /^(\s*)(?:const|let)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=\s*(async\s+)?([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=>/gm,
       function(match, indent, name, asyncKw, param) {
         // Skip if param looks like a value (number, string) — it's an assignment not arrow fn
-        if (/^[0-9"'`]/.test(param)) return match;
+        if (/^[0-9"']/.test(param)) return match;
         return indent + 'var ' + name + ' = window.' + name + ' = ' + (asyncKw || '') + param + ' =>';
       }
     );
@@ -964,7 +964,7 @@ REQUIRED SCRIPT STRUCTURE — FOLLOW EXACTLY:
 ABSOLUTE RULES:
 ✅ ALL UI written in HTML — onAuthStateChanged only shows/hides, never builds
 ✅ Every button uses onclick="functionName()" — no exceptions
-✅ ALL functions use the `function` keyword at TOP LEVEL — BEFORE document.addEventListener
+✅ ALL functions use the function keyword at TOP LEVEL — BEFORE document.addEventListener
 ✅ Use EXACTLY id="authScreen", id="customerApp", id="ownerApp"
 ✅ authScreen starts with style="display:flex"
 ✅ customerApp and ownerApp start with style="display:none"
