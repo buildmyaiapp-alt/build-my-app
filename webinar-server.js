@@ -102,11 +102,13 @@ const server = http.createServer((req, res) => {
         res.end('workshop-tool.html not found — make sure this server.js is in the same folder.');
         return;
       }
-      // Inject webinar mode flag so the tool uses /api/claude instead of direct API
-      const patched = html.replace(
-        '<head>',
-        '<head>\n<script>window._WEBINAR_MODE=true;window._WEBINAR_PORT=' + PORT + ';</script>'
-      );
+      // Inject webinar mode — banner directly in HTML + JS flag + hide server box
+      const banner = '<div style="background:linear-gradient(135deg,#6c3aed,#a855f7);color:#fff;text-align:center;padding:11px 16px;font-size:14px;font-weight:800;position:sticky;top:0;z-index:99999;letter-spacing:0.3px;">🎓 Webinar Mode &nbsp;—&nbsp; Claude powered by your instructor &nbsp;|&nbsp; No API key needed</div>';
+      const flag   = '<script>window._WEBINAR_MODE=true;window._WEBINAR_PORT=' + PORT + ';</script>';
+      const hideServerBox = '<style>#serverSetupBox,#serverPill{display:none!important;}</style>';
+      let patched = html
+        .replace('<head>', '<head>\n' + flag + hideServerBox)
+        .replace('<body>', '<body>\n' + banner);
       res.writeHead(200, { ...CORS, 'Content-Type': 'text/html; charset=utf-8' });
       res.end(patched);
       stats.students.add(ip);
