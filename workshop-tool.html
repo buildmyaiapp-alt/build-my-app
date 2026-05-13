@@ -513,6 +513,29 @@ function repairButtonScope(html) {
   });
 }
 
+// Detect and repair HTML truncated by token limit
+function fixTruncatedHTML(html) {
+  // Count open vs closed script tags
+  var opens  = (html.match(/<script(?:\s[^>]*)?>(?!.*src)/gi) || []).length;
+  var closes = (html.match(/<\/script>/gi) || []).length;
+
+  // If there's an unclosed <script>, close it properly
+  if (opens > closes) {
+    // Find the last unclosed script and close it cleanly
+    // Add a safe comment to end any broken statement, then close
+    html += '\n// (truncated — auto-completed)\n</script>';
+  }
+
+  // Ensure </body> and </html> exist
+  if (!html.includes('</body>')) {
+    html += '\n</body>\n</html>';
+  } else if (!html.includes('</html>')) {
+    html += '\n</html>';
+  }
+
+  return html;
+}
+
 // CORE_JS fallback is still injected only for rare non-Firebase apps.
 function prepareApp(html) {
   html = repairButtonScope(html); // always repair button scope first
@@ -1047,6 +1070,9 @@ Return complete HTML only. No markdown. No explanation. No code fences.`
       throw new Error('AI returned invalid content. Preview: ' + raw.slice(0, 120));
     }
 
+    // Fix truncated output — Claude sometimes hits token limit mid-script
+    raw = fixTruncatedHTML(raw);
+
     generatedCode = raw;
     originalIdea = userIdea;
 
@@ -1362,9 +1388,8 @@ ${generatedCode}`
     if (!updatedCode.includes('<html') || updatedCode.length < 500) {
       throw new Error('AI returned incomplete response. Your previous app is unchanged — please try again.');
     }
-    // Auto-fix truncated response — if </body> or </html> missing, append them
-    if (!updatedCode.includes('</body>')) updatedCode += '\n</body></html>';
-    else if (!updatedCode.includes('</html>')) updatedCode += '\n</html>';
+    // Auto-fix truncated response — detect and repair cut-off HTML
+    updatedCode = fixTruncatedHTML(updatedCode);
 
     // Save backup in case something looks wrong
     const previousCode = generatedCode;
