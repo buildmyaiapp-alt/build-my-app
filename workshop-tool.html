@@ -393,23 +393,28 @@ function repairButtonScope(html) {
     );
     // Now inject helper at very top (after replacements so it won't be touched)
     // fn() runs directly — DOM already ready on blob URLs, no setTimeout delay
+    // Also inject _showBtnErr on window early + window.onerror so ANY crash is visible.
     if (!newBody.includes('function __runWhenReady')) {
       var readyHelper = 'function __runWhenReady(fn){if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",fn);}else{fn();}}';
-      newBody = readyHelper + '\n' + newBody;
+      // _showBtnErr defined on window early so every code path (observer, onerror, etc.) can use it
+      var earlyErr = 'if(!window._showBtnErr){window._showBtnErr=function(msg){try{var _t=document.createElement("div");_t.textContent="⚠️ "+msg;_t.style.cssText="position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#c62828;color:#fff;padding:10px 18px;border-radius:10px;z-index:99999;font-size:13px;max-width:90%;text-align:center;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);";_t.onclick=function(){_t.remove();};document.body.appendChild(_t);setTimeout(function(){if(_t.parentNode)_t.remove();},8000);}catch(e){}};}';
+      // window.onerror catches any script crash and shows it visually
+      var earlyOnerror = 'window.onerror=function(msg,s,l,c,err){if(window._showBtnErr)window._showBtnErr((err&&err.message)||msg);return false;};window.addEventListener("unhandledrejection",function(ev){if(window._showBtnErr)window._showBtnErr("Promise error: "+((ev.reason&&ev.reason.message)||ev.reason||"unknown"));});';
+      newBody = readyHelper + '\n' + earlyErr + '\n' + earlyOnerror + '\n' + newBody;
     }
 
-    // ── FIX 2: eval rebinder injected INSIDE every __runWhenReady block ─────────
-    // direct eval() runs in the lexical scope where functions are defined
-    // _ocDone guard prevents double-wiring when element is re-scanned
-    // Visible error toast shown inside the generated app when a button's eval fails.
-    // This makes silent failures visible so the user (and developer) can see what broke.
-    var errToast = 'function _showBtnErr(msg){try{var _t=document.createElement("div");_t.textContent="⚠️ "+msg;_t.style.cssText="position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#c62828;color:#fff;padding:10px 18px;border-radius:10px;z-index:99999;font-size:13px;max-width:90%;text-align:center;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);";_t.onclick=function(){_t.remove();};document.body.appendChild(_t);setTimeout(function(){if(_t.parentNode)_t.remove();},8000);}catch(e){}}';
-    var evalRebind = errToast + 'try{document.querySelectorAll("[onclick]").forEach(function(el){if(el._ocDone)return;el._ocDone=true;var oc=el.getAttribute("onclick");el.removeAttribute("onclick");el.addEventListener("click",function(e){try{eval(oc);}catch(ex){_showBtnErr(ex.message+" ["+oc.slice(0,40)+"]");console.error("btn-fail:",oc,ex);}});});}catch(_e){console.error("evalRebind crash",_e);}';
+    // ── FIX 2: new Function rebinder injected INSIDE every __runWhenReady block ──
+    // KEY CHANGE: (new Function("event", oc)).call(el, e) instead of eval(oc)
+    //   - new Function ALWAYS runs in GLOBAL scope — finds window.* functions reliably
+    //   - eval(oc) runs in local closure scope — can miss functions defined outside
+    //   - .call(el, e) sets `this` = button element and passes event (like native onclick)
+    // _showBtnErr is on window (set above) so ALL error paths can show the toast.
+    var errToast = 'if(!window._showBtnErr){window._showBtnErr=function(msg){try{var _t=document.createElement("div");_t.textContent="⚠️ "+msg;_t.style.cssText="position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#c62828;color:#fff;padding:10px 18px;border-radius:10px;z-index:99999;font-size:13px;max-width:90%;text-align:center;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);";_t.onclick=function(){_t.remove();};document.body.appendChild(_t);setTimeout(function(){if(_t.parentNode)_t.remove();},8000);}catch(e){}};}';
+    var evalRebind = errToast + 'try{document.querySelectorAll("[onclick]").forEach(function(el){if(el._ocDone)return;el._ocDone=true;var oc=el.getAttribute("onclick");el.removeAttribute("onclick");el.addEventListener("click",function(e){try{(new Function("event",oc)).call(el,e);}catch(ex){if(window._showBtnErr)window._showBtnErr(ex.message+" ["+oc.slice(0,40)+"]");console.error("btn-fail:",oc,ex);}});});}catch(_e){console.error("evalRebind crash",_e);}';
     // MutationObserver: re-wire onclick buttons added dynamically AFTER login
     // (innerHTML set inside onAuthStateChanged fires AFTER the initial evalRebind pass)
-    // _rw defined here so eval() inherits the same lexical scope as all app functions
     // interval runs for 30 seconds (60 * 500ms) to cover slow Firebase auth
-    var observerSetup = 'try{if(!window._moSetup){window._moSetup=true;var _rw=function(){try{document.querySelectorAll("[onclick]").forEach(function(el){if(el._ocDone)return;el._ocDone=true;var oc=el.getAttribute("onclick");el.removeAttribute("onclick");el.addEventListener("click",function(e){try{eval(oc);}catch(ex){if(typeof _showBtnErr==="function")_showBtnErr(ex.message+" ["+oc.slice(0,40)+"]");console.error("btn-fail:",oc,ex);}});});}catch(e){}};if(document.body)new MutationObserver(function(){setTimeout(_rw,30);}).observe(document.body,{childList:true,subtree:true});var _ri=0;var _rint=setInterval(function(){_rw();if(++_ri>60)clearInterval(_rint);},500);}}catch(_me){console.error("observerSetup crash",_me);}';
+    var observerSetup = 'try{if(!window._moSetup){window._moSetup=true;var _rw=function(){try{document.querySelectorAll("[onclick]").forEach(function(el){if(el._ocDone)return;el._ocDone=true;var oc=el.getAttribute("onclick");el.removeAttribute("onclick");el.addEventListener("click",function(e){try{(new Function("event",oc)).call(el,e);}catch(ex){if(window._showBtnErr)window._showBtnErr(ex.message+" ["+oc.slice(0,40)+"]");console.error("btn-fail:",oc,ex);}});});}catch(e){}};if(document.body)new MutationObserver(function(){setTimeout(_rw,30);}).observe(document.body,{childList:true,subtree:true});var _ri=0;var _rint=setInterval(function(){_rw();if(++_ri>60)clearInterval(_rint);},500);}}catch(_me){console.error("observerSetup crash",_me);}';
 
     // Brace-count to find the exact closing } of each __runWhenReady CALL
     // Matches __runWhenReady(function — skips the helper definition itself
