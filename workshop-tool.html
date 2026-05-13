@@ -70,19 +70,6 @@
     .api-status.ok{color:#28c864;}.api-status.err{color:#ff5f57;}
     @media(max-width:600px){.hero h1{font-size:26px;}.result-actions{flex-direction:column;}.action-btn{width:100%;}iframe{height:450px;}.api-row{flex-direction:column;}}
   </style>
-  <style>
-    #passwordScreen{position:fixed;inset:0;background:linear-gradient(160deg,#060d2e 0%,#0d1b6e 100%);display:flex;align-items:center;justify-content:center;z-index:9999;padding:24px;}
-    .pw-card{background:#fff;border-radius:24px;padding:40px 32px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.4);}
-    .pw-logo{font-size:48px;margin-bottom:10px;}
-    .pw-title{font-size:22px;font-weight:900;color:#0d1b6e;margin-bottom:6px;}
-    .pw-sub{font-size:14px;color:#888;margin-bottom:24px;line-height:1.5;}
-    .pw-input{width:100%;border:2px solid #ddd;border-radius:12px;padding:14px 18px;font-size:16px;font-family:'Inter',sans-serif;outline:none;text-align:center;letter-spacing:2px;transition:border 0.2s;}
-    .pw-input:focus{border-color:#0d1b6e;}
-    .pw-btn{width:100%;margin-top:14px;background:linear-gradient(135deg,#F5A623,#e8960f);color:#000;border:none;padding:16px;border-radius:12px;font-size:17px;font-weight:900;cursor:pointer;transition:transform 0.15s;}
-    .pw-btn:hover{transform:translateY(-2px);}
-    .pw-err{color:#e53935;font-size:13px;font-weight:700;margin-top:10px;display:none;}
-    .pw-hint{font-size:12px;color:#bbb;margin-top:14px;}
-  </style>
 </head>
 <body>
 
@@ -129,7 +116,6 @@
       </div>
     </div>
     <button class="build-btn" id="buildBtn" onclick="buildApp()">⚡ Build My App Now</button>
-    <div id="buildError" style="display:none;background:rgba(255,95,87,0.15);border:1px solid rgba(255,95,87,0.4);border-radius:10px;padding:12px 16px;margin-top:12px;color:#ff5f57;font-size:14px;font-weight:600;text-align:center;"></div>
   </div>
 
   <div class="loading" id="loading">
@@ -280,15 +266,6 @@ let isMobileView = false;
 // Safari blocks localStorage for file:// URLs — use memory fallback
 function _saveKey(k) { try { localStorage.setItem('palash_api_key', k); } catch(e) {} window._memApiKey = k; }
 function _getKey() { try { return localStorage.getItem('palash_api_key') || window._memApiKey || ''; } catch(e) { return window._memApiKey || ''; } }
-
-function saveWorkshopKey() {
-  const key = document.getElementById('apiKeyInput2').value.trim();
-  if (!key.startsWith('sk-ant-')) {
-    document.getElementById('keyErr').style.display = 'block';
-    return;
-  }
-  _saveKey(key);
-}
 
 // ─────────────────────────────────────────────────────────────
 // Backup: attach buildApp via addEventListener in case onclick is blocked
@@ -552,7 +529,8 @@ async function buildApp() {
   if (!userIdea) {
     document.getElementById('buildBtn').textContent = '⚡ Build My App Now';
     document.getElementById('buildBtn').style.background = '';
-    document.getElementById('buildError').textContent = '⚠️ Please type your app idea first!';
+    document.getElementById('buildErrorMsg').textContent = '⚠️ Please type your app idea first!';
+    document.getElementById('buildErrorDetail').textContent = 'Click one of the example buttons above, or type your own app idea.';
     document.getElementById('buildError').style.display = 'block';
     return;
   }
@@ -865,6 +843,8 @@ Return complete HTML only. No markdown. No explanation. No code fences.`
     clearInterval(stepInterval);
     document.getElementById('loading').style.display = 'none';
     document.getElementById('buildBtn').disabled = false;
+    document.getElementById('buildBtn').textContent = '⚡ Build My App Now';
+    document.getElementById('buildBtn').style.background = '';
     document.getElementById('buildError').style.display = 'block';
     document.getElementById('buildErrorMsg').textContent = 'Build failed — ' + err.message;
     document.getElementById('buildErrorDetail').textContent = 'Check your API key is valid, then try again. If it keeps failing, reload the page.';
@@ -1066,9 +1046,11 @@ Apply this change fully and correctly. Follow these rules:
 - Return the COMPLETE updated HTML file — raw HTML only, no markdown, no code fences
 
 CRITICAL — BUTTONS RULE (do not break this):
-- This app uses addEventListener for ALL buttons — NEVER add onclick attributes
-- If you add any new button, give it an id and attach its handler with addEventListener inside DOMContentLoaded
-- NEVER write onclick="..." anywhere — it will break the button immediately
+- ALL buttons MUST use onclick="functionName()" directly on the element
+- ALL functions MUST be defined at TOP LEVEL of the script block — never inside DOMContentLoaded
+- If you add new buttons: write onclick="yourFunction()" on the button, define yourFunction at top level
+- NEVER use addEventListener for buttons — buttons added that way will stop working
+- NEVER put new functions inside DOMContentLoaded — they won't be reachable from onclick
 
 CURRENT APP CODE:
 ${generatedCode}`
@@ -1130,7 +1112,7 @@ ${generatedCode}`
 
     document.getElementById('modifyLoading').style.display = 'none';
     btn.disabled = false;
-    btn.textContent = '✏️ Apply Changes to My App';
+    btn.textContent = '✏️ Apply My Changes';
     document.getElementById('modifyPrompt').value = '';
 
     // Show success banner under the modify box
@@ -1143,7 +1125,7 @@ ${generatedCode}`
   } catch (err) {
     document.getElementById('modifyLoading').style.display = 'none';
     btn.disabled = false;
-    btn.textContent = '✏️ Apply Changes to My App';
+    btn.textContent = '✏️ Apply My Changes';
     const errEl = document.getElementById('modifyError');
     errEl.textContent = '❌ Error: ' + err.message + ' — Please try again.';
     errEl.style.display = 'block';
