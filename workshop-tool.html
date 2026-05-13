@@ -287,19 +287,23 @@ let originalIdea = '';
 let isMobileView = false;
 
 // ── API KEY SCREEN ────────────────────────────────────────────
+// Safari blocks localStorage for file:// URLs — use memory fallback
+function _saveKey(k) { try { localStorage.setItem('palash_api_key', k); } catch(e) {} window._memApiKey = k; }
+function _getKey() { try { return _getKey() || window._memApiKey || ''; } catch(e) { return window._memApiKey || ''; } }
+
 function saveWorkshopKey() {
   const key = document.getElementById('apiKeyInput2').value.trim();
   if (!key.startsWith('sk-ant-')) {
     document.getElementById('keyErr').style.display = 'block';
     return;
   }
-  localStorage.setItem('palash_api_key', key);
+  _saveKey(key);
   document.getElementById('passwordScreen').style.display = 'none';
 }
 
-// Skip API key screen if key already saved in browser
+// Skip API key screen if key already saved
 window.addEventListener('DOMContentLoaded', function() {
-  const savedKey = localStorage.getItem('palash_api_key');
+  const savedKey = _getKey();
   if (savedKey && savedKey.startsWith('sk-ant-')) {
     document.getElementById('passwordScreen').style.display = 'none';
   }
@@ -504,7 +508,7 @@ function prepareDownload(html) {
 
 // Check if API key already saved
 window.onload = function() {
-  const saved = localStorage.getItem('palash_api_key');
+  const saved = _getKey();
   if (saved) {
     document.getElementById('apiSetup').style.background = 'rgba(40,200,100,0.08)';
     document.getElementById('apiSetup').style.borderColor = 'rgba(40,200,100,0.4)';
@@ -524,7 +528,7 @@ function saveApiKey() {
     document.getElementById('apiStatus').textContent = '❌ Invalid key. Must start with sk-ant-';
     return;
   }
-  localStorage.setItem('palash_api_key', key);
+  _saveKey(key);
   document.getElementById('apiStatus').className = 'api-status ok';
   document.getElementById('apiStatus').textContent = '✅ Key saved! You can now build apps.';
   document.getElementById('apiSetup').style.background = 'rgba(40,200,100,0.08)';
@@ -549,7 +553,7 @@ async function buildApp() {
   const userIdea = document.getElementById('appPrompt').value.trim();
   if (!userIdea) { alert('Please describe your app first!'); return; }
 
-  const apiKey = localStorage.getItem('palash_api_key') || '';
+  const apiKey = _getKey();
   if (!apiKey) {
     alert('Please add your API key first using the setup box at the top!');
     return;
@@ -916,7 +920,7 @@ function fillModify(text) {
 
 async function fixAllButtons() {
   if (!generatedCode) { alert('Please build your app first!'); return; }
-  const apiKey = localStorage.getItem('palash_api_key') || '';
+  const apiKey = _getKey();
   if (!apiKey) { alert('API key missing. Please add it at the top.'); return; }
 
   const btn = document.getElementById('fixBtn');
@@ -1018,7 +1022,7 @@ async function modifyApp() {
   if (!changes) { alert('Please describe what you want to change!'); return; }
   if (!generatedCode) { alert('Please build your app first!'); return; }
 
-  const apiKey = localStorage.getItem('palash_api_key') || '';
+  const apiKey = _getKey();
   if (!apiKey) { alert('API key missing. Please add it at the top.'); return; }
 
   const btn = document.getElementById('modifyBtn');
