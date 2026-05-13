@@ -397,12 +397,22 @@ function repairButtonScope(html) {
     // DOMContentLoaded never fires again → addEventListener callback is MISSED.   ─
     // IMPORTANT: do the replacement FIRST, then inject helper so the helper's     ─
     // own internal addEventListener("DOMContentLoaded") is NOT itself replaced.   ─
+    // Replace ALL ready-wait patterns — DOMContentLoaded, load, window.onload
     newBody = newBody.replace(
       /document\.addEventListener\s*\(\s*['"]DOMContentLoaded['"]\s*,\s*/g,
       '__runWhenReady('
     );
-    // Now inject helper at very top (after replacement so it won't be touched)
-    // Use fn() directly (not setTimeout) so listeners attach synchronously on blob URLs
+    newBody = newBody.replace(
+      /window\.addEventListener\s*\(\s*['"]load['"]\s*,\s*/g,
+      '__runWhenReady('
+    );
+    // window.onload = function(){...}  →  __runWhenReady(function(){...})
+    newBody = newBody.replace(
+      /window\.onload\s*=\s*function\s*/g,
+      '__runWhenReady(function '
+    );
+    // Now inject helper at very top (after replacements so it won't be touched)
+    // fn() runs directly — DOM already ready on blob URLs, no setTimeout delay
     if (!newBody.includes('function __runWhenReady')) {
       var readyHelper = 'function __runWhenReady(fn){if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",fn);}else{fn();}}';
       newBody = readyHelper + '\n' + newBody;
@@ -413,9 +423,8 @@ function repairButtonScope(html) {
     var evalRebind = 'try{document.querySelectorAll("[onclick]").forEach(function(el){var oc=el.getAttribute("onclick");el.removeAttribute("onclick");el.addEventListener("click",function(e){try{eval(oc);}catch(ex){console.error("btn:",oc,ex);}});});}catch(_e){}';
 
     // Brace-count to find the exact closing } of each __runWhenReady CALL
-    // Use \(\s*function to match only calls like __runWhenReady(function(){...})
-    // This skips the helper definition itself: function __runWhenReady(fn){...}
-    var dclRe = /__runWhenReady\s*\(\s*function/g;
+    // Matches __runWhenReady(function — skips the helper definition itself
+    var dclRe = /__runWhenReady\s*\(\s*(async\s+)?function/g;
     var dclPos = [], dm;
     while ((dm = dclRe.exec(newBody)) !== null) dclPos.push(dm.index);
 
