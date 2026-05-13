@@ -698,12 +698,15 @@ EVERY APP MUST HAVE:
 ━━ SCREEN 1: AUTH (shown first, covers full screen) ━━
 - Beautiful full-screen login/signup UI with dark premium background
 - Role selection buttons at top: "I am a Customer" and "I am a Shop Owner" (or relevant role for this app type)
-- When a role is selected, highlight it and store the choice
+- FIRST role button must be visually pre-selected/highlighted on page load (set its opacity:1, others 0.5)
+- var currentUserRole = 'customer'; — DEFAULT to first role so signup works without clicking role button
+- selectRole() just updates the visual highlight and currentUserRole
 - Name field (signup only), Email field, Password field
 - Login button that calls _auth.signInWithEmailAndPassword()
 - Sign Up button that calls _auth.createUserWithEmailAndPassword() and saves to Firestore users collection with role
 - Working inline error display (red text under fields)
 - Toggle between Login and Sign Up modes
+- ⚠️ CRITICAL: doSignup() must NEVER block or return if currentUserRole is empty — always use currentUserRole || 'customer' with NO blocking check. Signup must work even if user never clicked a role button.
 
 ━━ SCREEN 2: CUSTOMER APP (shown after customer login) ━━
 - Home tab: hero banner with app name, 4 hardcoded featured item cards (emoji, name, price, Add to Cart button) — these are always visible even before owner adds products
@@ -874,10 +877,12 @@ REQUIRED SCRIPT STRUCTURE — FOLLOW EXACTLY:
       _auth.signInWithEmailAndPassword(email, pass).catch(function(err){ document.getElementById('fbErr').textContent=err.message; });
     }
     function doSignup() {
-      var name = document.getElementById('fbName').value;
-      var email = document.getElementById('fbEmail').value;
+      var name = document.getElementById('fbName').value.trim();
+      var email = document.getElementById('fbEmail').value.trim();
       var pass = document.getElementById('fbPass').value;
-      var role = currentUserRole || 'customer';
+      if(!name||!email||!pass){ document.getElementById('fbErr').textContent='Please fill all fields'; return; }
+      var role = currentUserRole || 'customer'; // ALWAYS has a value — no blocking role check
+      document.getElementById('fbErr').textContent='Creating account...';
       _auth.createUserWithEmailAndPassword(email, pass).then(function(cred){
         return _db.collection('users').doc(cred.user.uid).set({ uid:cred.user.uid, name:name, email:email, role:role, createdAt:firebase.firestore.FieldValue.serverTimestamp() });
       }).catch(function(err){ document.getElementById('fbErr').textContent=err.message; });
