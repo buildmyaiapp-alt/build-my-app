@@ -86,31 +86,16 @@
 </head>
 <body>
 
-<!-- PASSWORD SCREEN -->
+<!-- API KEY SCREEN -->
 <div id="passwordScreen">
   <div class="pw-card">
     <div class="pw-logo">⚡</div>
     <div class="pw-title">Build My App — Workshop Tool</div>
-
-    <!-- Step 1: Password -->
-    <div id="step1">
-      <div class="pw-sub">Enter the workshop password given by Palash</div>
-      <input type="password" class="pw-input" id="pwInput" placeholder="Enter password..." autocomplete="off" onkeydown="if(event.key==='Enter')checkPassword()"/>
-      <button class="pw-btn" onclick="checkPassword()">🔓 Unlock Tool</button>
-      <div class="pw-err" id="pwErr">❌ Wrong password. Please try again.</div>
-      <div class="pw-hint">Password is shared during the live workshop only</div>
-    </div>
-
-    <!-- Step 2: API Key (shown after correct password) -->
-    <div id="step2" style="display:none;">
-      <div style="font-size:32px;margin-bottom:8px;">✅</div>
-      <div style="font-size:16px;font-weight:800;color:#0d1b6e;margin-bottom:6px;">Password Correct!</div>
-      <div class="pw-sub">Now enter the Workshop API Key shown on screen by Palash</div>
-      <input type="text" class="pw-input" id="apiKeyInput2" placeholder="sk-ant-api03-..." onkeydown="if(event.key==='Enter')saveWorkshopKey()"/>
-      <button class="pw-btn" onclick="saveWorkshopKey()">🚀 Start Building!</button>
-      <div class="pw-err" id="keyErr">❌ Invalid key. Must start with sk-ant-</div>
-    </div>
-
+    <div class="pw-sub">Enter your Claude API Key to start building apps with AI</div>
+    <input type="text" class="pw-input" id="apiKeyInput2" placeholder="sk-ant-api03-..." onkeydown="if(event.key==='Enter')saveWorkshopKey()" style="letter-spacing:0;"/>
+    <button class="pw-btn" onclick="saveWorkshopKey()">🚀 Start Building!</button>
+    <div class="pw-err" id="keyErr">❌ Invalid key. Must start with sk-ant-</div>
+    <div class="pw-hint">Your key is saved only in your browser — never shared</div>
   </div>
 </div>
 
@@ -301,22 +286,7 @@ let generatedCode = '';
 let originalIdea = '';
 let isMobileView = false;
 
-// ── WORKSHOP PASSWORD SYSTEM ──────────────────────────────────
-const WORKSHOP_PWD = '1milliondollerby2027';
-
-function checkPassword() {
-  const val = document.getElementById('pwInput').value.trim();
-  if (val === WORKSHOP_PWD) {
-    document.getElementById('step1').style.display = 'none';
-    document.getElementById('step2').style.display = 'block';
-    setTimeout(function(){ document.getElementById('apiKeyInput2').focus(); }, 100);
-  } else {
-    document.getElementById('pwErr').style.display = 'block';
-    document.getElementById('pwInput').value = '';
-    document.getElementById('pwInput').focus();
-  }
-}
-
+// ── API KEY SCREEN ────────────────────────────────────────────
 function saveWorkshopKey() {
   const key = document.getElementById('apiKeyInput2').value.trim();
   if (!key.startsWith('sk-ant-')) {
@@ -324,11 +294,10 @@ function saveWorkshopKey() {
     return;
   }
   localStorage.setItem('palash_api_key', key);
-  sessionStorage.setItem('workshop_unlocked', '1');
   document.getElementById('passwordScreen').style.display = 'none';
 }
 
-// Skip password screen if API key already saved in browser
+// Skip API key screen if key already saved in browser
 window.addEventListener('DOMContentLoaded', function() {
   const savedKey = localStorage.getItem('palash_api_key');
   if (savedKey && savedKey.startsWith('sk-ant-')) {
