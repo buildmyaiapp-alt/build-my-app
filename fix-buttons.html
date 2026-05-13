@@ -42,13 +42,23 @@
   <ol>
     <li><strong>Open your workshop tool</strong> → build or modify your app</li>
     <li><strong>Click ⬇️ Download App</strong> → saves <code>my-app.html</code></li>
-    <li><strong>Open <code>my-app.html</code></strong> in Notepad / TextEdit → Select All → Copy</li>
-    <li><strong>Paste below</strong> → click Fix All Buttons → Download fixed file</li>
+    <li><strong>Click the upload box below</strong> (or drag &amp; drop <code>my-app.html</code> onto it) — fixes instantly!</li>
+    <li><strong>Or paste manually:</strong> open <code>my-app.html</code> in a <em>code editor</em> (VS Code, Notepad) → Select All → Copy → paste below</li>
   </ol>
 </div>
 
 <div class="card">
-  <label>📄 Paste your broken app HTML here</label>
+  <label>📄 Upload or Paste Your App HTML</label>
+
+  <!-- UPLOAD BUTTON — easiest way, no editor needed -->
+  <div style="border:2px dashed rgba(245,166,35,0.5);border-radius:12px;padding:24px;text-align:center;margin-bottom:14px;cursor:pointer;transition:all 0.2s;" id="dropZone" onclick="document.getElementById('fileInput').click()" ondragover="event.preventDefault();this.style.borderColor='#F5A623'" ondrop="handleDrop(event)">
+    <div style="font-size:36px;margin-bottom:8px;">📁</div>
+    <div style="font-size:15px;font-weight:800;color:#F5A623;margin-bottom:4px;">Click to Upload my-app.html</div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.4);">Or drag and drop the file here</div>
+    <input type="file" id="fileInput" accept=".html" style="display:none;" onchange="handleFile(event)"/>
+  </div>
+
+  <div style="text-align:center;color:rgba(255,255,255,0.3);font-size:12px;margin-bottom:10px;">— OR paste HTML manually below —</div>
   <textarea id="inputHtml" placeholder="Paste the full HTML of your downloaded app here..."></textarea>
   <button class="btn btn-fix" onclick="fixApp()">🔧 Fix All Buttons — Instant, No API Needed</button>
   <div class="status" id="fixStatus">✅ Done! Scroll down to copy or download your fixed app.</div>
@@ -226,6 +236,43 @@ function openFixed() {
   var blobUrl = URL.createObjectURL(blob);
   window.open(blobUrl, '_blank');
   setTimeout(function(){ URL.revokeObjectURL(blobUrl); }, 60000);
+}
+
+// ── File upload handlers ─────────────────────────────────────────
+function handleFile(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var dz = document.getElementById('dropZone');
+  dz.style.borderColor = '#28c864';
+  var label = dz.querySelector('div:nth-child(2)');
+  if (label) label.textContent = '✅ ' + file.name + ' loaded!';
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('inputHtml').value = e.target.result;
+    fixApp();
+  };
+  reader.readAsText(file);
+}
+
+function handleDrop(event) {
+  event.preventDefault();
+  var dz = document.getElementById('dropZone');
+  dz.style.borderColor = 'rgba(245,166,35,0.5)';
+  var file = event.dataTransfer.files[0];
+  if (!file) return;
+  if (!file.name.endsWith('.html') && file.type !== 'text/html') {
+    alert('Please drop an HTML file (.html)');
+    return;
+  }
+  dz.style.borderColor = '#28c864';
+  var label = dz.querySelector('div:nth-child(2)');
+  if (label) label.textContent = '✅ ' + file.name + ' loaded!';
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('inputHtml').value = e.target.result;
+    fixApp();
+  };
+  reader.readAsText(file);
 }
 </script>
 </body>
