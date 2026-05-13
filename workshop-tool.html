@@ -331,6 +331,37 @@ function repairButtonScope(html) {
       }
     );
 
+    // ── FIX 1b: const/let X = [async] function(...) — expose on window ───────────
+    // Handles: const showTab = function(id) { ... }
+    //          let doLogin = async function() { ... }
+    newBody = newBody.replace(
+      /^(\s*)(?:const|let)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=\s*(async\s+)?function\s*(?:[a-zA-Z_$][a-zA-Z0-9_$]*)?\s*\(/gm,
+      function(match, indent, name, asyncKw) {
+        return indent + 'var ' + name + ' = window.' + name + ' = ' + (asyncKw || '') + 'function ' + name + '(';
+      }
+    );
+
+    // ── FIX 1c: const/let X = [async] (params) => — expose on window ────────────
+    // Handles: const showTab = (id) => { ... }
+    //          const doLogin = async (email, pass) => { ... }
+    newBody = newBody.replace(
+      /^(\s*)(?:const|let)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=\s*(async\s+)?\(([^)]*)\)\s*=>/gm,
+      function(match, indent, name, asyncKw, params) {
+        return indent + 'var ' + name + ' = window.' + name + ' = ' + (asyncKw || '') + '(' + params + ') =>';
+      }
+    );
+
+    // ── FIX 1d: const/let X = async? singleParam => — expose on window ──────────
+    // Handles: const save = e => { ... }  /  const load = async key => { ... }
+    newBody = newBody.replace(
+      /^(\s*)(?:const|let)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=\s*(async\s+)?([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=>/gm,
+      function(match, indent, name, asyncKw, param) {
+        // Skip if param looks like a value (number, string) — it's an assignment not arrow fn
+        if (/^[0-9"'`]/.test(param)) return match;
+        return indent + 'var ' + name + ' = window.' + name + ' = ' + (asyncKw || '') + param + ' =>';
+      }
+    );
+
     // ── FIX 3: __runWhenReady helper — blob URLs load instantly so               ─
     // document.readyState is ALREADY "complete" when the script runs.             ─
     // DOMContentLoaded never fires again → addEventListener callback is MISSED.   ─
@@ -360,12 +391,15 @@ function repairButtonScope(html) {
     // ── FIX 2: eval rebinder injected INSIDE every __runWhenReady block ─────────
     // direct eval() runs in the lexical scope where functions are defined
     // _ocDone guard prevents double-wiring when element is re-scanned
-    var evalRebind = 'try{document.querySelectorAll("[onclick]").forEach(function(el){if(el._ocDone)return;el._ocDone=true;var oc=el.getAttribute("onclick");el.removeAttribute("onclick");el.addEventListener("click",function(e){try{eval(oc);}catch(ex){console.error("btn:",oc,ex);}});});}catch(_e){}';
+    // Visible error toast shown inside the generated app when a button's eval fails.
+    // This makes silent failures visible so the user (and developer) can see what broke.
+    var errToast = 'function _showBtnErr(msg){try{var _t=document.createElement("div");_t.textContent="⚠️ "+msg;_t.style.cssText="position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#c62828;color:#fff;padding:10px 18px;border-radius:10px;z-index:99999;font-size:13px;max-width:90%;text-align:center;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);";_t.onclick=function(){_t.remove();};document.body.appendChild(_t);setTimeout(function(){if(_t.parentNode)_t.remove();},8000);}catch(e){}}';
+    var evalRebind = errToast + 'try{document.querySelectorAll("[onclick]").forEach(function(el){if(el._ocDone)return;el._ocDone=true;var oc=el.getAttribute("onclick");el.removeAttribute("onclick");el.addEventListener("click",function(e){try{eval(oc);}catch(ex){_showBtnErr(ex.message+" ["+oc.slice(0,40)+"]");console.error("btn-fail:",oc,ex);}});});}catch(_e){console.error("evalRebind crash",_e);}';
     // MutationObserver: re-wire onclick buttons added dynamically AFTER login
     // (innerHTML set inside onAuthStateChanged fires AFTER the initial evalRebind pass)
     // _rw defined here so eval() inherits the same lexical scope as all app functions
     // interval runs for 30 seconds (60 * 500ms) to cover slow Firebase auth
-    var observerSetup = 'try{if(!window._moSetup){window._moSetup=true;var _rw=function(){try{document.querySelectorAll("[onclick]").forEach(function(el){if(el._ocDone)return;el._ocDone=true;var oc=el.getAttribute("onclick");el.removeAttribute("onclick");el.addEventListener("click",function(e){try{eval(oc);}catch(ex){console.error("btn:",oc,ex);}});});}catch(e){}};if(document.body)new MutationObserver(function(){setTimeout(_rw,30);}).observe(document.body,{childList:true,subtree:true});var _ri=0;var _rint=setInterval(function(){_rw();if(++_ri>60)clearInterval(_rint);},500);}}catch(_me){}';
+    var observerSetup = 'try{if(!window._moSetup){window._moSetup=true;var _rw=function(){try{document.querySelectorAll("[onclick]").forEach(function(el){if(el._ocDone)return;el._ocDone=true;var oc=el.getAttribute("onclick");el.removeAttribute("onclick");el.addEventListener("click",function(e){try{eval(oc);}catch(ex){if(typeof _showBtnErr==="function")_showBtnErr(ex.message+" ["+oc.slice(0,40)+"]");console.error("btn-fail:",oc,ex);}});});}catch(e){}};if(document.body)new MutationObserver(function(){setTimeout(_rw,30);}).observe(document.body,{childList:true,subtree:true});var _ri=0;var _rint=setInterval(function(){_rw();if(++_ri>60)clearInterval(_rint);},500);}}catch(_me){console.error("observerSetup crash",_me);}';
 
     // Brace-count to find the exact closing } of each __runWhenReady CALL
     // Matches __runWhenReady(function — skips the helper definition itself
@@ -735,68 +769,200 @@ This means:
   <button onclick="showTab('browseTab')">Browse</button>
   <button onclick="approveOrder('orderId')">Approve</button>
 
-✅ ALL functions defined at TOP LEVEL of script — never inside DOMContentLoaded:
+✅ ALL functions defined at TOP LEVEL of script — BEFORE document.addEventListener
+✅ Use ONLY the function keyword — NEVER const/let/arrow functions for anything called from onclick
 
-REQUIRED SCRIPT STRUCTURE:
+REQUIRED SCRIPT STRUCTURE — FOLLOW EXACTLY:
 
   [Firebase CDN scripts — no async, no defer]
   [Complete HTML body — all screens, all tabs, all buttons WRITTEN IN HTML]
-  [script block at bottom:]
-    // Firebase init at top level
-    const _app = firebase.initializeApp({...});
-    const _auth = firebase.auth(_app);
-    const _db = firebase.firestore(_app);
-    let cart = [];
-    let currentUser = null;
+  <script>
+    // 1. Firebase init — at very top of script
+    var _app = firebase.initializeApp({...});
+    var _auth = firebase.auth(_app);
+    var _db = firebase.firestore(_app);
+    var cart = [];
+    var currentUser = null;
+    var currentUserRole = '';
 
-    // ALL functions at top level
+    // 2. ALL app functions — using function keyword, at top level, before DOMContentLoaded
     function showTab(tabId) {
-      document.querySelectorAll('.c-tab').forEach(t => t.style.display='none');
+      document.querySelectorAll('.tab-pane').forEach(function(t){ t.style.display='none'; });
       document.getElementById(tabId).style.display='block';
     }
-    function doLogin() { ... }
-    function addToCart(name, price, shopId, shopName) { ... }
-    function placeOrder() { ... }
-    function approveOrder(orderId) { ... }
-    function renderProducts(snap) {
-      // Only dynamic DATA lists are OK to build with innerHTML — not nav/buttons/forms
-      document.getElementById('productsList').innerHTML = snap.docs.map(function(d) {
-        return '<div class="card"><h3>' + d.data().name + '</h3>' +
-          '<button onclick="addToCart(\'' + d.data().name + '\',' + d.data().price + ',\'' + d.data().shopId + '\',\'' + d.data().shopName + '\')">Add to Cart</button></div>';
-      }).join('');
+    function showOwnerTab(tabId) {
+      document.querySelectorAll('.owner-pane').forEach(function(t){ t.style.display='none'; });
+      document.getElementById(tabId).style.display='block';
+    }
+    function doLogin() {
+      var email = document.getElementById('fbEmail').value;
+      var pass = document.getElementById('fbPass').value;
+      _auth.signInWithEmailAndPassword(email, pass).catch(function(err){ document.getElementById('fbErr').textContent=err.message; });
+    }
+    function doSignup() {
+      var name = document.getElementById('fbName').value;
+      var email = document.getElementById('fbEmail').value;
+      var pass = document.getElementById('fbPass').value;
+      var role = currentUserRole || 'customer';
+      _auth.createUserWithEmailAndPassword(email, pass).then(function(cred){
+        return _db.collection('users').doc(cred.user.uid).set({ uid:cred.user.uid, name:name, email:email, role:role, createdAt:firebase.firestore.FieldValue.serverTimestamp() });
+      }).catch(function(err){ document.getElementById('fbErr').textContent=err.message; });
+    }
+    function fbLogout() { _auth.signOut(); }
+    function selectRole(role) {
+      currentUserRole = role;
+      document.querySelectorAll('.role-btn').forEach(function(b){ b.style.opacity='0.5'; });
+      var sel = document.getElementById('roleBtn_'+role);
+      if(sel) sel.style.opacity='1';
+    }
+    function addToCart(name, price, shopId, shopName) {
+      cart.push({name:name, price:Number(price), qty:1, shopId:shopId||'', shopName:shopName||''});
+      updateCartBadge();
+      showToast(name+' added to cart!');
+      renderCart();
+    }
+    function updateCartBadge() {
+      var b = document.getElementById('cartBadge');
+      if(b){ b.textContent=cart.length; b.style.display=cart.length>0?'flex':'none'; }
+    }
+    function showToast(msg) {
+      var t=document.createElement('div');
+      t.textContent=msg;
+      t.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;';
+      document.body.appendChild(t);
+      setTimeout(function(){t.remove();},2500);
+    }
+    function renderCart() {
+      var el = document.getElementById('cartList');
+      var tot = document.getElementById('cartTotal');
+      if(!el) return;
+      if(cart.length===0){ el.innerHTML='<p style="text-align:center;padding:30px;opacity:0.5">Cart is empty</p>'; if(tot)tot.textContent='₹0'; return; }
+      el.innerHTML = cart.map(function(item,i){ return '<div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.1)"><span>'+item.name+'</span><div style="display:flex;gap:8px;align-items:center"><span>₹'+item.price+'</span><button onclick="removeFromCart('+i+')" style="background:#e53935;color:#fff;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:14px;">×</button></div></div>'; }).join('');
+      var sum = cart.reduce(function(a,b){return a+b.price;},0);
+      if(tot) tot.textContent='₹'+sum;
+    }
+    function removeFromCart(i) { cart.splice(i,1); updateCartBadge(); renderCart(); }
+    function placeOrder() {
+      if(cart.length===0){ showToast('Add items first!'); return; }
+      if(!_auth.currentUser){ showToast('Please login first!'); return; }
+      var shopId = cart[0].shopId;
+      var shopName = cart[0].shopName;
+      _db.collection('orders').add({
+        customerId: _auth.currentUser.uid,
+        customerName: (currentUser&&currentUser.name)||_auth.currentUser.email,
+        shopId: shopId,
+        shopName: shopName,
+        items: cart.map(function(i){return{name:i.name,price:i.price,qty:i.qty};}),
+        total: cart.reduce(function(a,b){return a+b.price;},0),
+        status: 'pending',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function(){
+        cart=[];
+        updateCartBadge();
+        renderCart();
+        showToast('Order placed! 🎉');
+      }).catch(function(err){ showToast('Error: '+err.message); });
+    }
+    function approveOrder(orderId) {
+      _db.collection('orders').doc(orderId).update({status:'approved'}).then(function(){ showToast('Order approved!'); });
+    }
+    function saveProduct() {
+      if(!_auth.currentUser||!currentUser){ showToast('Not logged in'); return; }
+      var name = document.getElementById('prodName').value.trim();
+      var price = document.getElementById('prodPrice').value.trim();
+      var desc = document.getElementById('prodDesc').value.trim();
+      var cat = document.getElementById('prodCat').value.trim();
+      if(!name||!price){ showToast('Fill name and price!'); return; }
+      _db.collection('products').add({
+        name:name, price:Number(price), description:desc, category:cat,
+        shopId:_auth.currentUser.uid, shopName:currentUser.shopName||currentUser.name||'',
+        available:true, createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function(){
+        document.getElementById('prodName').value='';
+        document.getElementById('prodPrice').value='';
+        document.getElementById('prodDesc').value='';
+        showToast('Product saved!');
+      }).catch(function(err){ showToast('Error: '+err.message); });
     }
 
+    // 3. Auth state — ONLY shows/hides screens, never builds UI
     document.addEventListener('DOMContentLoaded', function() {
       _auth.onAuthStateChanged(function(user) {
         if (user) {
-          // ONLY show/hide — never build UI here
-          document.getElementById('authScreen').style.display = 'none';
-          if (userRole === 'owner') {
-            document.getElementById('ownerApp').style.display = 'block';
-            loadOwnerData(user);
-          } else {
-            document.getElementById('customerApp').style.display = 'block';
-            loadCustomerData(user);
-          }
+          _db.collection('users').doc(user.uid).get().then(function(doc){
+            currentUser = doc.exists ? doc.data() : {uid:user.uid, name:user.email, role:'customer'};
+            document.getElementById('authScreen').style.display = 'none';
+            if (currentUser.role === 'owner') {
+              document.getElementById('ownerApp').style.display = 'block';
+              document.getElementById('customerApp').style.display = 'none';
+              loadOwnerDashboard();
+            } else {
+              document.getElementById('customerApp').style.display = 'block';
+              document.getElementById('ownerApp').style.display = 'none';
+              loadCustomerProducts();
+            }
+          });
         } else {
+          currentUser = null;
           document.getElementById('authScreen').style.display = 'flex';
           document.getElementById('customerApp').style.display = 'none';
           document.getElementById('ownerApp').style.display = 'none';
         }
       });
     });
+
+    function loadCustomerProducts() {
+      _db.collection('products').where('available','==',true).onSnapshot(function(snap){
+        var el = document.getElementById('productsList');
+        if(!el) return;
+        if(snap.empty){ el.innerHTML='<p style="text-align:center;padding:30px;opacity:0.5">No items yet</p>'; return; }
+        el.innerHTML = snap.docs.map(function(d){
+          var p = d.data();
+          return '<div class="product-card" style="background:rgba(255,255,255,0.07);border-radius:14px;padding:16px;margin-bottom:12px;"><div style="font-weight:700;font-size:15px;margin-bottom:4px;">'+p.name+'</div><div style="opacity:0.6;font-size:13px;margin-bottom:8px;">'+( p.description||'')+'</div><div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-weight:800;font-size:16px;color:var(--primary,#F5A623)">₹'+p.price+'</span><button onclick="addToCart(\''+p.name.replace(/'/g,"\\'")+"',"+p.price+",'"+p.shopId+"','"+( p.shopName||'').replace(/'/g,"\\'")+"')" style="background:var(--primary,#F5A623);color:#000;border:none;padding:8px 16px;border-radius:8px;font-weight:700;cursor:pointer;">Add to Cart</button></div></div>';
+        }).join('');
+      });
+    }
+    function loadOwnerDashboard() {
+      if(!_auth.currentUser) return;
+      var uid = _auth.currentUser.uid;
+      _db.collection('products').where('shopId','==',uid).onSnapshot(function(snap){
+        var el = document.getElementById('myProductsList');
+        if(!el) return;
+        el.innerHTML = snap.empty ? '<p style="text-align:center;padding:20px;opacity:0.5">No products yet</p>' :
+          snap.docs.map(function(d){ var p=d.data(); return '<div style="background:rgba(255,255,255,0.07);border-radius:12px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-weight:700;">'+p.name+'</div><div style="opacity:0.6;font-size:12px;">₹'+p.price+'</div></div></div>'; }).join('');
+      });
+      _db.collection('orders').where('shopId','==',uid).onSnapshot(function(snap){
+        var orders = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+        orders.sort(function(a,b){return (b.createdAt&&b.createdAt.seconds||0)-(a.createdAt&&a.createdAt.seconds||0);});
+        var el = document.getElementById('ordersList');
+        if(!el) return;
+        if(orders.length===0){ el.innerHTML='<p style="text-align:center;padding:20px;opacity:0.5">No orders yet</p>'; return; }
+        el.innerHTML = orders.map(function(o){
+          var items=(o.items||[]).map(function(i){return i.name+' x'+i.qty;}).join(', ');
+          var isPending=o.status==='pending';
+          return '<div style="background:rgba(255,255,255,0.07);border-radius:12px;padding:14px;margin-bottom:10px;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-weight:700;">'+(o.customerName||'Customer')+'</span><span style="color:'+(isPending?'#F5A623':'#4CAF50')+';font-weight:700;">'+(isPending?'🟡 Pending':'✅ Done')+'</span></div><div style="font-size:12px;opacity:0.6;margin-bottom:8px;">'+items+'</div><div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-weight:800;">₹'+o.total+'</span>'+(isPending?'<button onclick="approveOrder(\''+o.id+'\')" style="background:#4CAF50;color:#fff;border:none;padding:6px 14px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;">Approve</button>':'')+'</div></div>';
+        }).join('');
+        // Update dashboard counts
+        var tc = document.getElementById('totalOrders');
+        var pc = document.getElementById('pendingOrders');
+        if(tc) tc.textContent = orders.length;
+        if(pc) pc.textContent = orders.filter(function(o){return o.status==='pending';}).length;
+      });
+    }
   <\/script>
 
 ABSOLUTE RULES:
 ✅ ALL UI written in HTML — onAuthStateChanged only shows/hides, never builds
-✅ Every button uses onclick="functionName()" — no addEventListener
-✅ ALL functions at TOP LEVEL of script block
+✅ Every button uses onclick="functionName()" — no exceptions
+✅ ALL functions use the `function` keyword at TOP LEVEL — BEFORE document.addEventListener
 ✅ Use EXACTLY id="authScreen", id="customerApp", id="ownerApp"
 ✅ authScreen starts with style="display:flex"
 ✅ customerApp and ownerApp start with style="display:none"
 ✅ shopId in every product = owner's Firebase UID
 ✅ shopId in every order = copied from product's shopId
 ✅ Owner orders query: .where('shopId','==',user.uid).onSnapshot()
+❌ NEVER use const/let for function declarations — use function keyword only
+❌ NEVER use arrow functions => for onclick-called functions
 ❌ NO innerHTML to build navigation, tabs, buttons, forms — only for data lists
 ❌ NO addEventListener for buttons
 ❌ NO wrapper div around all screens
