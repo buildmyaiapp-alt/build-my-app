@@ -757,7 +757,7 @@ This means:
 
 ❌ NEVER do this — building UI after login:
   onAuthStateChanged(user => {
-    customerApp.innerHTML = `<button>Home</button>...`; // WRONG — buttons won't work
+    customerApp.innerHTML = '<button>Home</button>...'; // WRONG — buttons won't work
   })
 
 ✅ ALWAYS do this — UI exists in HTML, just show it:
@@ -780,7 +780,7 @@ REQUIRED SCRIPT STRUCTURE:
 
   [Firebase CDN scripts — no async, no defer]
   [Complete HTML body — all screens, all tabs, all buttons WRITTEN IN HTML]
-  <script>
+  [script block at bottom:]
     // Firebase init at top level
     const _app = firebase.initializeApp({...});
     const _auth = firebase.auth(_app);
@@ -798,12 +798,11 @@ REQUIRED SCRIPT STRUCTURE:
     function placeOrder() { ... }
     function approveOrder(orderId) { ... }
     function renderProducts(snap) {
-      // Only this kind of dynamic content is OK — filling a list inside a pre-existing div
-      document.getElementById('productsList').innerHTML = snap.docs.map(d => `
-        <div class="card">
-          <h3>${d.data().name}</h3>
-          <button onclick="addToCart('${d.data().name}', ${d.data().price}, '${d.data().shopId}', '${d.data().shopName}')">Add to Cart</button>
-        </div>`).join('');
+      // Only dynamic DATA lists are OK to build with innerHTML — not nav/buttons/forms
+      document.getElementById('productsList').innerHTML = snap.docs.map(function(d) {
+        return '<div class="card"><h3>' + d.data().name + '</h3>' +
+          '<button onclick="addToCart(\'' + d.data().name + '\',' + d.data().price + ',\'' + d.data().shopId + '\',\'' + d.data().shopName + '\')">Add to Cart</button></div>';
+      }).join('');
     }
 
     document.addEventListener('DOMContentLoaded', function() {
