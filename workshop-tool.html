@@ -86,18 +86,7 @@
 </head>
 <body>
 
-<!-- API KEY SCREEN -->
-<div id="passwordScreen">
-  <div class="pw-card">
-    <div class="pw-logo">⚡</div>
-    <div class="pw-title">Build My App — Workshop Tool</div>
-    <div class="pw-sub">Enter your Claude API Key to start building apps with AI</div>
-    <input type="text" class="pw-input" id="apiKeyInput2" placeholder="sk-ant-api03-..." onkeydown="if(event.key==='Enter')saveWorkshopKey()" style="letter-spacing:0;"/>
-    <button class="pw-btn" onclick="saveWorkshopKey()">🚀 Start Building!</button>
-    <div class="pw-err" id="keyErr">❌ Invalid key. Must start with sk-ant-</div>
-    <div class="pw-hint">Your key is saved only in your browser — never shared</div>
-  </div>
-</div>
+<!-- NO ENTRY SCREEN — tool opens directly -->
 
 <div id="mobileWarning">⚠️ This tool is designed for Laptop / PC. Please open on a computer for the best experience.</div>
 <div class="header">
@@ -523,9 +512,9 @@ window.onload = function() {
 
 function saveApiKey() {
   const key = document.getElementById('apiKeyInput').value.trim();
-  if (!key || !key.startsWith('sk-ant-')) {
+  if (!key) {
     document.getElementById('apiStatus').className = 'api-status err';
-    document.getElementById('apiStatus').textContent = '❌ Invalid key. Must start with sk-ant-';
+    document.getElementById('apiStatus').textContent = '❌ Please paste your API key';
     return;
   }
   _saveKey(key);
