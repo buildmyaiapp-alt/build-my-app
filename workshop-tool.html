@@ -539,18 +539,26 @@ function fillExample(type) {
 }
 
 async function buildApp() {
+  // INSTANT feedback — if you see this, the click is working
+  document.getElementById('buildBtn').textContent = '⏳ Starting...';
+  document.getElementById('buildBtn').style.background = '#666';
+
   const userIdea = document.getElementById('appPrompt').value.trim();
   if (!userIdea) {
-    document.getElementById('buildError').textContent = '⚠️ Please describe your app first!';
+    document.getElementById('buildBtn').textContent = '⚡ Build My App Now';
+    document.getElementById('buildBtn').style.background = '';
+    document.getElementById('buildError').textContent = '⚠️ Please type your app idea first!';
     document.getElementById('buildError').style.display = 'block';
     return;
   }
 
   const apiKey = _getKey();
   if (!apiKey) {
+    document.getElementById('buildBtn').textContent = '⚡ Build My App Now';
+    document.getElementById('buildBtn').style.background = '';
     document.getElementById('apiSetup').style.display = 'block';
     document.getElementById('apiStatus').className = 'api-status err';
-    document.getElementById('apiStatus').textContent = '❌ Please paste your API key above and click Save Key first!';
+    document.getElementById('apiStatus').textContent = '❌ Paste your API key above and click Save Key first!';
     document.getElementById('apiSetup').scrollIntoView({behavior:'smooth'});
     return;
   }
@@ -794,7 +802,7 @@ REQUIRED SCRIPT STRUCTURE:
         }
       });
     });
-  </script>
+  <\/script>
 
 ABSOLUTE RULES:
 ✅ ALL UI written in HTML — onAuthStateChanged only shows/hides, never builds
