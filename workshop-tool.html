@@ -279,7 +279,7 @@ let isMobileView = false;
 // ── API KEY SCREEN ────────────────────────────────────────────
 // Safari blocks localStorage for file:// URLs — use memory fallback
 function _saveKey(k) { try { localStorage.setItem('palash_api_key', k); } catch(e) {} window._memApiKey = k; }
-function _getKey() { try { return _getKey() || window._memApiKey || ''; } catch(e) { return window._memApiKey || ''; } }
+function _getKey() { try { return localStorage.getItem('palash_api_key') || window._memApiKey || ''; } catch(e) { return window._memApiKey || ''; } }
 
 function saveWorkshopKey() {
   const key = document.getElementById('apiKeyInput2').value.trim();
@@ -512,15 +512,19 @@ window.onload = function() {
 };
 
 function saveApiKey() {
-  const key = document.getElementById('apiKeyInput').value.trim();
+  let key = document.getElementById('apiKeyInput').value.trim();
+  // If input field empty, try prompt dialog as fallback
+  if (!key) {
+    key = (window.prompt('Paste your Claude API key here:') || '').trim();
+  }
   if (!key) {
     document.getElementById('apiStatus').className = 'api-status err';
-    document.getElementById('apiStatus').textContent = '❌ Key field is empty — click inside the box and paste your key';
+    document.getElementById('apiStatus').textContent = '❌ No key entered';
     return;
   }
   _saveKey(key);
   document.getElementById('apiStatus').className = 'api-status ok';
-  document.getElementById('apiStatus').textContent = '✅ Key saved! Key starts with: ' + key.slice(0,12) + '...';
+  document.getElementById('apiStatus').textContent = '✅ Key saved! Starts with: ' + key.slice(0,14) + '...';
   document.getElementById('apiSetup').style.background = 'rgba(40,200,100,0.08)';
   document.getElementById('apiSetup').style.borderColor = 'rgba(40,200,100,0.4)';
   document.getElementById('apiKeyInput').value = '';
