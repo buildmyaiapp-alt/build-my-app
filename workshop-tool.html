@@ -100,10 +100,10 @@
 <div class="main">
   <!-- API KEY SETUP (hidden — workshop key is built in) -->
   <div class="api-setup" id="apiSetup" style="display:none;">
-    <h3>🔑 One-Time Setup — Add Your API Key</h3>
-    <p>Paste your Claude API key below. It is saved only in your browser. Students will never see this.</p>
+    <h3>🔑 Step 1 — Paste Your Claude API Key</h3>
+    <p>👇 Click inside the box below, paste your key (Cmd+V), then click Save:</p>
     <div class="api-row">
-      <input type="text" class="api-input" id="apiKeyInput" placeholder="Paste your sk-ant-api03-... key here" autocomplete="off" spellcheck="false"/>
+      <input type="text" class="api-input" id="apiKeyInput" placeholder="Click here first, then paste your sk-ant-api03-... key" autocomplete="off" spellcheck="false" style="font-size:13px;"/>
       <button class="api-save-btn" id="apiSaveBtn" onclick="saveApiKey()">Save Key ✓</button>
     </div>
     <div class="api-status" id="apiStatus"></div>
@@ -502,11 +502,12 @@ window.onload = function() {
     document.getElementById('apiSetup').style.background = 'rgba(40,200,100,0.08)';
     document.getElementById('apiSetup').style.borderColor = 'rgba(40,200,100,0.4)';
     document.getElementById('apiStatus').className = 'api-status ok';
-    document.getElementById('apiStatus').textContent = '✅ API key is saved and ready!';
+    document.getElementById('apiStatus').textContent = '✅ API key is saved and ready! Key: ' + saved.slice(0,12) + '...';
     document.getElementById('apiKeyInput').placeholder = 'Key saved — paste new one to update';
   } else {
-    // No key saved yet — show the setup box automatically
+    // No key saved — show box and focus input automatically
     document.getElementById('apiSetup').style.display = 'block';
+    setTimeout(function(){ document.getElementById('apiKeyInput').focus(); }, 300);
   }
 };
 
