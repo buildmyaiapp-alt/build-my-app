@@ -299,10 +299,51 @@ let generatedCode = '';
 let originalIdea = '';
 let isMobileView = false;
 
+// ── Claude API fetch — works in both direct and webinar/proxy mode ─
+function _claudeFetch(apiKey, payload) {
+  if (window._WEBINAR_MODE || apiKey === '__proxy__') {
+    return fetch('/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  }
+  return fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify(payload)
+  });
+}
+
+// ── WEBINAR MODE — uses proxy server, no API key needed ──────────
+if (window._WEBINAR_MODE) {
+  // Hide API key section, show webinar banner
+  document.addEventListener('DOMContentLoaded', function() {
+    var setup = document.getElementById('apiSetup');
+    if (setup) setup.style.display = 'none';
+    // Inject webinar badge
+    var header = document.querySelector('.header-inner') || document.querySelector('header') || document.body.firstElementChild;
+    if (header) {
+      var badge = document.createElement('div');
+      badge.innerHTML = '🎓 Webinar Mode — Claude powered by your instructor';
+      badge.style.cssText = 'background:linear-gradient(135deg,#6c3aed,#a855f7);color:#fff;text-align:center;padding:8px 16px;font-size:13px;font-weight:700;letter-spacing:0.3px;';
+      document.body.insertBefore(badge, document.body.firstChild);
+    }
+  });
+}
+
 // ── API KEY SCREEN ────────────────────────────────────────────
 // Safari blocks localStorage for file:// URLs — use memory fallback
 function _saveKey(k) { try { localStorage.setItem('palash_api_key', k); } catch(e) {} window._memApiKey = k; }
-function _getKey() { try { return localStorage.getItem('palash_api_key') || window._memApiKey || ''; } catch(e) { return window._memApiKey || ''; } }
+function _getKey() {
+  if (window._WEBINAR_MODE) return '__proxy__'; // webinar mode — use proxy
+  try { return localStorage.getItem('palash_api_key') || window._memApiKey || ''; } catch(e) { return window._memApiKey || ''; }
+}
 
 // ─────────────────────────────────────────────────────────────
 // Backup: attach buildApp via addEventListener in case onclick is blocked
@@ -647,7 +688,7 @@ async function buildApp() {
   if (!apiKey) {
     document.getElementById('buildBtn').textContent = '⚡ Build My App Now';
     document.getElementById('buildBtn').style.background = '';
-    document.getElementById('apiSetup').style.display = 'block';
+    if (!window._WEBINAR_MODE) { document.getElementById('apiSetup').style.display = 'block'; }
     document.getElementById('apiStatus').className = 'api-status err';
     document.getElementById('apiStatus').textContent = '❌ Paste your API key above and click Save Key first!';
     document.getElementById('apiSetup').scrollIntoView({behavior:'smooth'});
@@ -676,15 +717,7 @@ async function buildApp() {
   }, 6000);
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
+    const response = await _claudeFetch(apiKey, {
         model: 'claude-sonnet-4-5',
         max_tokens: 16000,
         thinking: { type: 'enabled', budget_tokens: 5000 },
@@ -1050,7 +1083,6 @@ ABSOLUTE RULES:
 
 Return complete HTML only. No markdown. No explanation. No code fences.`
         }]
-      })
     });
 
     clearInterval(stepInterval);
@@ -1237,15 +1269,7 @@ async function fixAllButtons() {
   document.getElementById('modifyError').style.display = 'none';
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
+    const response = await _claudeFetch(apiKey, {
         model: 'claude-sonnet-4-5',
         max_tokens: 16000,
         thinking: { type: 'enabled', budget_tokens: 5000 },
@@ -1274,7 +1298,6 @@ Return the complete fully working HTML file now:
 
 ${generatedCode}`
         }]
-      })
     });
 
     if (!response.ok) {
@@ -1339,15 +1362,7 @@ async function modifyApp() {
   document.getElementById('modifyError').style.display = 'none';
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
+    const response = await _claudeFetch(apiKey, {
         model: 'claude-sonnet-4-5',
         max_tokens: 16000,
         thinking: { type: 'enabled', budget_tokens: 4000 },
@@ -1372,7 +1387,6 @@ CRITICAL — BUTTONS RULE (do not break this):
 CURRENT APP CODE:
 ${generatedCode}`
         }]
-      })
     });
 
     if (!response.ok) {
