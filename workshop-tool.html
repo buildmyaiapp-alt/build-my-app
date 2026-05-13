@@ -103,7 +103,7 @@
     <h3>🔑 One-Time Setup — Add Your API Key</h3>
     <p>Paste your Claude API key below. It is saved only in your browser. Students will never see this.</p>
     <div class="api-row">
-      <input type="password" class="api-input" id="apiKeyInput" placeholder="sk-ant-api03-..."/>
+      <input type="text" class="api-input" id="apiKeyInput" placeholder="Paste your sk-ant-api03-... key here" autocomplete="off" spellcheck="false"/>
       <button class="api-save-btn" id="apiSaveBtn" onclick="saveApiKey()">Save Key ✓</button>
     </div>
     <div class="api-status" id="apiStatus"></div>
@@ -514,12 +514,12 @@ function saveApiKey() {
   const key = document.getElementById('apiKeyInput').value.trim();
   if (!key) {
     document.getElementById('apiStatus').className = 'api-status err';
-    document.getElementById('apiStatus').textContent = '❌ Please paste your API key';
+    document.getElementById('apiStatus').textContent = '❌ Key field is empty — click inside the box and paste your key';
     return;
   }
   _saveKey(key);
   document.getElementById('apiStatus').className = 'api-status ok';
-  document.getElementById('apiStatus').textContent = '✅ Key saved! You can now build apps.';
+  document.getElementById('apiStatus').textContent = '✅ Key saved! Key starts with: ' + key.slice(0,12) + '...';
   document.getElementById('apiSetup').style.background = 'rgba(40,200,100,0.08)';
   document.getElementById('apiSetup').style.borderColor = 'rgba(40,200,100,0.4)';
   document.getElementById('apiKeyInput').value = '';
