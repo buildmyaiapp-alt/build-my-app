@@ -770,10 +770,28 @@ Config object:
   messagingSenderId: "823433789308"
   appId: "1:823433789308:web:5a953ee43cd5cf2548aef9"
 
+⚠️ APP DATA ISOLATION — CRITICAL:
+Every app MUST use collection names prefixed with the app name so different apps never share data.
+Take the app name, make it lowercase, remove spaces and special characters, and use it as a prefix.
+Example: "Spice Kitchen" → prefix = "spicekitchen" → collections: spicekitchen_users, spicekitchen_products, spicekitchen_orders
+Example: "FitZone Gym" → prefix = "fitzonegym" → collections: fitzonegym_users, fitzonegym_products, fitzonegym_orders
+Example: "GlowUp Salon" → prefix = "glowupsalon" → collections: glowupsalon_users, glowupsalon_products, glowupsalon_orders
+
+At the top of your script, define:
+  var APP_PREFIX = 'spicekitchen'; // ← use actual app name, lowercase, no spaces
+  var USERS_COL    = APP_PREFIX + '_users';
+  var PRODUCTS_COL = APP_PREFIX + '_products';
+  var ORDERS_COL   = APP_PREFIX + '_orders';
+
+Then use these variables everywhere instead of hardcoded collection names:
+  _db.collection(PRODUCTS_COL)  ← NOT _db.collection('products')
+  _db.collection(ORDERS_COL)    ← NOT _db.collection('orders')
+  _db.collection(USERS_COL)     ← NOT _db.collection('users')
+
 FIRESTORE COLLECTIONS — EXACT SCHEMA (follow precisely):
-- users: { uid, name, email, role ('customer' or 'owner'), shopName (owners only), createdAt: firebase.firestore.FieldValue.serverTimestamp() }
-- products: { name, price (number), description, category, shopId (= owner's Firebase UID), shopName, available: true, createdAt: serverTimestamp() }
-- orders: { customerId (= customer's Firebase UID), customerName, shopId (= owner's Firebase UID — MUST match the product's shopId), shopName, items: [{name, price, qty}], total (number), status: 'pending', createdAt: serverTimestamp() }
+- [APP_PREFIX]_users: { uid, name, email, role ('customer' or 'owner'), shopName (owners only), createdAt: firebase.firestore.FieldValue.serverTimestamp() }
+- [APP_PREFIX]_products: { name, price (number), description, category, shopId (= owner's Firebase UID), shopName, available: true, createdAt: serverTimestamp() }
+- [APP_PREFIX]_orders: { customerId (= customer's Firebase UID), customerName, shopId (= owner's Firebase UID — MUST match the product's shopId), shopName, items: [{name, price, qty}], total (number), status: 'pending', createdAt: serverTimestamp() }
 
 ━━ CRITICAL DATA FLOW — HOW CUSTOMER ORDER REACHES OWNER ━━
 This is the most important part. Follow exactly:
@@ -894,7 +912,13 @@ REQUIRED SCRIPT STRUCTURE — FOLLOW EXACTLY:
     var _db = firebase.firestore(_app);
     var cart = [];
     var currentUser = null;
-    var currentUserRole = '';
+    var currentUserRole = 'customer';
+
+    // 2. App-specific collection names — NEVER use generic 'products', 'orders', 'users'
+    var APP_PREFIX   = 'spicekitchen'; // ← replace with actual app name lowercase no spaces
+    var USERS_COL    = APP_PREFIX + '_users';
+    var PRODUCTS_COL = APP_PREFIX + '_products';
+    var ORDERS_COL   = APP_PREFIX + '_orders';
 
     // 2. ALL app functions — using function keyword, at top level, before DOMContentLoaded
     function showTab(tabId) {
