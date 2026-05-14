@@ -62,7 +62,6 @@ function proxyToClaude(body, res) {
       'Content-Type':      'application/json',
       'x-api-key':         API_KEY,
       'anthropic-version': '2023-06-01',
-      'anthropic-beta':    'interleaved-thinking-2025-05-14',
       'Content-Length':    Buffer.byteLength(body),
     },
   };
@@ -124,6 +123,8 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
       try {
         const parsed = JSON.parse(body);
+        // Remove thinking param — not supported without special beta headers
+        delete parsed.thinking;
         // Count builds vs modifies
         const isModify = parsed.messages && parsed.messages.some(m =>
           typeof m.content === 'string' && m.content.includes('existing code')
@@ -131,7 +132,8 @@ const server = http.createServer((req, res) => {
         if (isModify) stats.modifies++; else stats.builds++;
         stats.students.add(ip);
         console.log(`  📨 ${isModify ? 'Modify' : 'Build '} from ${ip} | Builds: ${stats.builds} | Modifies: ${stats.modifies} | Students: ${stats.students.size}`);
-      } catch(e) {}
+        body = JSON.stringify(parsed);
+      } catch(e) { console.log('  ⚠️  Parse error:', e.message); }
       proxyToClaude(body, res);
     });
     return;
