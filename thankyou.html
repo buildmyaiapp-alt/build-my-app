@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>You're In! 🎉 AI App Workshop — May 17</title>
+  <title>You're In! 🎉 AI App Workshop — May 23</title>
 
   <!-- Facebook Pixel -->
   <script>
@@ -22,7 +22,7 @@
       fbq('track', 'Purchase', {
         value: 99,
         currency: 'INR',
-        content_name: 'AI App Building Workshop - May 17',
+        content_name: 'AI App Building Workshop - May 23',
         content_type: 'product'
       });
       sessionStorage.setItem('purchase_fired', '1');
@@ -37,7 +37,7 @@
   (function() {
     var alreadyNotified = sessionStorage.getItem('sheet_notified');
     if (alreadyNotified) return;
-    var APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbyOmAD732invkJoQskwjUTHzASzf8DYbc-gnpECreIif8xuaAvOqMaopRoioEDo-i8Uew/exec';
+    var APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbyuy7BIiawxz_naZ2TMk59snieIqAApUhqnkNjdsUH4ZZlYXhBs5vK4IdfnX_O0lPsV/exec';
     try {
       var pending = JSON.parse(sessionStorage.getItem('pending_lead') || '{}');
       var name  = pending.name  || sessionStorage.getItem('buyer_name') || 'Customer';
@@ -82,7 +82,7 @@
   </style>
 
   <script>
-    var WA_GROUP = 'https://chat.whatsapp.com/C4wmu9pLd707uR0bVAoMbz';
+    var WA_GROUP = 'https://chat.whatsapp.com/CZM7GrmeDMJDVJ6ZnWtVzP';
     var secs = 5;
     function tick() {
       var el = document.getElementById('countNum');
@@ -102,18 +102,18 @@
   <div class="card">
     <div class="emoji">🎉</div>
     <h1>Payment Done! You're In!</h1>
-    <p class="sub">Your seat for May 17th is confirmed. Joining you to the WhatsApp group automatically...</p>
+    <p class="sub">Your seat for May 23rd is confirmed. Joining you to the WhatsApp group automatically...</p>
 
     <!-- AUTO-REDIRECT COUNTDOWN -->
     <div class="wa-box">
       <div class="wa-label">⚡ Joining WhatsApp Group in</div>
       <div class="countdown" id="countNum">5</div>
       <div class="wa-hint">seconds — or tap below to join right now</div>
-      <a href="https://chat.whatsapp.com/C4wmu9pLd707uR0bVAoMbz" class="whatsapp-btn">💬 Join WhatsApp Group Now →</a>
+      <a href="https://chat.whatsapp.com/CZM7GrmeDMJDVJ6ZnWtVzP" class="whatsapp-btn">💬 Join WhatsApp Group Now →</a>
     </div>
 
     <div class="detail-box">
-      <div class="detail-row"><span class="detail-label">📅 Date</span><span class="detail-value">17th May 2026</span></div>
+      <div class="detail-row"><span class="detail-label">📅 Date</span><span class="detail-value">23rd May 2026</span></div>
       <div class="detail-row"><span class="detail-label">⏰ Time</span><span class="detail-value">2:00 PM IST</span></div>
       <div class="detail-row"><span class="detail-label">📍 Platform</span><span class="detail-value">Live on Zoom</span></div>
       <div class="detail-row"><span class="detail-label">💰 Amount Paid</span><span class="detail-value">₹99 ✅</span></div>
