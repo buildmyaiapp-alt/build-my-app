@@ -21,7 +21,7 @@
   fbq('init', '1489981779278274');
   fbq('track', 'PageView');
   fbq('track', 'ViewContent', {
-    content_name: 'AI App Building Workshop - May 17',
+    content_name: 'AI App Building Workshop - May 30',
     content_category: 'Online Workshop',
     content_type: 'product',
     value: 99,
@@ -1101,7 +1101,7 @@
   <div class="event-grid" style="max-width:700px;margin:0 auto;">
     <div class="event-box">
       <div class="event-icon">📅</div>
-      <div><div class="lbl">DATE</div><div class="val">17th May 2026</div></div>
+      <div><div class="lbl">DATE</div><div class="val">30th May 2026</div></div>
     </div>
     <div class="event-box">
       <div class="event-icon">🕐</div>
@@ -1142,11 +1142,11 @@
       <div style="color:#AAA;font-size:11px;font-weight:700;margin-top:6px;letter-spacing:1px;">SECS</div>
     </div>
   </div>
-  <p style="color:#fff;font-size:14px;font-weight:700;margin:16px 0 0;">17th May 2026 &nbsp;·&nbsp; 2:00 PM IST &nbsp;·&nbsp; Live on Zoom</p>
+  <p style="color:#fff;font-size:14px;font-weight:700;margin:16px 0 0;">30th May 2026 &nbsp;·&nbsp; 2:00 PM IST &nbsp;·&nbsp; Live on Zoom</p>
 </div>
 <script>
 (function(){
-  const target = new Date('2026-05-17T14:00:00+05:30').getTime();
+  const target = new Date('2026-05-30T14:00:00+05:30').getTime();
   function tick(){
     const now = Date.now();
     const diff = target - now;
@@ -2317,8 +2317,8 @@
 
 <!-- ── PAYMENT LOGIC ── -->
 <script>
-  const PAYMENT_LINK = 'https://rzp.io/rzp/je2QDJ2';
-  const APPS_SCRIPT  = 'https://script.google.com/macros/s/AKfycbyOmAD732invkJoQskwjUTHzASzf8DYbc-gnpECreIif8xuaAvOqMaopRoioEDo-i8Uew/exec';
+  const PAYMENT_LINK = 'https://pages.razorpay.com/pl_SkNpn0hrFrJJYA/view';
+  const APPS_SCRIPT  = 'https://script.google.com/macros/s/AKfycbyuy7BIiawxz_naZ2TMk59snieIqAApUhqnkNjdsUH4ZZlYXhBs5vK4IdfnX_O0lPsV/exec';
 
   // Open modal when any enroll button clicked
   document.querySelectorAll('.enroll-btn, .sticky-btn').forEach(btn => {
@@ -2358,20 +2358,17 @@
 
     const btn = document.getElementById('rzp-pay-btn');
     btn.disabled = true;
-    btn.innerHTML = '⏳ Redirecting to Payment...';
+    btn.innerHTML = '⏳ Opening Payment...';
 
     const leadData = { name, email, phone, paymentId: 'PAYMENT_INITIATED', amount: 9900 };
 
-    // Save to sessionStorage
+    // Save to sessionStorage synchronously before redirect
     try {
       sessionStorage.setItem('buyer_name', name.split(' ')[0]);
       sessionStorage.setItem('pending_lead', JSON.stringify(leadData));
     } catch(err) {}
 
-    // Fire lead save in background — don't wait for it
-    saveLead(leadData);
-
-    // Fire Meta Pixel events — ONCE only
+    // Fire Meta Pixel events — ONCE only (synchronous, before redirect)
     if (typeof fbq !== 'undefined') {
       if (!sessionStorage.getItem('checkout_fired')) {
         fbq('track', 'InitiateCheckout', { value: 99, currency: 'INR' });
@@ -2380,10 +2377,12 @@
       }
     }
 
-    // Redirect immediately — don't wait for Apps Script
-    setTimeout(function() {
-      window.location.href = PAYMENT_LINK;
-    }, 600);
+    // Fire lead save in background (uses Image beacon — survives page navigation)
+    saveLead(leadData);
+
+    // REDIRECT IMMEDIATELY — must be synchronous from user click event
+    // (setTimeout blocks redirect on iOS Safari / Android Chrome)
+    window.location.href = PAYMENT_LINK;
   }
 
   function saveLead(data) {
