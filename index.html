@@ -2362,13 +2362,13 @@
 
     const leadData = { name, email, phone, paymentId: 'PAYMENT_INITIATED', amount: 9900 };
 
-    // Save to sessionStorage synchronously before redirect
+    // Save to sessionStorage
     try {
       sessionStorage.setItem('buyer_name', name.split(' ')[0]);
       sessionStorage.setItem('pending_lead', JSON.stringify(leadData));
     } catch(err) {}
 
-    // Fire Meta Pixel events — ONCE only (synchronous, before redirect)
+    // Fire Meta Pixel events — ONCE only
     if (typeof fbq !== 'undefined') {
       if (!sessionStorage.getItem('checkout_fired')) {
         fbq('track', 'InitiateCheckout', { value: 99, currency: 'INR' });
@@ -2377,17 +2377,23 @@
       }
     }
 
-    // Fire lead save in background (uses Image beacon — survives page navigation)
+    // Fire lead save in background — non-blocking
     saveLead(leadData);
 
-    // REDIRECT IMMEDIATELY — must be synchronous from user click event
-    // (setTimeout blocks redirect on iOS Safari / Android Chrome)
-    window.location.href = PAYMENT_LINK;
+    // Build Razorpay URL with pre-filled details so user doesn't have to type again
+    const rawPhone = document.getElementById('rzp-phone').value.trim();
+    const prefilled = PAYMENT_LINK
+      + '?name=' + encodeURIComponent(name)
+      + '&email=' + encodeURIComponent(email)
+      + '&contact=' + encodeURIComponent(rawPhone);
+
+    // REDIRECT IMMEDIATELY
+    window.location.href = prefilled;
   }
 
   function saveLead(data) {
-    // Image pixel GET request — 100% fires even during page redirect
-    // doGet in Apps Script handles this and saves to Sheet + sends email
+    // Use sendBeacon (best for background saves during navigation)
+    // Falls back to Image beacon if not supported
     try {
       const params = new URLSearchParams({
         name:      data.name,
@@ -2395,7 +2401,12 @@
         phone:     data.phone,
         paymentId: data.paymentId || 'LEAD'
       });
-      new Image().src = APPS_SCRIPT + '?' + params.toString();
+      const url = APPS_SCRIPT + '?' + params.toString();
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(url);
+      } else {
+        new Image().src = url;
+      }
     } catch(err) {}
 
     // Backup to localStorage
