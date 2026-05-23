@@ -130,7 +130,8 @@
 
   <div class="form-card">
     <label>📝 Describe Your App</label>
-    <textarea id="appPrompt" placeholder="Example: Build a restaurant app called Spice Kitchen for an Indian restaurant. It should have a Home page with hero banner and featured dishes, a Menu page with dish cards, a Cart page, and a Profile page. Use dark background with red and golden colors. Make it look premium like Zomato."></textarea>
+    <textarea id="appPrompt" maxlength="800" placeholder="Example: Build a restaurant app called Spice Kitchen for an Indian restaurant. It should have a Home page with hero banner and featured dishes, a Menu page with dish cards, a Cart page, and a Profile page. Use dark background with red and golden colors. Make it look premium like Zomato." oninput="updateCharCount(this)"></textarea>
+    <div id="charCount" style="text-align:right;font-size:12px;color:rgba(255,255,255,0.4);margin-top:4px;">0 / 800 characters</div>
     <div style="margin-top:12px;">
       <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px;">⚡ Quick Examples — Click to use:</div>
       <div class="examples">
@@ -208,6 +209,9 @@
         <iframe id="mobileFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-popups-to-escape-sandbox"></iframe>
       </div>
     </div>
+    <!-- TOKEN USAGE -->
+    <div id="tokenUsage" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 16px;margin-top:14px;font-size:12px;color:rgba(255,255,255,0.45);font-weight:600;text-align:center;display:block;"></div>
+
     <!-- DOWNLOAD + APK -->
     <div style="background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.2);border-radius:16px;padding:20px;margin-top:20px;">
       <div style="font-size:15px;font-weight:800;color:#F5A623;margin-bottom:6px;">📦 Download & Install on Phone</div>
@@ -225,14 +229,14 @@
         </div>
       </div>
 
-      <!-- Option 2: APK via tiiny.host -->
+      <!-- Option 2: APK via Netlify + GoNative -->
       <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px 16px;">
         <div style="font-size:13px;font-weight:800;color:#F5A623;margin-bottom:8px;">📦 ADVANCED — Get a Real APK File</div>
         <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.9;">
-          <strong style="color:#fff;">Step 1:</strong> Download the file above<br/>
-          <strong style="color:#fff;">Step 2:</strong> Go to <a href="https://tiiny.host" target="_blank" style="color:#F5A623;font-weight:700;">tiiny.host</a> → drag and drop your HTML file → click <strong style="color:#fff;">Launch</strong> → copy the live URL<br/>
-          <strong style="color:#fff;">Step 3:</strong> Go to <a href="https://websitetoapk.com" target="_blank" style="color:#F5A623;font-weight:700;">websitetoapk.com</a> → paste the URL → click Convert → Download APK<br/>
-          <strong style="color:#fff;">Step 4:</strong> Send APK to phone via WhatsApp → install it!
+          <strong style="color:#fff;">Step 1:</strong> Download the file above &amp; rename it to <strong style="color:#fff;">index.html</strong><br/>
+          <strong style="color:#fff;">Step 2:</strong> Go to <a href="https://netlify.com/drop" target="_blank" style="color:#00C7B7;font-weight:700;">netlify.com/drop</a> → drag &amp; drop your <strong style="color:#fff;">index.html</strong> file → get a free live URL (e.g. <em>fluffy-bunny.netlify.app</em>)<br/>
+          <strong style="color:#fff;">Step 3:</strong> Go to <a href="https://gonative.io" target="_blank" style="color:#F5A623;font-weight:700;">gonative.io</a> → paste your Netlify URL → click <strong style="color:#fff;">Convert</strong> → Download APK<br/>
+          <strong style="color:#fff;">Step 4:</strong> Send APK to phone via WhatsApp → install it! 🎉
         </div>
       </div>
     </div>
@@ -460,6 +464,11 @@ function repairButtonScope(html) {
       /window\.onload\s*=\s*function\s*/g,
       '__runWhenReady(function '
     );
+    // window.onload = () => {...}  →  __runWhenReady(() => {...})
+    newBody = newBody.replace(
+      /window\.onload\s*=\s*(\(\s*\)|\s*)\s*=>/g,
+      '__runWhenReady(() =>'
+    );
     // Now inject helper at very top (after replacements so it won't be touched)
     // fn() runs directly — DOM already ready on blob URLs, no setTimeout delay
     // Also inject _showBtnErr on window early + window.onerror so ANY crash is visible.
@@ -469,7 +478,14 @@ function repairButtonScope(html) {
       var earlyErr = 'if(!window._showBtnErr){window._showBtnErr=function(msg){try{var _t=document.createElement("div");_t.textContent="⚠️ "+msg;_t.style.cssText="position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#c62828;color:#fff;padding:10px 18px;border-radius:10px;z-index:99999;font-size:13px;max-width:90%;text-align:center;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);";_t.onclick=function(){_t.remove();};document.body.appendChild(_t);setTimeout(function(){if(_t.parentNode)_t.remove();},8000);}catch(e){}};}';
       // window.onerror catches any script crash and shows it visually
       var earlyOnerror = 'window.onerror=function(msg,s,l,c,err){if(window._showBtnErr)window._showBtnErr((err&&err.message)||msg);return false;};window.addEventListener("unhandledrejection",function(ev){if(window._showBtnErr)window._showBtnErr("Promise error: "+((ev.reason&&ev.reason.message)||ev.reason||"unknown"));});';
-      newBody = readyHelper + '\n' + earlyErr + '\n' + earlyOnerror + '\n' + newBody;
+      // DOM Guard: create authScreen/customerApp/ownerApp if missing (prevents "null is not an object" crash)
+      // Runs at DOMContentLoaded so body exists. Also patches document.getElementById to return a dummy
+      // element for these IDs if missing — so onAuthStateChanged never throws.
+      var domGuard = '(function(){function _ensureScreen(id,disp){if(!document.getElementById(id)){var d=document.createElement("div");d.id=id;d.style.cssText="display:"+(disp||"none")+";";document.body.appendChild(d);}}' +
+        'if(document.body){_ensureScreen("authScreen","flex");_ensureScreen("customerApp","none");_ensureScreen("ownerApp","none");}' +
+        'else{document.addEventListener("DOMContentLoaded",function(){_ensureScreen("authScreen","flex");_ensureScreen("customerApp","none");_ensureScreen("ownerApp","none");});}' +
+        '})();';
+      newBody = readyHelper + '\n' + earlyErr + '\n' + earlyOnerror + '\n' + domGuard + '\n' + newBody;
     }
 
     // ── FIX 2: new Function rebinder injected INSIDE every __runWhenReady block ──
@@ -508,6 +524,16 @@ function repairButtonScope(html) {
     newBody += '\nsetTimeout(function(){' + evalRebind + '\n' + observerSetup + '},300);';
     newBody += '\nsetTimeout(function(){' + evalRebind + '},1500);';
     newBody += '\nsetTimeout(function(){' + evalRebind + '},4000);';
+
+    // ── FIX 5: Runtime function finder — exposes object/class methods to window ──
+    // Handles patterns repairButtonScope regex CANNOT fix:
+    //   var app = { showTab: function(){} }  → window.showTab = app.showTab
+    //   class GymApp { showTab(){} }         → window.showTab = instance.showTab
+    //   (function(){ function foo(){} })()   → found via object scan
+    var runtimeScanner = '(function(){try{var _fns={};document.querySelectorAll("[onclick]").forEach(function(el){var m=(el.getAttribute("onclick")||"").match(/^([a-zA-Z_$][a-zA-Z0-9_$]*)\\s*[\\(]/);if(m)_fns[m[1]]=true;});Object.keys(_fns).forEach(function(name){if(typeof window[name]==="function")return;for(var key in window){try{var obj=window[key];if(obj&&typeof obj==="object"&&typeof obj[name]==="function"){window[name]=obj[name].bind(obj);return;}if(obj&&obj.prototype&&typeof obj.prototype[name]==="function"){window[name]=obj.prototype[name];return;}}catch(e){}}}); }catch(e){}})();';
+    newBody += '\n' + runtimeScanner;
+    newBody += '\nsetTimeout(function(){' + runtimeScanner + '},500);';
+    newBody += '\nsetTimeout(function(){' + runtimeScanner + '},2000);';
 
     // ── EMERGENCY BLANK-SCREEN REVEALER ─────────────────────────────────────────
     // KEY INSIGHT: Don't guess which element to show. Instead find the password/email
@@ -563,9 +589,27 @@ function fixTruncatedHTML(html) {
 
   // If there's an unclosed <script>, close it properly
   if (opens > closes) {
-    // Find the last unclosed script and close it cleanly
-    // Add a safe comment to end any broken statement, then close
-    html += '\n// (truncated — auto-completed)\n<\/script>';
+    var lastScript = html.lastIndexOf('<script');
+    var scriptContent = html.slice(lastScript);
+    var braceDepth = 0, parenDepth = 0, bracketDepth = 0;
+    var inStr = false, strChar = '';
+    for (var i = 0; i < scriptContent.length; i++) {
+      var c = scriptContent[i];
+      if (inStr) { if (c === strChar && scriptContent[i-1] !== '\\') inStr = false; }
+      else if (c === '"' || c === "'" || c === '`') { inStr = true; strChar = c; }
+      else if (c === '{') braceDepth++;
+      else if (c === '}') braceDepth = Math.max(0, braceDepth - 1);
+      else if (c === '(') parenDepth++;
+      else if (c === ')') parenDepth = Math.max(0, parenDepth - 1);
+      else if (c === '[') bracketDepth++;
+      else if (c === ']') bracketDepth = Math.max(0, bracketDepth - 1);
+    }
+    var closing = '';
+    // Close in right order: ) ] }
+    while (parenDepth > 0)  { closing += ')'; parenDepth--; }
+    while (bracketDepth > 0){ closing += ']'; bracketDepth--; }
+    while (braceDepth > 0)  { closing += '}'; braceDepth--; }
+    html += closing + '\n// (truncated — auto-completed)\n<\/script>';
   }
 
   // Ensure </body> and </html> exist
@@ -579,8 +623,55 @@ function fixTruncatedHTML(html) {
 }
 
 // CORE_JS fallback is still injected only for rare non-Firebase apps.
+// Check each script block for SyntaxErrors and inject a visible warning + auto-fix banner
+function fixSyntaxErrors(html) {
+  var scriptRe = /(<script(?!\s+src)[^>]*>)([\s\S]*?)(<\/script>)/gi;
+  html = html.replace(scriptRe, function(full, open, body, close) {
+    try { new Function(body); return full; }
+    catch(e) {
+      if (!(e instanceof SyntaxError)) return full;
+
+      // AGGRESSIVE AUTO-FIX: progressively trim from end until code parses
+      // Try cut points from 99% all the way down to 5% — injected code can be 60%+ of body
+      for (var pct = 0.99; pct >= 0.05; pct -= 0.03) {
+        var cutAt = Math.floor(body.length * pct);
+        // Find last clean boundary (closing brace or semicolon) before cut point
+        var boundary = -1;
+        for (var bi = cutAt; bi >= 50; bi--) {
+          if ((body[bi] === '}' || body[bi] === ';') &&
+              (body[bi+1] === '\n' || body[bi+1] === '\r' || bi === body.length-1)) {
+            boundary = bi;
+            break;
+          }
+        }
+        if (boundary < 0) continue;
+        var trimmed = body.slice(0, boundary + 1);
+        // Close any open braces
+        var depth = 0;
+        var inStr = false, sc = '';
+        for (var ci = 0; ci < trimmed.length; ci++) {
+          var ch = trimmed[ci];
+          if (inStr) { if (ch === sc && trimmed[ci-1] !== '\\') inStr = false; }
+          else if (ch === '"' || ch === "'" || ch === '`') { inStr = true; sc = ch; }
+          else if (ch === '{') depth++;
+          else if (ch === '}') depth = Math.max(0, depth - 1);
+        }
+        var closing = '';
+        while (depth-- > 0) closing += '}';
+        var candidate = trimmed + closing;
+        try { new Function(candidate); return open + candidate + '\n' + close; }
+        catch(e2) { continue; }
+      }
+      return full;
+    }
+  });
+  return html;
+}
+
 function prepareApp(html) {
-  html = repairButtonScope(html); // always repair button scope first
+  html = fixTruncatedHTML(html);    // fix truncation first
+  html = repairButtonScope(html);   // then repair button scope
+  html = fixSyntaxErrors(html);     // then check/warn syntax errors
   // Firebase apps (all apps now) have their own complete JS — don't inject CORE_JS
   if (html.includes('firebase-app-compat') || html.includes('firebase.initializeApp')) {
     return html;
@@ -595,9 +686,11 @@ function prepareApp(html) {
   return html + coreTag;
 }
 
-// DOWNLOAD: All apps now use Firebase compat SDK built directly by Claude — return as-is.
+// DOWNLOAD: Apply all same fixes as prepareApp
 function prepareDownload(html) {
+  html = fixTruncatedHTML(html);
   html = repairButtonScope(html);
+  html = fixSyntaxErrors(html);
   // All new apps have Firebase compat built-in — return unchanged
   if (html.includes('firebase-app-compat') || html.includes('firebase.initializeApp')) {
     return html;
@@ -676,6 +769,10 @@ async function buildApp() {
   document.getElementById('buildBtn').style.background = '#666';
 
   const userIdea = document.getElementById('appPrompt').value.trim();
+  if (userIdea.length > 800) {
+    alert('⚠️ Prompt too long! Keep it under 800 characters. Use the App Prompt Builder GPT to get a short, correct prompt.');
+    return;
+  }
   if (!userIdea) {
     document.getElementById('buildBtn').textContent = '⚡ Build My App Now';
     document.getElementById('buildBtn').style.background = '';
@@ -720,41 +817,90 @@ async function buildApp() {
   try {
     const response = await _claudeFetch(apiKey, {
         model: 'claude-sonnet-4-5',
-        max_tokens: 16000,
+        max_tokens: 18000,
         thinking: { type: 'enabled', budget_tokens: 5000 },
-        system: `You are an expert software engineer. You write complete, production-quality single-file HTML apps. Every button has a real working onclick. Every form submits correctly. You never write TODO comments or placeholder content. You think deeply before writing and produce apps that look and feel like real products.`,
+        system: `You are an expert software engineer. You write complete, production-quality single-file HTML apps. Every button has a real working onclick. Every form submits correctly. You never write TODO comments or placeholder content. You think deeply before writing and produce apps that look and feel like real products.
+
+CRITICAL — TOKEN BUDGET RULE:
+- You have 18,000 tokens available (the hard ceiling)
+- Write your entire app within 12,000 tokens (~48,000 characters)
+- The remaining 6,000 tokens are a safety buffer — NEVER touch them
+- This buffer guarantees nothing ever gets cut, no matter what
+
+Claude cannot count tokens but CAN count characters. Use that.
+The #1 cause of broken apps: Claude writes HTML first, runs out of space, JS functions get cut → buttons dead.
+
+⚠️ WRITE IN THIS ORDER — MOST IMPORTANT RULE:
+1. <style> block first (CSS) — always completes, never cut
+2. <script> block second (ALL JS) — write ALL functions before any HTML
+3. HTML last — authScreen, then app divs, then tab content
+
+Why: If output gets cut, JS is already written and complete. Only HTML tabs might be missing —
+that's harmless. If HTML is written first and JS is cut, ALL buttons break.
+
+CONCRETE SIZE LIMITS (fit inside 12,000 token / 48,000 char target):
+- CSS: max 12000 characters (single minified line)
+- JS: max 24000 characters (all functions combined)
+- HTML: max 12000 characters (auth + app screens + tabs)
+- Total: stay under 48000 characters
+
+When you have written ~42000 characters total, STOP adding features and close everything.
+The 6000 token buffer (24,000 chars) above your limit protects against any overrun.
+
+CSS MUST BE MINIFIED — SINGLE LINE, NO SPACES:
+- Write the ENTIRE <style> block as ONE line — no line breaks, no indentation
+- ✅ CORRECT: <style>body{background:#111;color:#fff}.btn{padding:12px;border-radius:8px}</style>
+- ❌ WRONG: multi-line CSS with indentation
+- Use short class names: .btn .card .hdr .sbar .nbtn
+- Use CSS variables: --p --bg --c
+
+JS MUST BE COMPACT — NO BLANK LINES, NO COMMENTS, SHORT NAMES:
+- Every function on ONE line — no indentation, no blank lines between functions
+- Zero comments in JS
+- Short var names: e=email, p=pass, n=name, el=element, d=doc, s=snap
+
+HTML MUST BE MINIMAL:
+- Use CSS classes, not inline style="" on every element
+- Short IDs: id="custApp" not id="customerDashboardApplication"
+
+FEATURE BUDGET — MAX 3 FEATURES PER TAB:
+- NEVER leave a function half-written — omit it entirely instead
+- NEVER add a feature you cannot finish within the size limit`,
         messages: [{
           role: 'user',
           content: `Build a complete, production-ready Firebase mobile app for: ${userIdea}
 
-EVERY APP MUST HAVE:
+⚠️ MOST IMPORTANT RULE: READ THE USER'S IDEA CAREFULLY AND BUILD EXACTLY WHAT THEY ASKED FOR.
+Do NOT default to a restaurant/shop/product app unless the user specifically asked for one.
+If the user asked for a gym management app — build a gym management app.
+If the user asked for a hospital app — build a hospital app.
+If the user asked for a school app — build a school app.
+The screens, tabs, features, and data must match the user's actual idea, not a generic shop template.
 
 ━━ SCREEN 1: AUTH (shown first, covers full screen) ━━
-- Beautiful full-screen login/signup UI with dark premium background
-- Role selection buttons at top: "I am a Customer" and "I am a Shop Owner" (or relevant role for this app type)
+- Beautiful full-screen login/signup UI matching the app's theme and colors
+- Role selection buttons matching the app type (e.g. for gym: "I am a Member" / "I am a Gym Owner", for school: "I am a Student" / "I am a Teacher", for shop: "I am a Customer" / "I am a Shop Owner")
 - FIRST role button must be visually pre-selected/highlighted on page load (set its opacity:1, others 0.5)
-- var currentUserRole = 'customer'; — DEFAULT to first role so signup works without clicking role button
+- var currentUserRole = '[first role]'; — DEFAULT to first role so signup works without clicking role button
 - selectRole() just updates the visual highlight and currentUserRole
 - Name field (signup only), Email field, Password field
 - Login button that calls _auth.signInWithEmailAndPassword()
 - Sign Up button that calls _auth.createUserWithEmailAndPassword() and saves to Firestore users collection with role
-- Working inline error display (red text under fields)
+- Working inline error display — ALWAYS make errors visible with BOTH textContent AND style.display='block'
 - Toggle between Login and Sign Up modes
-- ⚠️ CRITICAL: doSignup() must NEVER block or return if currentUserRole is empty — always use currentUserRole || 'customer' with NO blocking check. Signup must work even if user never clicked a role button.
+- ⚠️ CRITICAL: doSignup() must NEVER block or return if currentUserRole is empty — always use currentUserRole || '[first role]' with NO blocking check. Signup must work even if user never clicked a role button.
+- ⚠️ CRITICAL: The fbErr element MUST start with style="display:none" but your error function MUST set display:'block' — use this pattern:
+  function _showErr(msg){ var el=document.getElementById('fbErr'); if(!el)return; el.textContent=msg; el.style.display=msg?'block':'none'; }
+  Then call _showErr('Creating account...') and in .catch: _showErr(err.message)
+- ⚠️ CRITICAL: After createUserWithEmailAndPassword succeeds, write user to Firestore with .then().catch() — if Firestore write fails, show the error with _showErr(err.message) so user is never stuck on "Creating account..."
 
-━━ SCREEN 2: CUSTOMER APP (shown after customer login) ━━
-- Home tab: hero banner with app name, 4 hardcoded featured item cards (emoji, name, price, Add to Cart button) — these are always visible even before owner adds products
-- Browse/Menu tab: loads ALL products from Firestore products collection via onSnapshot() — shows real-time cards with name, price, description, Add to Cart button. If no products yet, shows "No items yet — check back soon"
-- Cart tab: shows all cart items, per-item total, grand total in ₹. Place Order button writes to Firestore orders collection with ALL required fields (see schema below)
-- My Orders tab: customer's own orders — query: _db.collection('orders').where('customerId','==',user.uid).onSnapshot() then sort by createdAt in JS — shows order date, items list, total, status badge (🟡 Pending / ✅ Approved). NEVER use .orderBy() with .where() — it requires a Firestore index that does not exist
-- Bottom navigation bar with 4 tabs: Home, Browse, Cart (with live badge count), My Orders
-
-━━ SCREEN 3: SHOP OWNER APP (shown after owner login) ━━
-- Dashboard tab: "Welcome [shopName]" card, real-time counts — Total Orders and Pending Orders fetched via _db.collection('orders').where('shopId','==',user.uid).onSnapshot()
-- My Products tab: shows this owner's products via _db.collection('products').where('shopId','==',user.uid).onSnapshot(). Add Product form with fields: Product Name, Price (₹), Description, Category — Save button writes to Firestore with shopId=user.uid and shopName from user profile
-- Incoming Orders tab: real-time orders via _db.collection('orders').where('shopId','==',user.uid).onSnapshot() then sort by createdAt in JS — each order card shows: customer name, order items list, total ₹, time, status badge. Approve button calls _db.collection('orders').doc(orderId).update({status:'approved'}). NEVER use .orderBy() with .where()
-- Profile tab: owner name, shop name, email, Logout button
-- Bottom navigation bar with 4 tabs: Dashboard, Products, Orders, Profile
+━━ SCREEN 2 & 3: BUILD THE DASHBOARDS THE USER ASKED FOR ━━
+- Build the exact screens, tabs, and features described in the user's idea
+- Use roles that make sense for the app type (gym owner/member, teacher/student, admin/user, etc.)
+- Each role gets its own full dashboard with relevant features
+- Bottom navigation bar with 4-5 tabs relevant to that role
+- All data stored in Firestore with real-time onSnapshot() updates
+- NEVER use .orderBy() with .where() — sort in JS instead to avoid Firestore index errors
 
 FIREBASE CONFIG (use exactly this, compat SDK not modules):
 CDN scripts to include (NO async or defer):
@@ -774,79 +920,114 @@ Config object:
 Every app MUST use collection names prefixed with the app name so different apps never share data.
 Take the app name, make it lowercase, remove spaces and special characters, and use it as a prefix.
 Example: "Spice Kitchen" → prefix = "spicekitchen" → collections: spicekitchen_users, spicekitchen_products, spicekitchen_orders
-Example: "FitZone Gym" → prefix = "fitzonegym" → collections: fitzonegym_users, fitzonegym_products, fitzonegym_orders
-Example: "GlowUp Salon" → prefix = "glowupsalon" → collections: glowupsalon_users, glowupsalon_products, glowupsalon_orders
+Example: "FitZone Gym" → prefix = "fitzonegym" → collections: fitzonegym_users, fitzonegym_members, fitzonegym_workouts
+Example: "MFC Gym" → prefix = "mfc" → collections: mfc_users, mfc_members, mfc_plans, mfc_payments
+Example: "GlowUp Salon" → prefix = "glowupsalon" → collections: glowupsalon_users, glowupsalon_bookings
 
-At the top of your script, define:
-  var APP_PREFIX = 'spicekitchen'; // ← use actual app name, lowercase, no spaces
-  var USERS_COL    = APP_PREFIX + '_users';
-  var PRODUCTS_COL = APP_PREFIX + '_products';
-  var ORDERS_COL   = APP_PREFIX + '_orders';
+At the top of your script, define APP_PREFIX and name your collections based on what the app actually needs:
+  var APP_PREFIX = 'appname'; // ← use actual app name, lowercase, no spaces
 
-Then use these variables everywhere instead of hardcoded collection names:
-  _db.collection(PRODUCTS_COL)  ← NOT _db.collection('products')
-  _db.collection(ORDERS_COL)    ← NOT _db.collection('orders')
-  _db.collection(USERS_COL)     ← NOT _db.collection('users')
+Collections should match the app type. Examples:
+- Shop app: [prefix]_users, [prefix]_products, [prefix]_orders
+- Gym app: [prefix]_users, [prefix]_members, [prefix]_plans, [prefix]_payments, [prefix]_attendance
+- School app: [prefix]_users, [prefix]_students, [prefix]_courses, [prefix]_assignments
+- Hospital app: [prefix]_users, [prefix]_patients, [prefix]_appointments, [prefix]_records
+- Salon app: [prefix]_users, [prefix]_bookings, [prefix]_services
 
-FIRESTORE COLLECTIONS — EXACT SCHEMA (follow precisely):
-- [APP_PREFIX]_users: { uid, name, email, role ('customer' or 'owner'), shopName (owners only), createdAt: firebase.firestore.FieldValue.serverTimestamp() }
-- [APP_PREFIX]_products: { name, price (number), description, category, shopId (= owner's Firebase UID), shopName, available: true, createdAt: serverTimestamp() }
-- [APP_PREFIX]_orders: { customerId (= customer's Firebase UID), customerName, shopId (= owner's Firebase UID — MUST match the product's shopId), shopName, items: [{name, price, qty}], total (number), status: 'pending', createdAt: serverTimestamp() }
+Use these variables everywhere — NEVER hardcode collection names like 'users', 'products', 'orders'.
 
-━━ CRITICAL DATA FLOW — HOW CUSTOMER ORDER REACHES OWNER ━━
-This is the most important part. Follow exactly:
+FIRESTORE RULES:
+- NEVER use .orderBy() with .where() — always sort in JS after fetching to avoid index errors
+- Use onSnapshot() for real-time data
+- Use serverTimestamp() for createdAt fields
+- Always link records to the owner/admin using their Firebase UID
 
-STEP 1 — Owner adds product:
-  _db.collection('products').add({
-    name: productName, price: Number(price), description: desc,
-    shopId: _auth.currentUser.uid,        // ← owner's UID becomes shopId
-    shopName: currentUser.shopName,
-    available: true,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
+⚠️ UNIVERSAL EMAIL-LINKING RULE — ALL APP TYPES (gym, school, hospital, salon, etc.):
 
-STEP 2 — Customer browses products (sees ALL products):
-  _db.collection('products').where('available','==',true).onSnapshot(snap => {
-    // render all products regardless of shopId
-  });
+The core problem: When an admin/owner adds a person (member/student/patient/employee) by email,
+Firestore creates a doc with an auto-generated ID like "abc123". Later when that person creates
+their own Firebase account, their Auth UID is a COMPLETELY DIFFERENT ID like "xyz789".
+If you look up their data using their UID, you find nothing.
 
-STEP 3 — Customer adds to cart (MUST store shopId with each item):
-  cart.push({ name, price, qty: 1, shopId: product.shopId, shopName: product.shopName });
+THE FIX — always look up by email first, then use that doc ID to fetch their data:
 
-STEP 4 — Customer places order (MUST write shopId to order):
-  const shopId = cart[0].shopId;         // take shopId from first cart item
-  const shopName = cart[0].shopName;
-  _db.collection('orders').add({
-    customerId: _auth.currentUser.uid,
-    customerName: currentUserName,
-    shopId: shopId,                       // ← this links order to owner
-    shopName: shopName,
-    items: cart.map(i => ({name:i.name, price:i.price, qty:i.qty})),
-    total: cart.reduce((s,i) => s + i.price*i.qty, 0),
-    status: 'pending',
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-
-STEP 5 — Owner sees orders in real-time (NO .orderBy — sort in JS instead):
-  _db.collection('orders').where('shopId','==',_auth.currentUser.uid)
-    .onSnapshot(snap => {
-      const orders = snap.docs.map(d => ({id:d.id, ...d.data()}));
-      orders.sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
-      // render order cards
+  // ✅ CORRECT — works for gym, school, hospital, salon, any app:
+  function loadUserDashboard() {
+    var userEmail = _auth.currentUser.email;
+    function showData(recordDocId) {
+      // use recordDocId to fetch plans/assignments/records/bookings etc.
+      _db.collection(DATA_COL).doc(recordDocId).onSnapshot(function(doc) { /* render */ });
+    }
+    // Step 1: find the record the admin created for this email
+    _db.collection(MEMBERS_COL).where('email','==',userEmail).limit(1).get().then(function(snap) {
+      if (!snap.empty) { showData(snap.docs[0].id); }  // ← use the admin-created doc ID
+      else { showData(_auth.currentUser.uid); }         // ← fallback if not pre-added
     });
+  }
 
-STEP 6 — Owner approves order:
-  _db.collection('orders').doc(orderId).update({ status: 'approved' });
+This applies to ALL roles that are "added by admin" before they create their account:
+- Gym: member looks up workout/diet plans → query MEMBERS_COL by email → use that doc ID for PLANS_COL
+- School: student looks up assignments/grades → query STUDENTS_COL by email → use that doc ID for ASSIGNMENTS_COL
+- Hospital: patient looks up records/appointments → query PATIENTS_COL by email → use that doc ID for RECORDS_COL
+- Salon: customer looks up bookings → query CUSTOMERS_COL by email → use that doc ID for BOOKINGS_COL
+- Any app: if admin pre-adds people, ALWAYS look up by email first, NEVER by Auth UID alone
 
-DESIGN RULES:
-- Mobile-first, max-width 430px, centered on desktop with dark outer background
-- Beautiful premium UI matching the app type (restaurant = dark red+gold, gym = dark blue+neon, salon = rose+pink, etc.)
-- Real Indian content — realistic product/service names and ₹ prices
-- Status bar at top showing current time
-- Smooth CSS transitions on buttons and cards
-- Card shadows, gradient accents, rounded corners
-- Star ratings ★★★★☆ and badges (NEW, POPULAR, HOT) on product cards
-- No placeholder text, no TODO comments
+❌ NEVER do this for pre-added users:
+  _db.collection(PLANS_COL).doc(_auth.currentUser.uid)  // ← UID ≠ member doc ID, finds nothing
+
+DESIGN RULES — MAKE IT LOOK LIKE A REAL ₹10 LAKH APP:
+The app must look so impressive that students gasp. Use these exact patterns:
+
+COLOR PALETTES (pick based on app type):
+- Gym/Fitness: bg=#0a0a0f, primary=#6c3aed, accent=#a855f7, card=#12121a
+- Restaurant/Food: bg=#0d0a00, primary=#f59e0b, accent=#fbbf24, card=#1a1500
+- Salon/Beauty: bg=#0d000a, primary=#ec4899, accent=#f472b6, card=#1a0012
+- School/Education: bg=#000d1a, primary=#3b82f6, accent=#60a5fa, card=#001224
+- Hospital/Health: bg=#000d0a, primary=#10b981, accent=#34d399, card=#001a12
+- Shop/Ecommerce: bg=#0a000d, primary=#8b5cf6, accent=#a78bfa, card=#0f0015
+- Any other: bg=#0a0a0f, primary=#6c3aed, accent=#a855f7, card=#12121a
+
+AUTH SCREEN — must look stunning:
+- Full screen gradient background: linear-gradient(135deg, bg 0%, a darker shade of primary 100%)
+- App logo/icon as big emoji (60px) with glow effect: filter:drop-shadow(0 0 20px primary)
+- App name in bold 28px white text
+- Glassmorphism card for the form: background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:28px
+- Inputs: background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:14px 16px;color:#fff;font-size:16px;width:100%;outline:none
+- Primary button: background:linear-gradient(135deg,primary,accent);border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:700;color:#fff;width:100%;cursor:pointer;box-shadow:0 8px 32px rgba(primary,0.4)
+- Role selector: styled pill buttons with active state glowing
+
+DASHBOARD — premium mobile app feel:
+- Header: background:linear-gradient(135deg,primary,accent);padding:20px 20px 24px;border-radius:0 0 28px 28px;box-shadow:0 8px 32px rgba(primary,0.3)
+- Status bar in header: display:flex;justify-content:space-between;font-size:12px;opacity:0.8;margin-bottom:8px — show time on left, battery+wifi icons on right (use text symbols: ▮▮▮ for battery, ))) for wifi)
+- Welcome text: "Good morning, [Name]! 👋" in 20px bold white
+- Stats cards: display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px;margin-top:-16px — each card: background:card;border-radius:20px;padding:20px;border:1px solid rgba(255,255,255,0.08)
+- Stat card numbers in 28px bold primary color, labels in 12px gray
+- Section headers: color:#fff;font-size:16px;font-weight:700;padding:16px 16px 8px
+- Data cards: background:card;border-radius:16px;margin:8px 16px;padding:16px;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:12px
+- Avatar circles for people: width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,primary,accent);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff
+- Status badges: border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700 — active=rgba(16,185,129,0.2)+color:#10b981, pending=rgba(245,158,11,0.2)+color:#f59e0b
+
+BOTTOM NAV — glowing active tab:
+- background:#111;border-top:1px solid rgba(255,255,255,0.08);padding:8px 0 20px;display:flex;justify-content:around;position:fixed;bottom:0;width:100%;max-width:430px
+- Each tab button: flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;color:#666;font-size:10px;cursor:pointer;padding:8px 0
+- Active tab: color:primary — icon has glow: filter:drop-shadow(0 0 8px primary)
+- Tab icons: use emojis (🏠 📊 👥 ⚙️ 💳 📅 etc.)
+
+ACTION BUTTONS:
+- Primary: gradient button with shadow (as above)
+- Secondary: background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:12px 20px;color:#fff
+- Danger: background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444;border-radius:12px;padding:8px 16px
+- FAB (add button): position:fixed;bottom:90px;right:20px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,primary,accent);border:none;font-size:28px;color:#fff;box-shadow:0 8px 24px rgba(primary,0.5);cursor:pointer
+
+FORMS/MODALS:
+- Modal overlay: position:fixed;inset:0;background:rgba(0,0,0,0.8);display:flex;align-items:flex-end;z-index:999
+- Modal sheet: background:#1a1a2e;border-radius:24px 24px 0 0;padding:24px;width:100%;max-height:80vh;overflow-y:auto
+- Handle bar at top: width:40px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin:0 auto 20px
+
+CONTENT AREA: padding-bottom:100px so content doesn't hide behind nav
+
+MINIFY ALL CSS — single line, no spaces after colons/semicolons is fine
+No placeholder text, no TODO comments, no code comments
 
 TECHNICAL RULES:
 - Use firebase-app-compat.js, firebase-auth-compat.js, firebase-firestore-compat.js (compat not modules)
@@ -901,200 +1082,149 @@ This means:
 ✅ ALL functions defined at TOP LEVEL of script — BEFORE document.addEventListener
 ✅ Use ONLY the function keyword — NEVER const/let/arrow functions for anything called from onclick
 
-REQUIRED SCRIPT STRUCTURE — FOLLOW EXACTLY:
+❌ NEVER use these patterns for onclick functions — buttons will BREAK:
+  // ❌ Object methods — showTab won't be on window:
+  var app = { showTab: function(id){} }
 
-  [Firebase CDN scripts — no async, no defer]
-  [Complete HTML body — all screens, all tabs, all buttons WRITTEN IN HTML]
+  // ❌ Class methods — showTab won't be on window:
+  class App { showTab(id){} }
+
+  // ❌ IIFE — functions inside won't be on window:
+  (function(){ function showTab(){} })();
+
+  // ❌ Nested functions — won't be on window:
+  function init(){ function showTab(){} }
+
+✅ ONLY this pattern works for onclick:
+  function showTab(id) { ... }        ← standalone, top-level, function keyword
+
+REQUIRED FILE ORDER — THIS CONTROLS WHAT SURVIVES TOKEN TRUNCATION:
+
+Claude cannot count tokens but tokens always run out at the END of the output.
+So whatever you write LAST is what gets cut. Write the most important things FIRST.
+
+CORRECT ORDER (write in this exact sequence):
+  1. <!DOCTYPE html><html><head> — meta tags, title
+  2. <style> — ALL CSS in one minified line (written first = never cut)
+  3. Firebase CDN <script> tags — must load before app script
+  4. <script> — ALL JavaScript functions (written before HTML = rarely cut)
+  5. <body> — authScreen HTML
+  6. customerApp / ownerApp divs — tab content HTML (written last = may be cut, that's OK)
+  7. </body></html>
+
+Why this order works: If the output is cut at 90%, only some HTML tab content is missing.
+The CSS, Firebase, and ALL JS functions are already written and complete.
+Missing tab content = empty tab = ugly but functional.
+Missing JS functions = all buttons dead = total failure.
+
+❌ WRONG ORDER (current common mistake):
+  <head><style>...</style></head>
+  <body>
+    [ALL HTML written first — 60% of tokens]
+    <script>[JS functions — runs out of tokens here, gets cut]<\/script>
+  </body>
+
+✅ CORRECT ORDER:
+  <head>
+    <style>[minified CSS]</style>
+    [Firebase CDN scripts]
+    <script>[ALL JS — vars, onAuthStateChanged, ALL functions]<\/script>
+  </head>
+  <body>
+    [authScreen HTML]
+    [app HTML — tabs, content]
+  </body>
+
+⚠️ TAB SWITCHING — NEVER use querySelector('[onclick*="..."]') to find active nav button.
+   The onclick attribute gets removed at runtime. Use index-based approach instead:
+   var showTab = window.showTab = function showTab(id){
+     document.querySelectorAll('.tab-pane').forEach(function(t){t.classList.remove('active');});
+     var el=document.getElementById(id);if(el)el.classList.add('active');
+     var order=['tab1Id','tab2Id','tab3Id'];
+     var btns=document.querySelectorAll('#appDiv .nbtn');
+     btns.forEach(function(b){b.classList.remove('active');});
+     var i=order.indexOf(id);if(i>=0&&btns[i])btns[i].classList.add('active');
+   }
+
+⚠️ WITHIN THE SCRIPT: vars → onAuthStateChanged → all functions
+   onAuthStateChanged MUST come before all functions. JS hoists function declarations,
+   so loadOwnerDashboard() etc. work even though they are written after the observer.
+
+⚠️ CSS MUST BE A SINGLE MINIFIED LINE — example:
+  <style>:root{--p:#F5A623;--bg:#0a0a0a;--c:#1a1a1a;--t:#fff}*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,sans-serif}body{background:var(--bg);color:var(--t)}#authScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:linear-gradient(135deg,#0a0a0a,#1a0a00)}.auth-box{background:#111;padding:32px;border-radius:20px;width:100%;max-width:380px;border:1px solid rgba(245,166,35,.2)}.auth-box h1{font-size:28px;font-weight:900;text-align:center;background:linear-gradient(135deg,var(--p),#FF6B35);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}.auth-box>p{text-align:center;opacity:.5;margin-bottom:22px;font-size:13px}.role-sel{display:flex;gap:8px;margin-bottom:18px}.role-btn{flex:1;padding:12px;background:rgba(245,166,35,.07);border:1.5px solid rgba(245,166,35,.25);border-radius:12px;color:rgba(255,255,255,.45);font-weight:700;font-size:13px;cursor:pointer;transition:all .25s}.role-btn.sel{background:rgba(245,166,35,.15);border-color:var(--p);color:#fff}input{width:100%;padding:14px;margin-bottom:12px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;color:var(--t);font-size:15px;transition:border .2s}input:focus{outline:none;border-color:var(--p)}.abtn{width:100%;padding:15px;background:linear-gradient(135deg,var(--p),#FF6B35);border:none;border-radius:12px;color:#fff;font-weight:800;font-size:16px;cursor:pointer;margin-bottom:10px;box-shadow:0 4px 18px rgba(245,166,35,.3);transition:transform .2s}.abtn:active{transform:scale(.97)}.abtn.sec{background:transparent;border:1.5px solid rgba(245,166,35,.3);color:var(--p);box-shadow:none}.tog{text-align:center;margin-top:12px;color:rgba(255,255,255,.4);font-size:13px;cursor:pointer}.tog span{color:var(--p);font-weight:700}#fbErr{display:none;background:rgba(229,57,53,.1);border:1px solid rgba(229,57,53,.4);padding:10px;border-radius:10px;margin-bottom:12px;font-size:13px;text-align:center;color:#ff6b6b}#customerApp,#ownerApp{display:none;max-width:430px;margin:0 auto;min-height:100vh;padding-bottom:76px}.sbar{padding:7px 18px;display:flex;justify-content:space-between;font-size:11px;font-weight:700;letter-spacing:.5px;border-bottom:1px solid rgba(245,166,35,.1);background:rgba(245,166,35,.05)}.hdr{padding:22px 18px 18px;background:linear-gradient(180deg,rgba(245,166,35,.1) 0%,transparent 100%)}.hdr-badge{display:inline-block;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--p);margin-bottom:8px;letter-spacing:.5px}.hdr h2{font-size:24px;font-weight:900;margin-bottom:3px;letter-spacing:-.3px}.hdr p{opacity:.45;font-size:13px}.tab-pane,.owner-pane{display:none;padding:14px}.tab-pane.active,.owner-pane.active{display:block}.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(10,10,10,.97);backdrop-filter:blur(20px);border-top:1px solid rgba(245,166,35,.1);display:flex;justify-content:space-around;padding:9px 0 13px}.nbtn{background:none;border:none;color:rgba(255,255,255,.35);font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;padding:4px 14px;letter-spacing:.3px;transition:color .2s}.nbtn.active{color:var(--p)}.nbtn .ni{font-size:20px}.card{background:var(--c);border-radius:16px;padding:16px;margin-bottom:12px;border:1px solid rgba(245,166,35,.1)}.card h3{font-size:14px;font-weight:800;color:var(--p);margin-bottom:10px}.pcard{background:var(--c);border-radius:16px;padding:16px;margin-bottom:10px;border:1px solid rgba(245,166,35,.1)}.pcard-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}.pcard-name{font-weight:700;font-size:15px}.pcard-price{font-size:17px;font-weight:900;color:var(--p)}.pcard-desc{font-size:12px;opacity:.4;margin-bottom:10px}.stat-row{display:flex;gap:10px;margin-bottom:14px}.stat{flex:1;background:linear-gradient(135deg,rgba(245,166,35,.1),rgba(255,107,53,.07));border-radius:16px;padding:16px;text-align:center;border:1px solid rgba(245,166,35,.13)}.stat .v{font-size:26px;font-weight:900;background:linear-gradient(135deg,var(--p),#FF6B35);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.stat .l{font-size:10px;opacity:.4;text-transform:uppercase;letter-spacing:1px;font-weight:700}.lbl{display:block;font-size:11px;font-weight:700;color:rgba(245,166,35,.75);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}.inp{width:100%;padding:12px 14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:11px;color:var(--t);font-size:14px;margin-bottom:12px}.inp:focus{outline:none;border-color:var(--p)}.big-btn{background:linear-gradient(135deg,var(--p),#FF6B35);color:#fff;border:none;padding:14px 20px;border-radius:13px;font-weight:800;cursor:pointer;width:100%;font-size:15px;box-shadow:0 4px 18px rgba(245,166,35,.25);transition:transform .2s}.big-btn:active{transform:scale(.97)}.danger-btn{background:linear-gradient(135deg,#FF5252,#D50000);color:#fff;border:none;padding:14px 20px;border-radius:13px;font-weight:800;cursor:pointer;width:100%;font-size:15px;box-shadow:0 4px 18px rgba(255,82,82,.25)}.sec-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.sec-head h3{font-size:17px;font-weight:800}.sm-btn{background:rgba(245,166,35,.1);color:var(--p);border:1.5px solid rgba(245,166,35,.3);padding:9px 14px;border-radius:11px;font-weight:700;font-size:12px;cursor:pointer}.prof-hero{background:linear-gradient(135deg,rgba(245,166,35,.1),rgba(255,107,53,.08));border-radius:20px;padding:26px 20px;margin-bottom:14px;border:1px solid rgba(245,166,35,.12);text-align:center}.prof-av{width:66px;height:66px;border-radius:50%;background:linear-gradient(135deg,var(--p),#FF6B35);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 12px;box-shadow:0 0 22px rgba(245,166,35,.3)}.prof-name{font-size:20px;font-weight:900;margin-bottom:3px}.prof-email{font-size:12px;opacity:.4;margin-bottom:10px}.prof-badge{display:inline-block;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:20px;padding:4px 14px;font-size:11px;font-weight:700;color:var(--p)}.form-sec{background:rgba(245,166,35,.04);border:1px solid rgba(245,166,35,.1);border-radius:16px;padding:16px;margin-bottom:14px}.item-row{background:var(--c);border-radius:14px;padding:14px;margin-bottom:9px;display:flex;align-items:center;gap:12px;border:1px solid rgba(245,166,35,.1)}.item-av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--p),#FF6B35);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff;flex-shrink:0}</style>
+
+  Note: Replace color values (--p, gradient colors) to match the app type:
+  - Gym: --p:#00E5FF with #7C4DFF gradient (neon cyan + purple)
+  - Restaurant: --p:#F5A623 with #FF6B35 gradient (orange + red-orange)
+  - Salon: --p:#FF80AB with #F48FB1 gradient (pink + rose)
+  - School: --p:#26C6DA with #00ACC1 gradient (teal + dark teal)
+  - Hospital: --p:#66BB6A with #43A047 gradient (green + dark green)
+  - Finance: --p:#7C4DFF with #5E35B1 gradient (purple + deep purple)
+
+⚠️ JS MUST BE COMPACT — NO BLANK LINES BETWEEN FUNCTIONS, NO COMMENTS, SHORT VAR NAMES:
   <script>
-    // 1. Firebase init — at very top of script
-    var _app = firebase.initializeApp({...});
-    var _auth = firebase.auth(_app);
-    var _db = firebase.firestore(_app);
-    var cart = [];
-    var currentUser = null;
-    var currentUserRole = 'customer';
-
-    // 2. App-specific collection names — NEVER use generic 'products', 'orders', 'users'
-    var APP_PREFIX   = 'spicekitchen'; // ← replace with actual app name lowercase no spaces
-    var USERS_COL    = APP_PREFIX + '_users';
-    var PRODUCTS_COL = APP_PREFIX + '_products';
-    var ORDERS_COL   = APP_PREFIX + '_orders';
-
-    // 2. ALL app functions — using function keyword, at top level, before DOMContentLoaded
-    function showTab(tabId) {
-      document.querySelectorAll('.tab-pane').forEach(function(t){ t.style.display='none'; });
-      document.getElementById(tabId).style.display='block';
-    }
-    function showOwnerTab(tabId) {
-      document.querySelectorAll('.owner-pane').forEach(function(t){ t.style.display='none'; });
-      document.getElementById(tabId).style.display='block';
-    }
-    function doLogin() {
-      var email = document.getElementById('fbEmail').value;
-      var pass = document.getElementById('fbPass').value;
-      _auth.signInWithEmailAndPassword(email, pass).catch(function(err){ document.getElementById('fbErr').textContent=err.message; });
-    }
-    function doSignup() {
-      var name = document.getElementById('fbName').value.trim();
-      var email = document.getElementById('fbEmail').value.trim();
-      var pass = document.getElementById('fbPass').value;
-      if(!name||!email||!pass){ document.getElementById('fbErr').textContent='Please fill all fields'; return; }
-      var role = currentUserRole || 'customer'; // ALWAYS has a value — no blocking role check
-      document.getElementById('fbErr').textContent='Creating account...';
-      _auth.createUserWithEmailAndPassword(email, pass).then(function(cred){
-        return _db.collection('users').doc(cred.user.uid).set({ uid:cred.user.uid, name:name, email:email, role:role, createdAt:firebase.firestore.FieldValue.serverTimestamp() });
-      }).catch(function(err){ document.getElementById('fbErr').textContent=err.message; });
-    }
-    function fbLogout() { _auth.signOut(); }
-    function selectRole(role) {
-      currentUserRole = role;
-      document.querySelectorAll('.role-btn').forEach(function(b){ b.style.opacity='0.5'; });
-      var sel = document.getElementById('roleBtn_'+role);
-      if(sel) sel.style.opacity='1';
-    }
-    function addToCart(name, price, shopId, shopName) {
-      cart.push({name:name, price:Number(price), qty:1, shopId:shopId||'', shopName:shopName||''});
-      updateCartBadge();
-      showToast(name+' added to cart!');
-      renderCart();
-    }
-    function updateCartBadge() {
-      var b = document.getElementById('cartBadge');
-      if(b){ b.textContent=cart.length; b.style.display=cart.length>0?'flex':'none'; }
-    }
-    function showToast(msg) {
-      var t=document.createElement('div');
-      t.textContent=msg;
-      t.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;';
-      document.body.appendChild(t);
-      setTimeout(function(){t.remove();},2500);
-    }
-    function renderCart() {
-      var el = document.getElementById('cartList');
-      var tot = document.getElementById('cartTotal');
-      if(!el) return;
-      if(cart.length===0){ el.innerHTML='<p style="text-align:center;padding:30px;opacity:0.5">Cart is empty</p>'; if(tot)tot.textContent='₹0'; return; }
-      el.innerHTML = cart.map(function(item,i){ return '<div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.1)"><span>'+item.name+'</span><div style="display:flex;gap:8px;align-items:center"><span>₹'+item.price+'</span><button onclick="removeFromCart('+i+')" style="background:#e53935;color:#fff;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:14px;">×</button></div></div>'; }).join('');
-      var sum = cart.reduce(function(a,b){return a+b.price;},0);
-      if(tot) tot.textContent='₹'+sum;
-    }
-    function removeFromCart(i) { cart.splice(i,1); updateCartBadge(); renderCart(); }
-    function placeOrder() {
-      if(cart.length===0){ showToast('Add items first!'); return; }
-      if(!_auth.currentUser){ showToast('Please login first!'); return; }
-      var shopId = cart[0].shopId;
-      var shopName = cart[0].shopName;
-      _db.collection('orders').add({
-        customerId: _auth.currentUser.uid,
-        customerName: (currentUser&&currentUser.name)||_auth.currentUser.email,
-        shopId: shopId,
-        shopName: shopName,
-        items: cart.map(function(i){return{name:i.name,price:i.price,qty:i.qty};}),
-        total: cart.reduce(function(a,b){return a+b.price;},0),
-        status: 'pending',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(function(){
-        cart=[];
-        updateCartBadge();
-        renderCart();
-        showToast('Order placed! 🎉');
-      }).catch(function(err){ showToast('Error: '+err.message); });
-    }
-    function approveOrder(orderId) {
-      _db.collection('orders').doc(orderId).update({status:'approved'}).then(function(){ showToast('Order approved!'); });
-    }
-    function saveProduct() {
-      if(!_auth.currentUser||!currentUser){ showToast('Not logged in'); return; }
-      var name = document.getElementById('prodName').value.trim();
-      var price = document.getElementById('prodPrice').value.trim();
-      var desc = document.getElementById('prodDesc').value.trim();
-      var cat = document.getElementById('prodCat').value.trim();
-      if(!name||!price){ showToast('Fill name and price!'); return; }
-      _db.collection('products').add({
-        name:name, price:Number(price), description:desc, category:cat,
-        shopId:_auth.currentUser.uid, shopName:currentUser.shopName||currentUser.name||'',
-        available:true, createdAt:firebase.firestore.FieldValue.serverTimestamp()
-      }).then(function(){
-        document.getElementById('prodName').value='';
-        document.getElementById('prodPrice').value='';
-        document.getElementById('prodDesc').value='';
-        showToast('Product saved!');
-      }).catch(function(err){ showToast('Error: '+err.message); });
-    }
-
-    // 3. Auth state — ONLY shows/hides screens, never builds UI
-    document.addEventListener('DOMContentLoaded', function() {
-      _auth.onAuthStateChanged(function(user) {
-        if (user) {
-          _db.collection('users').doc(user.uid).get().then(function(doc){
-            currentUser = doc.exists ? doc.data() : {uid:user.uid, name:user.email, role:'customer'};
-            document.getElementById('authScreen').style.display = 'none';
-            if (currentUser.role === 'owner') {
-              document.getElementById('ownerApp').style.display = 'block';
-              document.getElementById('customerApp').style.display = 'none';
-              loadOwnerDashboard();
-            } else {
-              document.getElementById('customerApp').style.display = 'block';
-              document.getElementById('ownerApp').style.display = 'none';
-              loadCustomerProducts();
-            }
-          });
-        } else {
-          currentUser = null;
-          document.getElementById('authScreen').style.display = 'flex';
-          document.getElementById('customerApp').style.display = 'none';
-          document.getElementById('ownerApp').style.display = 'none';
-        }
-      });
-    });
-
-    function loadCustomerProducts() {
-      _db.collection('products').where('available','==',true).onSnapshot(function(snap){
-        var el = document.getElementById('productsList');
-        if(!el) return;
-        if(snap.empty){ el.innerHTML='<p style="text-align:center;padding:30px;opacity:0.5">No items yet</p>'; return; }
-        el.innerHTML = snap.docs.map(function(d){
-          var p = d.data();
-          return '<div class="product-card" style="background:rgba(255,255,255,0.07);border-radius:14px;padding:16px;margin-bottom:12px;"><div style="font-weight:700;font-size:15px;margin-bottom:4px;">'+p.name+'</div><div style="opacity:0.6;font-size:13px;margin-bottom:8px;">'+( p.description||'')+'</div><div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-weight:800;font-size:16px;color:var(--primary,#F5A623)">₹'+p.price+'</span><button onclick="addToCart(\''+p.name.replace(/'/g,"\\'")+"',"+p.price+",'"+p.shopId+"','"+( p.shopName||'').replace(/'/g,"\\'")+"')" style="background:var(--primary,#F5A623);color:#000;border:none;padding:8px 16px;border-radius:8px;font-weight:700;cursor:pointer;">Add to Cart</button></div></div>';
-        }).join('');
-      });
-    }
-    function loadOwnerDashboard() {
-      if(!_auth.currentUser) return;
-      var uid = _auth.currentUser.uid;
-      _db.collection('products').where('shopId','==',uid).onSnapshot(function(snap){
-        var el = document.getElementById('myProductsList');
-        if(!el) return;
-        el.innerHTML = snap.empty ? '<p style="text-align:center;padding:20px;opacity:0.5">No products yet</p>' :
-          snap.docs.map(function(d){ var p=d.data(); return '<div style="background:rgba(255,255,255,0.07);border-radius:12px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-weight:700;">'+p.name+'</div><div style="opacity:0.6;font-size:12px;">₹'+p.price+'</div></div></div>'; }).join('');
-      });
-      _db.collection('orders').where('shopId','==',uid).onSnapshot(function(snap){
-        var orders = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
-        orders.sort(function(a,b){return (b.createdAt&&b.createdAt.seconds||0)-(a.createdAt&&a.createdAt.seconds||0);});
-        var el = document.getElementById('ordersList');
-        if(!el) return;
-        if(orders.length===0){ el.innerHTML='<p style="text-align:center;padding:20px;opacity:0.5">No orders yet</p>'; return; }
-        el.innerHTML = orders.map(function(o){
-          var items=(o.items||[]).map(function(i){return i.name+' x'+i.qty;}).join(', ');
-          var isPending=o.status==='pending';
-          return '<div style="background:rgba(255,255,255,0.07);border-radius:12px;padding:14px;margin-bottom:10px;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-weight:700;">'+(o.customerName||'Customer')+'</span><span style="color:'+(isPending?'#F5A623':'#4CAF50')+';font-weight:700;">'+(isPending?'🟡 Pending':'✅ Done')+'</span></div><div style="font-size:12px;opacity:0.6;margin-bottom:8px;">'+items+'</div><div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-weight:800;">₹'+o.total+'</span>'+(isPending?'<button onclick="approveOrder(\''+o.id+'\')" style="background:#4CAF50;color:#fff;border:none;padding:6px 14px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;">Approve</button>':'')+'</div></div>';
-        }).join('');
-        // Update dashboard counts
-        var tc = document.getElementById('totalOrders');
-        var pc = document.getElementById('pendingOrders');
-        if(tc) tc.textContent = orders.length;
-        if(pc) pc.textContent = orders.filter(function(o){return o.status==='pending';}).length;
-      });
-    }
+var _app=firebase.initializeApp({apiKey:"...",authDomain:"...",projectId:"...",storageBucket:"...",messagingSenderId:"...",appId:"..."});
+var _auth=firebase.auth(_app),_db=firebase.firestore(_app);
+var currentUser=null,currentUserRole='customer';
+var APP_PREFIX='myapp',USERS_COL=APP_PREFIX+'_users',PRODUCTS_COL=APP_PREFIX+'_products',ORDERS_COL=APP_PREFIX+'_orders';
+function _sd(id,v){var e=document.getElementById(id);if(e)e.style.display=v;}
+_auth.onAuthStateChanged(function(user){
+if(!user){currentUser=null;_sd('authScreen','flex');_sd('customerApp','none');_sd('ownerApp','none');return;}
+_db.collection(USERS_COL).doc(user.uid).get().then(function(doc){
+currentUser=doc.exists?doc.data():{uid:user.uid,name:user.email,role:'customer'};
+_sd('authScreen','none');
+if(currentUser.role==='owner'){_sd('ownerApp','block');_sd('customerApp','none');loadOwnerDashboard();}
+else{_sd('customerApp','block');_sd('ownerApp','none');loadCustomerData();}
+});
+});
+function showTab(id){document.querySelectorAll('.tab-pane').forEach(function(t){t.classList.remove('active');});document.getElementById(id).classList.add('active');}
+function showOwnerTab(id){document.querySelectorAll('.owner-pane').forEach(function(t){t.classList.remove('active');});document.getElementById(id).classList.add('active');}
+function selectRole(r){currentUserRole=r;document.querySelectorAll('.role-btn').forEach(function(b){b.classList.remove('sel');});var s=document.getElementById('roleBtn_'+r);if(s)s.classList.add('sel');}
+function _showErr(m){var e=document.getElementById('fbErr');if(!e)return;e.textContent=m;e.style.display=m?'block':'none';e.style.color=m.includes('ing...')?'#999':'#ff6b6b';}
+function doLogin(){var e=document.getElementById('fbEmail').value.trim(),p=document.getElementById('fbPass').value;if(!e||!p){_showErr('Fill all fields');return;}_showErr('Logging in...');_auth.signInWithEmailAndPassword(e,p).catch(function(err){_showErr(err.message);});}
+function doSignup(){var n=document.getElementById('fbName').value.trim(),e=document.getElementById('fbEmail').value.trim(),p=document.getElementById('fbPass').value;if(!n||!e||!p){_showErr('Fill all fields');return;}if(p.length<6){_showErr('Min 6 chars');return;}_showErr('Creating account...');_auth.createUserWithEmailAndPassword(e,p).then(function(c){return _db.collection(USERS_COL).doc(c.user.uid).set({uid:c.user.uid,name:n,email:e,role:currentUserRole||'customer',createdAt:firebase.firestore.FieldValue.serverTimestamp()});}).then(function(){_showErr('');}).catch(function(err){_showErr(err.message);});}
+function fbLogout(){_auth.signOut();}
+function toggleAuthMode(){var sf=document.getElementById('signupFields'),lb=document.getElementById('loginBtn'),sb=document.getElementById('signupBtn'),tt=document.getElementById('toggleText'),s=sb.style.display==='none';sf.style.display=s?'block':'none';lb.style.display=s?'none':'block';sb.style.display=s?'block':'none';tt.textContent=s?'Have account? Login →':'No account? Sign up →';}
+function showToast(m){var t=document.createElement('div');t.textContent=m;t.style.cssText='position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.9);color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;';document.body.appendChild(t);setTimeout(function(){t.remove();},2500);}
+function updateClock(){var n=new Date(),h=n.getHours(),m=n.getMinutes();var s=(h<10?'0':'')+h+':'+(m<10?'0':'')+m;document.querySelectorAll('.clock').forEach(function(c){c.textContent=s;});}
+setInterval(updateClock,1000);updateClock();
   <\/script>
+
+🏠 HOME SCREEN — REQUIRED FOR EVERY APP (CUSTOMER SIDE):
+
+The FIRST tab of every customer app MUST be a premium Home screen. This is non-negotiable.
+
+HOME SCREEN MUST INCLUDE:
+1. HERO BANNER — gradient background, app name, tagline, welcome message with user's name
+2. STATS ROW — 2-3 quick stat cards (e.g. total orders, wallet balance, active plan, points)
+3. FEATURED SECTION — top 3-4 products/items loaded from Firestore with image emoji, name, price, "Add" button
+4. CATEGORIES ROW — horizontal scrollable chips (e.g. All, Food, Drinks, Snacks)
+5. QUICK ACTIONS — 2-3 shortcut buttons (Browse Menu, My Orders, My Profile)
+
+HOME SCREEN UI RULES:
+- Use bold gradient header with user's first name: "Hey Palash 👋"
+- Stats cards: gradient background, large bold number, small label below
+- Product cards in a 2-column grid: emoji (60px), name, price, +Add button
+- Categories: horizontal scroll, pill-shaped chips, active chip highlighted in theme color
+- Quick action buttons: icon + label, card style, shadow
+- Everything loads from Firestore using onSnapshot — real-time updates
+- Home tab ID must be: id="homeTab" and it must be the ACTIVE tab by default
+
+OWNER HOME SCREEN:
+- Show dashboard stats: total products, total orders, today's revenue, pending orders
+- Recent orders list (last 5) with customer name, amount, status badge
+- Quick action buttons: Add Product, View All Orders
 
 ABSOLUTE RULES:
 ✅ ALL UI written in HTML — onAuthStateChanged only shows/hides, never builds
 ✅ Every button uses onclick="functionName()" — no exceptions
-✅ ALL functions use the function keyword at TOP LEVEL — BEFORE document.addEventListener
+✅ ALL functions use the function keyword at TOP LEVEL
+✅ _auth.onAuthStateChanged() goes IMMEDIATELY AFTER the var declarations — BEFORE all functions
 ✅ Use EXACTLY id="authScreen", id="customerApp", id="ownerApp"
 ✅ authScreen starts with style="display:flex"
 ✅ customerApp and ownerApp start with style="display:none"
+✅ ALWAYS define _sd helper before onAuthStateChanged: function _sd(id,v){var e=document.getElementById(id);if(e)e.style.display=v;}
+✅ Use _sd('authScreen','flex') NOT document.getElementById('authScreen').style.display='flex' — avoids null crash
 ✅ shopId in every product = owner's Firebase UID
 ✅ shopId in every order = copied from product's shopId
 ✅ Owner orders query: .where('shopId','==',user.uid).onSnapshot()
@@ -1106,7 +1236,8 @@ ABSOLUTE RULES:
 ❌ NO async or defer on Firebase script tags
 ❌ NEVER use .orderBy() with .where() in Firestore — sort in JavaScript instead
 
-Return complete HTML only. No markdown. No explanation. No code fences.`
+Return complete HTML only. No markdown. No explanation. No code fences.
+FINAL REMINDER: If you are close to your token limit — STOP, close all open functions with }, close the script tag, then close body and html. An app with fewer features that runs is better than a broken app.`
         }]
     });
 
@@ -1118,6 +1249,18 @@ Return complete HTML only. No markdown. No explanation. No code fences.`
     }
 
     const data = await response.json();
+
+    // ── TOKEN USAGE LOG ──
+    if (data.usage) {
+      const inp = data.usage.input_tokens || 0;
+      const out = data.usage.output_tokens || 0;
+      const total = inp + out;
+      const cost = ((inp * 3 + out * 15) / 1000000).toFixed(4);
+      console.log(`🪙 Tokens — Input: ${inp} | Output: ${out} | Total: ${total} | Cost: $${cost}`);
+      const tokenEl = document.getElementById('tokenUsage');
+      if (tokenEl) tokenEl.textContent = `🪙 Tokens used: ${total.toLocaleString()} (Input: ${inp.toLocaleString()} + Output: ${out.toLocaleString()}) | Cost: $${cost}`;
+    }
+
     // With extended thinking, content array has a thinking block then a text block
     const textBlock = data.content && data.content.find(function(b){ return b.type === 'text'; });
     let raw = textBlock ? textBlock.text.trim() : '';
@@ -1174,9 +1317,22 @@ function toggleMobile() {
   }
 }
 
+// Use current origin if served remotely (ngrok), else localhost
+const SERVER_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+  ? 'http://localhost:7823'
+  : location.origin;
+
+function updateCharCount(el) {
+  const count = el.value.length;
+  const display = document.getElementById('charCount');
+  if (!display) return;
+  display.textContent = count + ' / 800 characters';
+  display.style.color = count > 700 ? '#ff6b6b' : count > 500 ? '#F5A623' : 'rgba(255,255,255,0.4)';
+}
+
 async function checkServerStatus() {
   try {
-    const r = await fetch('http://localhost:7823/', { method: 'GET', cache: 'no-store' });
+    const r = await fetch(SERVER_BASE + '/', { method: 'GET', cache: 'no-store' });
     return r.status < 500;
   } catch (_e) {
     return false;
@@ -1205,7 +1361,7 @@ async function openFullApp() {
 
   // ── MODE 1: LOCAL SERVER (best — real HTTP, Firebase works, all buttons work) ──
   try {
-    const resp = await fetch('http://localhost:7823/save-preview', {
+    const resp = await fetch(SERVER_BASE + '/save-preview', {
       method: 'POST',
       headers: { 'Content-Type': 'text/html' },
       body: prepareApp(generatedCode)
@@ -1250,7 +1406,7 @@ async function openFullApp() {
   const blob = new Blob([prepareApp(generatedCode)], { type: 'text/html' });
   const blobUrl = URL.createObjectURL(blob);
   window.open(blobUrl, '_blank');
-  setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+  setTimeout(() => URL.revokeObjectURL(blobUrl), 600000);
 }
 
 function downloadApp() {
@@ -1296,28 +1452,30 @@ async function fixAllButtons() {
   try {
     const response = await _claudeFetch(apiKey, {
         model: 'claude-sonnet-4-5',
-        max_tokens: 16000,
+        max_tokens: 18000,
         thinking: { type: 'enabled', budget_tokens: 5000 },
         system: `You are an expert software engineer — you operate like Claude Code. You systematically read every line of code, trace exactly why each button is broken, then fix every single issue completely. You return the complete fixed HTML. Raw HTML only — no markdown, no explanation.`,
         messages: [{
           role: 'user',
-          content: `This is my app code. Find and fix EVERY broken thing — buttons, tabs, data flow, Firebase queries. Make it completely working end-to-end.
+          content: `This is my app code. Find and fix EVERY broken thing — syntax errors, buttons, tabs, data flow, Firebase queries. Make it completely working end-to-end.
 
 CHECK AND FIX ALL OF THESE:
 
+0. SYNTAX ERRORS — MOST CRITICAL — fix first:
+   - Remove any extra or mismatched } ) ] brackets
+   - Fix any unclosed strings or template literals
+   - Fix any truncated function calls
+   - Every script block must be valid JavaScript with no SyntaxErrors
+   - ALL functions must use the function keyword at top level — NEVER const/let/arrow functions for onclick handlers
+   - NEVER use object methods { fn: function(){} } or class methods for onclick — only standalone function declarations
+
 1. NAVIGATION — bottom nav tabs must show correct screen and hide all others
-2. BUTTONS — every Add to Cart / Book / Order / Enroll / Save button must work
-3. CATEGORY FILTERS — must show/hide correct items
-4. FIREBASE DATA FLOW — this is critical:
-   - When owner adds a product, it MUST save shopId = owner's Firebase UID
-   - When customer places order, order MUST contain shopId from the product
-   - Owner's orders tab MUST query: _db.collection('orders').where('shopId','==',_auth.currentUser.uid).onSnapshot()
-   - Customer's orders tab MUST query: _db.collection('orders').where('customerId','==',_auth.currentUser.uid).onSnapshot()
-   - If these queries are wrong or missing, fix them completely
-5. AUTH SCREEN — must be visible (display:flex) on load, not hidden
-6. onAuthStateChanged — must show correct app screen (customer or owner) based on user's role from Firestore
-7. Approve Order button — must call _db.collection('orders').doc(id).update({status:'approved'})
-8. Cart — add/remove items must update count badge in real time
+2. BUTTONS — every button onclick must call a real defined function
+3. FIREBASE DATA FLOW — owner adds items with their UID, members see data
+4. AUTH SCREEN — must be visible (display:flex) on load, not hidden
+5. ERROR DISPLAY — fbErr element must use style.display='block' when showing errors — NEVER leave errors hidden with display:none
+6. doSignup — must show "Creating account..." then show error if fails — never hang silently
+7. onAuthStateChanged — must show correct dashboard based on user role from Firestore
 
 Return the complete fully working HTML file now:
 
@@ -1356,8 +1514,10 @@ ${generatedCode}`
     btn.textContent = '🔧 Fix All Buttons — Make Everything Work';
 
     const banner = document.getElementById('modifySuccess');
-    banner.querySelector('div div:first-child').textContent = '✅ All buttons fixed!';
-    banner.querySelector('div div:last-child').textContent = 'Every button and tab is now working — scroll up to test';
+    const bannerFirst = banner && banner.querySelector('div div:first-child');
+    const bannerLast = banner && banner.querySelector('div div:last-child');
+    if (bannerFirst) bannerFirst.textContent = '✅ All buttons fixed!';
+    if (bannerLast) bannerLast.textContent = 'Every button and tab is now working — scroll up to test';
     banner.style.display = 'flex';
     setTimeout(() => { banner.style.display = 'none'; }, 5000);
     document.getElementById('previewFrame').scrollIntoView({ behavior: 'smooth' });
@@ -1389,8 +1549,8 @@ async function modifyApp() {
   try {
     const response = await _claudeFetch(apiKey, {
         model: 'claude-sonnet-4-5',
-        max_tokens: 16000,
-        thinking: { type: 'enabled', budget_tokens: 4000 },
+        max_tokens: 18000,
+        thinking: { type: 'enabled', budget_tokens: 5000 },
         system: `You are an expert software engineer. You carefully read the existing code, understand exactly how it works, then apply the requested change completely and correctly. You never break existing working Firebase code, auth flows, or Firestore operations. You never use placeholders or TODO comments. Every button works after your change.`,
         messages: [{
           role: 'user',
@@ -1415,11 +1575,11 @@ ${generatedCode}`
     });
 
     if (!response.ok) {
-      const errData = await response.json();
-      throw new Error(errData.error?.message || 'API error ' + response.status);
+      const errData = await response.json().catch(() => ({}));
+      throw new Error((errData.error && errData.error.message) || 'API error ' + response.status);
     }
 
-    const data = await response.json();
+    const data = await response.json().catch(() => ({}));
     const textBlock2 = data.content && data.content.find(function(b){ return b.type === 'text'; });
     let updatedCode = textBlock2 ? textBlock2.text.trim() : '';
 
