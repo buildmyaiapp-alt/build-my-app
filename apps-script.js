@@ -7,7 +7,7 @@
 const CONFIG = {
   SHEET_NAME:      'Batch 4',
   SENDER_NAME:     'Palash — AI App Workshop',
-  WORKSHOP_DATE:   '30th May 2026, 2:00 PM IST',
+  WORKSHOP_DATE:   '31st May 2026, 2:00 PM IST',
   WHATSAPP_API_KEY: '',
   WHATSAPP_NUMBER:  '',
 };
