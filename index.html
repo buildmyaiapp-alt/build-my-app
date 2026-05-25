@@ -2392,20 +2392,27 @@
   }
 
   function saveLead(data) {
-    // Use sendBeacon (best for background saves during navigation)
-    // Falls back to Image beacon if not supported
     try {
-      const params = new URLSearchParams({
+      const payload = JSON.stringify({
         name:      data.name,
         email:     data.email,
         phone:     data.phone,
-        paymentId: data.paymentId || 'LEAD'
+        paymentId: data.paymentId || 'LEAD',
+        amount:    data.amount || null
       });
-      const url = APPS_SCRIPT + '?' + params.toString();
       if (navigator.sendBeacon) {
-        navigator.sendBeacon(url);
+        // sendBeacon sends POST — Apps Script doPost receives JSON body correctly
+        const blob = new Blob([payload], { type: 'application/json' });
+        navigator.sendBeacon(APPS_SCRIPT, blob);
       } else {
-        new Image().src = url;
+        // Fallback: GET request for older browsers
+        const params = new URLSearchParams({
+          name:      data.name,
+          email:     data.email,
+          phone:     data.phone,
+          paymentId: data.paymentId || 'LEAD'
+        });
+        new Image().src = APPS_SCRIPT + '?' + params.toString();
       }
     } catch(err) {}
 
