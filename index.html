@@ -1017,7 +1017,7 @@
   <!-- Mobile-only video at top -->
   <div class="mobile-video-top">
     <div id="mobile-video-thumb" style="position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;cursor:pointer;" onclick="document.getElementById('mobile-video-thumb').innerHTML='<iframe src=\'https://www.youtube.com/embed/MTdZrsozNrA?rel=0&autoplay=1&playsinline=1\' frameborder=\'0\' allow=\'autoplay;encrypted-media\' allowfullscreen style=\'width:100%;height:100%;position:absolute;top:0;left:0;\'></iframe>'">
-      <img src="https://i.ytimg.com/vi/MTdZrsozNrA/maxresdefault.jpg" alt="Watch before you enroll" style="width:100%;height:100%;object-fit:cover;display:block;" loading="eager" onerror="this.src='https://i.ytimg.com/vi/MTdZrsozNrA/mqdefault.jpg'"/>
+      <img src="https://i.ytimg.com/vi/MTdZrsozNrA/mqdefault.jpg" alt="Watch before you enroll" style="width:100%;height:100%;object-fit:cover;display:block;" loading="eager" onerror="this.src='https://i.ytimg.com/vi/MTdZrsozNrA/mqdefault.jpg'"/>
       <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:68px;height:48px;background:red;border-radius:12px;display:flex;align-items:center;justify-content:center;">
         <div style="width:0;height:0;border-top:14px solid transparent;border-bottom:14px solid transparent;border-left:22px solid white;margin-left:4px;"></div>
       </div>
@@ -1039,7 +1039,7 @@
       <div class="hero-video-header">▶ Watch This Before You Enroll</div>
       <!-- Desktop video -->
       <div id="desktop-video-thumb" style="position:relative;width:100%;aspect-ratio:16/9;background:#000;cursor:pointer;" onclick="document.getElementById('desktop-video-thumb').innerHTML='<iframe src=\'https://www.youtube.com/embed/MTdZrsozNrA?rel=0&autoplay=1&playsinline=1\' frameborder=\'0\' allow=\'autoplay;encrypted-media\' allowfullscreen style=\'width:100%;height:100%;position:absolute;top:0;left:0;\'></iframe>'">
-        <img src="https://i.ytimg.com/vi/MTdZrsozNrA/maxresdefault.jpg" alt="Watch before you enroll" style="width:100%;height:100%;object-fit:cover;display:block;" loading="eager" onerror="this.src='https://i.ytimg.com/vi/MTdZrsozNrA/mqdefault.jpg'"/>
+        <img src="https://i.ytimg.com/vi/MTdZrsozNrA/mqdefault.jpg" alt="Watch before you enroll" style="width:100%;height:100%;object-fit:cover;display:block;" loading="eager" onerror="this.src='https://i.ytimg.com/vi/MTdZrsozNrA/mqdefault.jpg'"/>
         <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:68px;height:48px;background:red;border-radius:12px;display:flex;align-items:center;justify-content:center;">
           <div style="width:0;height:0;border-top:14px solid transparent;border-bottom:14px solid transparent;border-left:22px solid white;margin-left:4px;"></div>
         </div>
@@ -1209,7 +1209,7 @@
           <div style="position:absolute;top:22px;left:50%;transform:translateX(-50%);width:80px;height:20px;background:#1c1c1e;border-radius:0 0 14px 14px;z-index:10;"></div>
           <!-- screen -->
           <div style="border-radius:28px;overflow:hidden;background:#000;aspect-ratio:9/19.5;position:relative;">
-            <video width="100%" height="100%" autoplay muted loop playsinline style="display:block;object-fit:cover;width:100%;height:100%;">
+            <video preload="none" width="100%" height="100%" autoplay muted loop playsinline style="display:block;object-fit:cover;width:100%;height:100%;">
               <source src="app-demo.mp4" type="video/mp4"/>
             </video>
           </div>
@@ -1379,7 +1379,7 @@
       <!-- Person 1: Abhishek -->
       <div class="vt-card">
         <div class="vt-avatar">
-          <img src="abhishek.jpg" alt="Abhishek"/>
+          <img loading="lazy" src="abhishek.jpg" alt="Abhishek"/>
         </div>
         <div class="vt-name">Abhishek</div>
         <div class="vt-built">📸 Marriage Video Shoot App</div>
@@ -1389,7 +1389,7 @@
       <!-- Person 2: Abhimanue -->
       <div class="vt-card">
         <div class="vt-avatar">
-          <img src="abhimanue.jpg" alt="Abhimanue"/>
+          <img loading="lazy" src="abhimanue.jpg" alt="Abhimanue"/>
         </div>
         <div class="vt-name">Abhimanue</div>
         <div class="vt-built">📦 Trading Company App</div>
@@ -1399,7 +1399,7 @@
       <!-- Logo 1: Brocliy Restaurant -->
       <div class="vt-logo-card">
         <div class="vt-logo-wrap">
-          <img src="logo-brocliy.jpg" alt="Brocliy Italian Cuisine"/>
+          <img loading="lazy" src="logo-brocliy.jpg" alt="Brocliy Italian Cuisine"/>
         </div>
         <div class="vt-biz-name">Brocliy</div>
         <div class="vt-biz-type">🍝 Italian Cuisine Restaurant</div>
@@ -1409,7 +1409,7 @@
       <!-- Logo 2: Shiva Traders -->
       <div class="vt-logo-card">
         <div class="vt-logo-wrap" style="background:#fffde7;">
-          <img src="logo-shiva.jpg" alt="Shiva Traders"/>
+          <img loading="lazy" src="logo-shiva.jpg" alt="Shiva Traders"/>
         </div>
         <div class="vt-biz-name">Shiva Traders</div>
         <div class="vt-biz-type">🔧 Hardware Shop</div>
@@ -1419,7 +1419,7 @@
       <!-- Logo 3: The Workout Fitness Gym -->
       <div class="vt-logo-card">
         <div class="vt-logo-wrap" style="background:#1a1a1a;">
-          <img src="logo-workout.jpg" alt="The Workout Fitness Gym"/>
+          <img loading="lazy" src="logo-workout.jpg" alt="The Workout Fitness Gym"/>
         </div>
         <div class="vt-biz-name">The Workout</div>
         <div class="vt-biz-type">💪 Fitness Gym</div>
@@ -1749,11 +1749,11 @@
     <p class="wa-green-sub">Here's what our students said in our WhatsApp community...</p>
 
     <div class="wa-grid">
-      <div class="wa-img-card"><img src="wa-Abhimanyu.jpg" alt="Abhimanyu WhatsApp"/></div>
-      <div class="wa-img-card"><img src="wa-abhishek.jpg" alt="Abhishek WhatsApp"/></div>
-      <div class="wa-img-card"><img src="wa-rohit.jpg" alt="Rohit WhatsApp"/></div>
-      <div class="wa-img-card"><img src="wa-vaishali.jpg" alt="Vaishali WhatsApp"/></div>
-      <div class="wa-img-card"><img src="wa-alex.jpg" alt="Alex WhatsApp"/></div>
+      <div class="wa-img-card"><img loading="lazy" src="wa-Abhimanyu.jpg" alt="Abhimanyu WhatsApp"/></div>
+      <div class="wa-img-card"><img loading="lazy" src="wa-abhishek.jpg" alt="Abhishek WhatsApp"/></div>
+      <div class="wa-img-card"><img loading="lazy" src="wa-rohit.jpg" alt="Rohit WhatsApp"/></div>
+      <div class="wa-img-card"><img loading="lazy" src="wa-vaishali.jpg" alt="Vaishali WhatsApp"/></div>
+      <div class="wa-img-card"><img loading="lazy" src="wa-alex.jpg" alt="Alex WhatsApp"/></div>
     </div>
   </div>
 </section>
@@ -1846,7 +1846,7 @@
     <div class="sec-divider"></div>
     <div class="results-2col" style="margin-top:36px;">
       <div class="results-img">
-        <img src="palash-teach.png" alt="Palash Rajak" style="width:100%;display:block;object-fit:cover;max-height:400px;object-position:center 20%;"/>
+        <img loading="lazy" src="palash-teach.png" alt="Palash Rajak" style="width:100%;display:block;object-fit:cover;max-height:400px;object-position:center 20%;"/>
         <div style="text-align:center;margin-top:12px;">
           <p style="font-size:16px;font-weight:800;color:#F0F0F0;margin:0;">Palash Rajak</p>
           <p style="font-size:13px;color:#AAA;margin:2px 0 0;">Founder — VisualPro Media &amp; BuildMyApp</p>
@@ -2184,7 +2184,7 @@
     <h2 class="sec-title">Meet Your <span class="hl">Instructor</span></h2>
     <div class="sec-divider"></div>
     <div style="max-width:380px;margin:32px auto 0;background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.12);">
-      <img src="palash-ai.png" alt="Palash Rajak" style="width:100%;display:block;object-fit:cover;max-height:420px;object-position:center top;"/>
+      <img loading="lazy" src="palash-ai.png" alt="Palash Rajak" style="width:100%;display:block;object-fit:cover;max-height:420px;object-position:center top;"/>
       <div style="padding:20px 24px 24px;">
         <p style="font-size:20px;font-weight:900;color:#0d1b6e;margin:0 0 4px;">Palash Rajak</p>
         <p style="font-size:14px;color:#e8251a;font-weight:700;margin:0 0 10px;">Founder — VisualPro Media &amp; BuildMyApp</p>
@@ -2198,7 +2198,7 @@
 <section class="about-section">
   <div class="about-box">
     <div style="text-align:center;">
-      <img src="my intro.png" alt="Palash Rajak - BuildMyApp Founder" style="width:100%;max-width:420px;border-radius:16px;display:block;margin:0 auto;"/>
+      <img loading="lazy" src="my intro.png" alt="Palash Rajak - BuildMyApp Founder" style="width:100%;max-width:420px;border-radius:16px;display:block;margin:0 auto;"/>
     </div>
     <div>
       <h2>Who Is Palash And Why Should You Care?</h2>
