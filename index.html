@@ -2335,7 +2335,7 @@
 <!-- ── PAYMENT LOGIC ── -->
 <script>
   const PAYMENT_LINK      = 'https://pages.razorpay.com/pl_SkNpn0hrFrJJYA/view'; // ₹99 — live only
-  const PAYMENT_LINK_BUMP = 'https://rzp.io/rzp/IckNgJCH'; // ₹199 — live + recording
+  const PAYMENT_LINK_BUMP = 'https://pages.razorpay.com/pl_StwAUVFbFCMr3f/view'; // ₹199 — live + recording
   var bumpSelected = false;
 
   function toggleBump() {
@@ -2424,19 +2424,13 @@
     // Fire lead save in background — non-blocking
     saveLead(leadData);
 
-    // Build Razorpay URL — pre-fill only works on pages.razorpay.com links, not rzp.io short links
-    const rawPhone = document.getElementById('rzp-phone').value.trim();
-    var finalLink;
-    if (bumpSelected) {
-      // rzp.io short link — use as-is, no pre-fill params (they break short links)
-      finalLink = PAYMENT_LINK_BUMP;
-    } else {
-      // Full payment page URL — supports pre-fill
-      finalLink = PAYMENT_LINK
-        + '?name='    + encodeURIComponent(name)
-        + '&email='   + encodeURIComponent(email)
-        + '&contact=' + encodeURIComponent(rawPhone);
-    }
+    // Build Razorpay URL with pre-filled details
+    const rawPhone   = document.getElementById('rzp-phone').value.trim();
+    const activeLink = bumpSelected ? PAYMENT_LINK_BUMP : PAYMENT_LINK;
+    const finalLink  = activeLink
+      + '?name='    + encodeURIComponent(name)
+      + '&email='   + encodeURIComponent(email)
+      + '&contact=' + encodeURIComponent(rawPhone);
 
     // REDIRECT IMMEDIATELY
     window.location.href = finalLink;
