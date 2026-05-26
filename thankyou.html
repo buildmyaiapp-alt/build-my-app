@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>You're In! 🎉 AI App Workshop — May 23</title>
+  <title>You're In! 🎉 AI App Workshop — May 31</title>
 
   <!-- Facebook Pixel -->
   <script>
@@ -58,62 +58,86 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <style>
     *{margin:0;padding:0;box-sizing:border-box;}
-    body{font-family:'Inter',sans-serif;background:linear-gradient(160deg,#060d2e 0%,#0d1b6e 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
-    .card{background:#fff;border-radius:24px;padding:36px 28px;max-width:500px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
-    .emoji{font-size:56px;margin-bottom:10px;}
-    h1{font-size:24px;font-weight:900;color:#0d1b6e;margin-bottom:8px;line-height:1.2;}
-    .sub{font-size:14px;color:#666;margin-bottom:20px;line-height:1.6;}
+    body{font-family:'Inter',sans-serif;background:linear-gradient(160deg,#060d2e 0%,#0d1b6e 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;}
+    .card{background:#fff;border-radius:24px;padding:28px 22px;max-width:500px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+    .emoji{font-size:52px;margin-bottom:8px;}
+    h1{font-size:22px;font-weight:900;color:#0d1b6e;margin-bottom:6px;line-height:1.2;}
+    .sub{font-size:13px;color:#666;margin-bottom:16px;line-height:1.5;}
 
-    /* Countdown box */
-    .wa-box{background:linear-gradient(135deg,#e8f5e9,#d0f0da);border:2.5px solid #25D366;border-radius:20px;padding:22px 20px;margin-bottom:18px;}
-    .wa-label{font-size:12px;font-weight:800;color:#1a6b35;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
-    .countdown{font-size:64px;font-weight:900;color:#128C4F;line-height:1;margin:4px 0 6px;}
-    .wa-hint{font-size:13px;color:#2e7d32;margin-bottom:16px;}
-    .whatsapp-btn{display:block;background:#25D366;color:#fff;text-decoration:none;padding:18px 24px;border-radius:14px;font-size:17px;font-weight:900;box-shadow:0 6px 24px rgba(37,211,102,0.45);transition:transform 0.15s,box-shadow 0.15s;}
-    .whatsapp-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(37,211,102,0.5);}
+    /* BIG WhatsApp join box — the HERO element */
+    .wa-hero{background:linear-gradient(135deg,#128C4F,#25D366);border-radius:20px;padding:24px 20px 20px;margin-bottom:16px;position:relative;overflow:hidden;}
+    .wa-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:rgba(255,255,255,0.07);border-radius:50%;}
+    .wa-urgent{font-size:11px;font-weight:900;color:rgba(255,255,255,0.85);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;}
+    .wa-main-text{font-size:18px;font-weight:900;color:#fff;margin-bottom:4px;line-height:1.3;}
+    .wa-sub-text{font-size:13px;color:rgba(255,255,255,0.85);margin-bottom:18px;line-height:1.4;}
+    .whatsapp-btn{display:block;background:#fff;color:#128C4F;text-decoration:none;padding:18px 24px;border-radius:14px;font-size:18px;font-weight:900;box-shadow:0 6px 24px rgba(0,0,0,0.2);letter-spacing:0.2px;transition:transform 0.15s;}
+    .whatsapp-btn:active{transform:scale(0.97);}
+    .wa-arrow{font-size:13px;color:rgba(255,255,255,0.8);margin-top:12px;font-weight:600;}
 
-    .detail-box{background:#f5f5f7;border-radius:14px;padding:16px 18px;margin-bottom:16px;text-align:left;}
-    .detail-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #e5e5e5;font-size:14px;}
+    /* Pulse animation on button */
+    @keyframes pulse{0%,100%{box-shadow:0 6px 24px rgba(0,0,0,0.2),0 0 0 0 rgba(255,255,255,0.4);}50%{box-shadow:0 6px 24px rgba(0,0,0,0.2),0 0 0 10px rgba(255,255,255,0);}}
+    .whatsapp-btn{animation:pulse 2s infinite;}
+
+    /* Countdown strip */
+    .countdown-strip{background:#e8f5e9;border-radius:10px;padding:8px 14px;margin-bottom:14px;font-size:13px;color:#1a6b35;font-weight:700;}
+    .countdown-strip span{font-size:18px;font-weight:900;color:#128C4F;}
+
+    .detail-box{background:#f5f5f7;border-radius:14px;padding:14px 16px;margin-bottom:14px;text-align:left;}
+    .detail-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e5e5e5;font-size:13px;}
     .detail-row:last-child{border-bottom:none;}
     .detail-label{color:#777;font-weight:500;}
     .detail-value{color:#0d1b6e;font-weight:700;}
-    .guarantee{background:#fff8e1;border:2px solid #FFD700;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#444;line-height:1.5;}
+    .guarantee{background:#fff8e1;border:2px solid #FFD700;border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#444;line-height:1.5;}
     .back-btn{color:#bbb;font-size:12px;text-decoration:none;font-weight:600;}
   </style>
 
   <script>
     var WA_GROUP = 'https://chat.whatsapp.com/BXDmICcy6tE8RZ6YOtcFqv';
-    var secs = 5;
+    var secs = 3;
+
     function tick() {
       var el = document.getElementById('countNum');
       if (!el) return;
       el.textContent = secs;
       if (secs <= 0) {
+        // Navigate entire page to WhatsApp group
         window.location.href = WA_GROUP;
         return;
       }
       secs--;
       setTimeout(tick, 1000);
     }
+
     window.addEventListener('load', function() {
-      // Open WhatsApp group in new tab IMMEDIATELY — don't wait for countdown
-      
-      setTimeout(tick, 800);
+      // Start countdown immediately
+      setTimeout(tick, 500);
     });
+
+    function joinNow() {
+      // User tapped the button — open WhatsApp and stop countdown
+      secs = -1;
+      window.location.href = WA_GROUP;
+    }
   </script>
 </head>
 <body>
   <div class="card">
     <div class="emoji">🎉</div>
     <h1>Payment Done! You're In!</h1>
-    <p class="sub">Your seat for May 31st is confirmed. Joining you to the WhatsApp group automatically...</p>
+    <p class="sub">✅ ₹99 received. Your seat for <strong>May 31st, 2:00 PM</strong> is confirmed.<br/>One last step — join the WhatsApp group below 👇</p>
 
-    <!-- AUTO-REDIRECT COUNTDOWN -->
-    <div class="wa-box">
-      <div class="wa-label">⚡ Joining WhatsApp Group in</div>
-      <div class="countdown" id="countNum">5</div>
-      <div class="wa-hint">seconds — or tap below to join right now</div>
-      <a href="https://chat.whatsapp.com/BXDmICcy6tE8RZ6YOtcFqv" class="whatsapp-btn">💬 Join WhatsApp Group Now →</a>
+    <!-- COUNTDOWN STRIP -->
+    <div class="countdown-strip">⚡ Auto-joining in <span id="countNum">3</span> seconds...</div>
+
+    <!-- BIG HERO WhatsApp Button -->
+    <div class="wa-hero">
+      <div class="wa-urgent">⚠️ Important — Do This Now</div>
+      <div class="wa-main-text">Join the WhatsApp Group</div>
+      <div class="wa-sub-text">Get your Zoom link, session reminders &amp; direct support from Palash — all in the group. You'll miss the class without this.</div>
+      <a href="https://chat.whatsapp.com/BXDmICcy6tE8RZ6YOtcFqv" class="whatsapp-btn" onclick="joinNow(); return false;">
+        💬 TAP HERE TO JOIN GROUP →
+      </a>
+      <div class="wa-arrow">👆 Tap this button right now</div>
     </div>
 
     <div class="detail-box">
