@@ -2424,16 +2424,22 @@
     // Fire lead save in background — non-blocking
     saveLead(leadData);
 
-    // Build Razorpay URL with pre-filled details so user doesn't have to type again
-    const rawPhone   = document.getElementById('rzp-phone').value.trim();
-    const activeLink = bumpSelected ? PAYMENT_LINK_BUMP : PAYMENT_LINK;
-    const prefilled  = activeLink
-      + '?name='    + encodeURIComponent(name)
-      + '&email='   + encodeURIComponent(email)
-      + '&contact=' + encodeURIComponent(rawPhone);
+    // Build Razorpay URL — pre-fill only works on pages.razorpay.com links, not rzp.io short links
+    const rawPhone = document.getElementById('rzp-phone').value.trim();
+    var finalLink;
+    if (bumpSelected) {
+      // rzp.io short link — use as-is, no pre-fill params (they break short links)
+      finalLink = PAYMENT_LINK_BUMP;
+    } else {
+      // Full payment page URL — supports pre-fill
+      finalLink = PAYMENT_LINK
+        + '?name='    + encodeURIComponent(name)
+        + '&email='   + encodeURIComponent(email)
+        + '&contact=' + encodeURIComponent(rawPhone);
+    }
 
     // REDIRECT IMMEDIATELY
-    window.location.href = prefilled;
+    window.location.href = finalLink;
   }
 
   function saveLead(data) {
