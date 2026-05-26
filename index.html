@@ -2304,6 +2304,23 @@
             onfocus="this.style.borderColor='#0d1b6e'" onblur="this.style.borderColor='#e0e0e0'"/>
         </div>
       </div>
+      <!-- ── ORDER BUMP ── -->
+      <div id="bump-box" onclick="toggleBump()" style="cursor:pointer;background:linear-gradient(135deg,#fff8e1,#fff3cd);border:2.5px dashed #f59e0b;border-radius:14px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:flex-start;gap:12px;transition:border-color 0.2s,background 0.2s;">
+        <div style="flex-shrink:0;margin-top:2px;">
+          <div id="bump-check" style="width:22px;height:22px;border-radius:6px;border:2.5px solid #f59e0b;background:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all 0.2s;"></div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:12px;font-weight:900;color:#92400e;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">⚡ Add-On — Check This Box!</div>
+          <div style="font-size:15px;font-weight:900;color:#1a1a1a;margin-bottom:4px;">🎥 Get the Full Workshop Recording</div>
+          <div style="font-size:13px;color:#555;line-height:1.5;margin-bottom:6px;">Can't attend live? Miss anything? Get lifetime access to the complete recording — rewatch anytime, forever.</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:16px;font-weight:900;color:#e8251a;">Only ₹100 extra</span>
+            <span style="font-size:13px;color:#aaa;text-decoration:line-through;">₹299</span>
+            <span style="background:#16a34a;color:#fff;font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px;">67% OFF</span>
+          </div>
+        </div>
+      </div>
+
       <button type="submit" id="rzp-pay-btn"
         style="width:100%;background:linear-gradient(135deg,#e8251a,#ff4444);color:#fff;border:none;border-radius:50px;padding:18px;font-size:18px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:inherit;">
         🔒 Pay ₹99 &amp; Secure My Seat →
@@ -2317,7 +2334,33 @@
 
 <!-- ── PAYMENT LOGIC ── -->
 <script>
-  const PAYMENT_LINK = 'https://pages.razorpay.com/pl_SkNpn0hrFrJJYA/view';
+  const PAYMENT_LINK      = 'https://pages.razorpay.com/pl_SkNpn0hrFrJJYA/view'; // ₹99 — live only
+  const PAYMENT_LINK_BUMP = 'PASTE_YOUR_199_RAZORPAY_LINK_HERE'; // ₹199 — live + recording
+  var bumpSelected = false;
+
+  function toggleBump() {
+    bumpSelected = !bumpSelected;
+    var box   = document.getElementById('bump-box');
+    var check = document.getElementById('bump-check');
+    var btn   = document.getElementById('rzp-pay-btn');
+    if (bumpSelected) {
+      check.innerHTML  = '✅';
+      check.style.background    = '#f59e0b';
+      check.style.borderColor   = '#f59e0b';
+      box.style.background      = 'linear-gradient(135deg,#fef3c7,#fde68a)';
+      box.style.borderColor     = '#d97706';
+      box.style.borderStyle     = 'solid';
+      btn.innerHTML = '🔒 Pay ₹199 &amp; Get Recording →';
+    } else {
+      check.innerHTML  = '';
+      check.style.background    = '#fff';
+      check.style.borderColor   = '#f59e0b';
+      box.style.background      = 'linear-gradient(135deg,#fff8e1,#fff3cd)';
+      box.style.borderColor     = '#f59e0b';
+      box.style.borderStyle     = 'dashed';
+      btn.innerHTML = '🔒 Pay ₹99 &amp; Secure My Seat →';
+    }
+  }
   const APPS_SCRIPT  = 'https://script.google.com/macros/s/AKfycbyuy7BIiawxz_naZ2TMk59snieIqAApUhqnkNjdsUH4ZZlYXhBs5vK4IdfnX_O0lPsV/exec';
 
   // Open modal when any enroll button clicked
@@ -2360,7 +2403,8 @@
     btn.disabled = true;
     btn.innerHTML = '⏳ Opening Payment...';
 
-    const leadData = { name, email, phone, paymentId: 'PAYMENT_INITIATED', amount: 9900 };
+    const amount   = bumpSelected ? 19900 : 9900;
+    const leadData = { name, email, phone, paymentId: 'PAYMENT_INITIATED', amount };
 
     // Save to sessionStorage
     try {
@@ -2381,10 +2425,11 @@
     saveLead(leadData);
 
     // Build Razorpay URL with pre-filled details so user doesn't have to type again
-    const rawPhone = document.getElementById('rzp-phone').value.trim();
-    const prefilled = PAYMENT_LINK
-      + '?name=' + encodeURIComponent(name)
-      + '&email=' + encodeURIComponent(email)
+    const rawPhone   = document.getElementById('rzp-phone').value.trim();
+    const activeLink = bumpSelected ? PAYMENT_LINK_BUMP : PAYMENT_LINK;
+    const prefilled  = activeLink
+      + '?name='    + encodeURIComponent(name)
+      + '&email='   + encodeURIComponent(email)
       + '&contact=' + encodeURIComponent(rawPhone);
 
     // REDIRECT IMMEDIATELY
