@@ -200,7 +200,7 @@ function sendEmail(name, email, paymentId) {
         <div style="background:linear-gradient(135deg,#e8f5e9,#d0f0da);border:2.5px solid #25D366;border-radius:16px;padding:20px;text-align:center;margin-bottom:24px;">
           <div style="font-size:13px;font-weight:800;color:#1a6b35;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">⚡ Step 1 — Join WhatsApp Group NOW</div>
           <div style="font-size:13px;color:#2e7d32;margin-bottom:14px;">Get the Zoom link, updates & reminders — all in the group</div>
-          <a href="https://chat.whatsapp.com/DkZlLeG2TtJ9TDCwdvc4NY" style="display:block;background:#25D366;color:#fff;text-decoration:none;padding:16px 24px;border-radius:12px;font-size:16px;font-weight:900;box-shadow:0 6px 24px rgba(37,211,102,0.4);">💬 Join WhatsApp Group →</a>
+          <a href="https://chat.whatsapp.com/Bb40tjsFL2s4Dka8o3zkLv" style="display:block;background:#25D366;color:#fff;text-decoration:none;padding:16px 24px;border-radius:12px;font-size:16px;font-weight:900;box-shadow:0 6px 24px rgba(37,211,102,0.4);">💬 Join WhatsApp Group →</a>
         </div>
 
         <div class="steps">
