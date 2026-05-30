@@ -5,9 +5,9 @@
 
 // ── CONFIG — Fill these in ──────────────────────────────────
 const CONFIG = {
-  SHEET_NAME:      'Batch 4',
+  SHEET_NAME:      'Batch 5',
   SENDER_NAME:     'Palash — AI App Workshop',
-  WORKSHOP_DATE:   '31st May 2026, 2:00 PM IST',
+  WORKSHOP_DATE:   '7th June 2026, 2:00 PM IST',
   WHATSAPP_API_KEY: '',
   WHATSAPP_NUMBER:  '',
 };
@@ -39,14 +39,18 @@ function doGet(e) {
       const isPaid = p.paymentId && p.paymentId !== 'LEAD' && p.paymentId !== 'PAYMENT_INITIATED';
 
       if (isPaid) {
+        // Detect ₹199 recording plan
+        const isRecording = p.plan === 'recording';
+        const paidAmount  = isRecording ? 19900 : (parseInt(p.amount) || 9900);
+
         // Try to update existing row first (avoid duplicates)
-        const updated = updateLeadStatus(p.phone || p.email, p.paymentId);
+        const updated = updateLeadStatus(p.phone || p.email, p.paymentId, paidAmount, isRecording);
         if (!updated) {
           // No existing row found — add new paid row
-          saveLead(p.name, p.email, p.phone || '', p.paymentId, 9900);
+          saveLead(p.name, p.email, p.phone || '', p.paymentId, paidAmount, isRecording);
         }
         // Send confirmation email
-        sendEmail(p.name, p.email, p.paymentId);
+        sendEmail(p.name, p.email, p.paymentId, isRecording);
         if (CONFIG.WHATSAPP_API_KEY) sendWhatsApp(p.name, p.phone);
       } else {
         // Just initiated — save as Initiated (not Paid)
@@ -64,7 +68,7 @@ function doGet(e) {
 // ────────────────────────────────────────────────────────────
 // 1. SAVE LEAD TO GOOGLE SHEET
 // ────────────────────────────────────────────────────────────
-function saveLead(name, email, phone, paymentId, amount) {
+function saveLead(name, email, phone, paymentId, amount, isRecording) {
   const ss = SpreadsheetApp.openById('18c0VazYcBZtgdFDzJK6baFb4ZQieb0_mhfWzzkIcKRA');
   let sheet = ss.getSheetByName(CONFIG.SHEET_NAME);
 
@@ -89,8 +93,8 @@ function saveLead(name, email, phone, paymentId, amount) {
 
   // Determine status based on paymentId
   const isPaid = paymentId && paymentId !== 'INITIATED' && paymentId !== 'PAYMENT_INITIATED' && paymentId !== 'LEAD';
-  const status = isPaid ? '✅ Paid' : '🔄 Initiated';
-  const bgColor = isPaid ? '#e8f5e9' : '#fff9c4'; // green for paid, yellow for initiated
+  const status = isPaid ? (isRecording ? '✅ Paid ₹199 🎥' : '✅ Paid ₹99') : '🔄 Initiated';
+  const bgColor = isPaid ? (isRecording ? '#e3f2fd' : '#e8f5e9') : '#fff9c4'; // blue=₹199, green=₹99, yellow=initiated
 
   const row = [
     new Date(),
@@ -98,9 +102,9 @@ function saveLead(name, email, phone, paymentId, amount) {
     email,
     phone,
     paymentId || 'INITIATED',
-    amount ? '₹' + (amount / 100) : (isPaid ? '₹99' : '—'),
+    amount ? '₹' + (amount / 100) : (isPaid ? (isRecording ? '₹199' : '₹99') : '—'),
     status,
-    isPaid ? 'Payment confirmed ✅' : 'Form filled — awaiting payment'
+    isPaid ? (isRecording ? 'Paid ₹199 — Live + Recording 🎥' : 'Payment confirmed ✅') : 'Form filled — awaiting payment'
   ];
   sheet.appendRow(row);
 
@@ -111,7 +115,7 @@ function saveLead(name, email, phone, paymentId, amount) {
 // ────────────────────────────────────────────────────────────
 // 2. UPDATE EXISTING ROW FROM INITIATED → PAID
 // ────────────────────────────────────────────────────────────
-function updateLeadStatus(phoneOrEmail, paymentId) {
+function updateLeadStatus(phoneOrEmail, paymentId, amount, isRecording) {
   const ss = SpreadsheetApp.openById('18c0VazYcBZtgdFDzJK6baFb4ZQieb0_mhfWzzkIcKRA');
   const sheet = ss.getSheetByName(CONFIG.SHEET_NAME);
   if (!sheet) return false;
@@ -128,11 +132,15 @@ function updateLeadStatus(phoneOrEmail, paymentId) {
       if (rowStatus.includes('Paid')) return true;
       // Still initiated — update to Paid
       if (rowStatus.includes('Initiated')) {
-        sheet.getRange(i + 1, 5).setValue(paymentId);       // Payment ID
-        sheet.getRange(i + 1, 6).setValue('₹99');            // Amount
-        sheet.getRange(i + 1, 7).setValue('✅ Paid');         // Status
-        sheet.getRange(i + 1, 8).setValue('Payment confirmed ✅');
-        sheet.getRange(i + 1, 1, 1, 8).setBackground('#e8f5e9'); // Green
+        const amtLabel  = isRecording ? '₹199' : (amount ? '₹' + (amount / 100) : '₹99');
+        const statusLbl = isRecording ? '✅ Paid ₹199 🎥' : '✅ Paid ₹99';
+        const notesLbl  = isRecording ? 'Paid ₹199 — Live + Recording 🎥' : 'Payment confirmed ✅';
+        const bgClr     = isRecording ? '#e3f2fd' : '#e8f5e9'; // blue for ₹199, green for ₹99
+        sheet.getRange(i + 1, 5).setValue(paymentId);
+        sheet.getRange(i + 1, 6).setValue(amtLabel);
+        sheet.getRange(i + 1, 7).setValue(statusLbl);
+        sheet.getRange(i + 1, 8).setValue(notesLbl);
+        sheet.getRange(i + 1, 1, 1, 8).setBackground(bgClr);
         return true;
       }
     }
@@ -200,7 +208,7 @@ function sendEmail(name, email, paymentId) {
         <div style="background:linear-gradient(135deg,#e8f5e9,#d0f0da);border:2.5px solid #25D366;border-radius:16px;padding:20px;text-align:center;margin-bottom:24px;">
           <div style="font-size:13px;font-weight:800;color:#1a6b35;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">⚡ Step 1 — Join WhatsApp Group NOW</div>
           <div style="font-size:13px;color:#2e7d32;margin-bottom:14px;">Get the Zoom link, updates & reminders — all in the group</div>
-          <a href="https://chat.whatsapp.com/Bb40tjsFL2s4Dka8o3zkLv" style="display:block;background:#25D366;color:#fff;text-decoration:none;padding:16px 24px;border-radius:12px;font-size:16px;font-weight:900;box-shadow:0 6px 24px rgba(37,211,102,0.4);">💬 Join WhatsApp Group →</a>
+          <a href="https://chat.whatsapp.com/LOKVqZZxL95DAvDLLzAWFJ" style="display:block;background:#25D366;color:#fff;text-decoration:none;padding:16px 24px;border-radius:12px;font-size:16px;font-weight:900;box-shadow:0 6px 24px rgba(37,211,102,0.4);">💬 Join WhatsApp Group →</a>
         </div>
 
         <div class="steps">

@@ -21,7 +21,7 @@
   fbq('init', '1489981779278274');
   fbq('track', 'PageView');
   fbq('track', 'ViewContent', {
-    content_name: 'AI App Building Workshop - May 31',
+    content_name: 'AI App Building Workshop - June 7',
     content_category: 'Online Workshop',
     content_type: 'product',
     value: 99,
@@ -1101,7 +1101,7 @@
   <div class="event-grid" style="max-width:700px;margin:0 auto;">
     <div class="event-box">
       <div class="event-icon">📅</div>
-      <div><div class="lbl">DATE</div><div class="val">31st May 2026</div></div>
+      <div><div class="lbl">DATE</div><div class="val">7th June 2026</div></div>
     </div>
     <div class="event-box">
       <div class="event-icon">🕐</div>
@@ -1142,7 +1142,7 @@
       <div style="color:#AAA;font-size:11px;font-weight:700;margin-top:6px;letter-spacing:1px;">SECS</div>
     </div>
   </div>
-  <p style="color:#fff;font-size:14px;font-weight:700;margin:16px 0 0;">31st May 2026 &nbsp;·&nbsp; 2:00 PM IST &nbsp;·&nbsp; Live on Zoom</p>
+  <p style="color:#fff;font-size:14px;font-weight:700;margin:16px 0 0;">7th June 2026 &nbsp;·&nbsp; 2:00 PM IST &nbsp;·&nbsp; Live on Zoom</p>
 </div>
 <script>
 (function(){
@@ -2336,6 +2336,7 @@
 <script>
   const PAYMENT_LINK      = 'https://pages.razorpay.com/pl_SkNpn0hrFrJJYA/view'; // ₹99 — live only
   const PAYMENT_LINK_BUMP = 'https://pages.razorpay.com/pl_StwAUVFbFCMr3f/view'; // ₹199 — live + recording
+  const WORKSHOP_DATE     = 'June 7';   // ← CHANGE DATE HERE — WhatsApp message updates automatically
   var bumpSelected = false;
 
   function toggleBump() {
@@ -2677,7 +2678,7 @@
     </div>
     <div class="wa-close" onclick="document.getElementById('waBubble').style.display='none'">✕</div>
   </div>
-  <a class="wa-btn" href="https://wa.me/919109637004?text=Hi%2C%20I%20saw%20your%20ad%20for%20the%20AI%20App%20Building%20Workshop%20on%20May%209.%20I%20have%20a%20question." target="_blank" onclick="if(typeof fbq!=='undefined'){fbq('track','Contact');}">
+  <a class="wa-btn" id="waChatBtn" href="#" target="_blank" onclick="this.href='https://wa.me/919109637004?text='+encodeURIComponent('Hi, I saw your ad for the AI App Building Workshop on '+WORKSHOP_DATE+'. I have a question.');if(typeof fbq!=='undefined'){fbq('track','Contact');}">
     <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
       <path d="M16 2C8.28 2 2 8.28 2 16c0 2.46.66 4.76 1.8 6.76L2 30l7.44-1.76A13.94 13.94 0 0016 30c7.72 0 14-6.28 14-14S23.72 2 16 2zm7.28 19.44c-.3.84-1.76 1.6-2.42 1.68-.62.08-1.4.1-2.26-.14-.52-.14-1.18-.34-2.04-.7-3.58-1.54-5.92-5.14-6.1-5.38-.18-.24-1.44-1.92-1.44-3.66s.92-2.6 1.24-2.96c.32-.36.7-.44.94-.44l.68.02c.22 0 .52-.08.8.62.3.72 1.02 2.48 1.1 2.66.1.18.16.4.04.64-.12.24-.18.4-.36.6-.18.22-.38.48-.54.64-.18.18-.36.38-.16.74.2.36.9 1.48 1.94 2.4 1.34 1.18 2.46 1.56 2.82 1.72.36.18.58.16.8-.1.22-.26.92-1.08 1.16-1.44.24-.36.5-.3.84-.18.34.12 2.14 1.02 2.5 1.2.36.18.6.26.7.42.08.14.08.84-.22 1.68z"/>
     </svg>
