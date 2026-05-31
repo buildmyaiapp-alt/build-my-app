@@ -141,6 +141,12 @@
         <button class="ex-btn" onclick="fillExample('salon')">💇 Salon App</button>
         <button class="ex-btn" onclick="fillExample('coaching')">📚 Coaching App</button>
         <button class="ex-btn" onclick="fillExample('hotel')">🏨 Hotel App</button>
+        <button class="ex-btn" onclick="fillExample('astrology')">🔮 Astrology App</button>
+        <button class="ex-btn" onclick="fillExample('hospital')">🏥 Hospital App</button>
+        <button class="ex-btn" onclick="fillExample('realestate')">🏠 Real Estate App</button>
+        <button class="ex-btn" onclick="fillExample('freelancer')">💼 Freelancer App</button>
+        <button class="ex-btn" onclick="fillExample('petcare')">🐾 Pet Care App</button>
+        <button class="ex-btn" onclick="fillExample('pharmacy')">💊 Pharmacy App</button>
       </div>
     </div>
     <button class="build-btn" id="buildBtn" onclick="buildApp()">⚡ Build My App Now</button>
@@ -256,8 +262,8 @@
         🔧 Fix All Buttons — Make Everything Work
       </button>
 
-      <!-- QUICK CHANGE BUTTONS -->
-      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+      <!-- QUICK CHANGE BUTTONS — updated dynamically after build -->
+      <div id="quickModifyBtns" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
         <button class="ex-btn" onclick="fillModify('Change the main color to blue and make it look more professional')">🎨 Change Color</button>
         <button class="ex-btn" onclick="fillModify('Add a Contact Us page with phone number, email, address and a WhatsApp button')">📞 Add Contact Page</button>
         <button class="ex-btn" onclick="fillModify('Make the design look more premium and luxurious with gold and dark theme')">✨ Make Premium</button>
@@ -756,8 +762,200 @@ const examples = {
   shop: `Build a shop app called Style Store for fashion clothing. Pages: 1) Home with hero banner, new arrivals with 6 product cards. 2) Products with category filter (Men, Women, Kids) and product grid with name, price, Add to Cart. 3) Cart with items, quantity controls, total and Checkout. 4) Orders with history. Bottom navigation. Design: clean white background, black and gold colors, premium fashion brand look.`,
   salon: `Build a salon booking app called GlowUp Salon. Pages: 1) Home with hero, services highlights, Book Now button. 2) Services with cards (Haircut, Facial, Manicure, Pedicure, Hair Color) showing name, duration, price and Book button. 3) My Appointments with upcoming bookings and Cancel option. 4) Profile. Bottom navigation. Design: rose gold and white, pink and gold accents, luxury spa feel.`,
   coaching: `Build a coaching app called LearnPro for online education. Pages: 1) Home with featured courses, 4 course cards with topic, duration, price, Enroll button. 2) Courses with category filter and course grid. 3) My Courses with enrolled courses and progress bars. 4) Profile with student details. Bottom navigation. Design: dark navy, blue and yellow accents, modern edtech look.`,
-  hotel: `Build a hotel booking app called Grand Stay Hotel. Pages: 1) Home with hotel hero, star rating, amenities, Book Room button. 2) Rooms with room type cards showing name, bed type, price per night, Book Now. 3) My Bookings with check-in, check-out, total amount. 4) Profile. Bottom navigation. Design: dark luxury background, gold and cream colors, 5-star hotel feel.`
+  hotel: `Build a hotel booking app called Grand Stay Hotel. Pages: 1) Home with hotel hero, star rating, amenities, Book Room button. 2) Rooms with room type cards showing name, bed type, price per night, Book Now. 3) My Bookings with check-in, check-out, total amount. 4) Profile. Bottom navigation. Design: dark luxury background, gold and cream colors, 5-star hotel feel.`,
+  astrology: `Build an astrology app called AstroGuru for professional astrologers. Roles: Astrologer (admin) and Client. Client pages: 1) Home with daily horoscope for their zodiac sign, featured services. 2) Services with cards (Birth Chart Reading ₹999, Tarot Reading ₹599, Numerology ₹499, Match Making ₹1499) with description, duration, Book Now button. 3) My Bookings showing upcoming and past consultations with astrologer name, service, date, status. 4) Profile with name, date of birth, zodiac sign. Astrologer pages: 1) Dashboard with today's bookings count, total clients, revenue stats. 2) Manage Bookings - list of all client bookings with Confirm/Cancel options. 3) Add Services - form to add new service with name, description, price, duration. 4) Profile. Design: deep purple/black background, gold and violet accents, mystical premium look with star and moon emojis throughout.`,
+  hospital: `Build a hospital appointment app called HealthCare Plus. Roles: Doctor (admin) and Patient. Patient pages: 1) Home with hero, specializations (Cardiology, Orthopedics, Pediatrics, Dermatology, General) as clickable cards. 2) Book Appointment - select doctor, date, time slot, reason for visit, confirm booking. 3) My Appointments - list of upcoming and past appointments with doctor name, date, status badge (Confirmed/Pending/Completed). 4) Profile with patient name, age, blood group, medical history notes. Doctor pages: 1) Dashboard with today's appointments count, total patients, pending requests. 2) Today's Appointments - list with patient name, time, reason, Mark as Done button. 3) All Patients - searchable list of patients who booked appointments. 4) Profile with specialization and available time slots. Design: clean white/light background, green and teal medical theme, professional clinical look.`,
+  realestate: `Build a real estate app called PropFinder for property listings. Roles: Agent (admin) and Buyer. Buyer pages: 1) Home with hero, property type filter (Flat, House, Villa, Plot, PG), featured listings grid. 2) Browse Properties - filter by type, BHK, price range; property cards with photo emoji, title, price, location, BHK, area. 3) Saved Properties - wishlist of saved properties with Remove option. 4) Profile with contact details and search preferences. Agent pages: 1) Dashboard with total listings, total inquiries, properties sold stats. 2) My Listings - list of all properties with status (Available/Sold) and Edit/Delete. 3) Add Property - form with property name, type, BHK, price, area sqft, location, description. 4) Inquiries - list of buyer messages/interests for each property. Design: dark background, indigo and gold colors, premium property portal look.`,
+  freelancer: `Build a freelancer portfolio app called FreelancePro for digital freelancers. Roles: Freelancer (admin) and Client. Client pages: 1) Home with freelancer hero photo area, name, tagline, skills badges, Hire Me button. 2) Portfolio - project cards with title, category (Web, Design, Video, SEO), description, View button. 3) Services - service packages (Basic ₹5000, Standard ₹15000, Premium ₹30000) with deliverables list and Order Now button. 4) Contact - send inquiry form with name, email, project description, budget, Submit button. Freelancer pages: 1) Dashboard - total projects, active orders, earnings this month, pending inquiries. 2) Manage Orders - list of client orders with status (New/In Progress/Completed) and Update Status button. 3) Add Portfolio - form to add new project with title, category, description, tools used. 4) Inquiries - list of client messages with client name, budget, date, Reply option. Design: dark charcoal background, electric indigo and white, modern professional look.`,
+  petcare: `Build a pet care app called PetPal for pet grooming and vet services. Roles: Vet/Groomer (admin) and Pet Owner. Pet Owner pages: 1) Home with hero, quick services (Grooming, Vaccination, Health Checkup, Deworming), upcoming appointment reminder. 2) Book Service - select service type, select pet type (Dog/Cat/Bird/Other), enter pet name and age, select date and time slot, add notes, Book button. 3) My Pets - list of registered pets with name, type, breed, age, Add New Pet button. 4) My Appointments - history of bookings with service name, pet name, date, status, and vet name. Vet pages: 1) Dashboard - today's bookings, total pets registered, total pet owners, monthly revenue. 2) Today's Appointments - list with pet name, owner name, service type, time, Mark Done button. 3) All Pets - list of all registered pets with owner contact details. 4) Services Management - add/remove services with name, description, price, duration. Design: warm orange and teal background, pet-friendly playful design with paw emojis, soft rounded cards.`,
+  pharmacy: `Build a pharmacy app called MediMart for an online pharmacy. Roles: Pharmacist (admin) and Customer. Customer pages: 1) Home with hero, medicine categories (Tablets, Syrups, Vitamins, Skincare, Baby Care, Surgical) as grid cards, search bar, Today's Offers. 2) Browse Medicines - filter by category; medicine cards with name, composition, brand, price, stock status, Add to Cart button. 3) Cart - items with quantity controls, subtotal, delivery charge, total and Place Order button. 4) My Orders - order history with medicine names, quantity, total amount, delivery status badge. Pharmacist pages: 1) Dashboard - total medicines, today's orders, low stock alerts, total revenue. 2) Manage Medicines - list of all medicines with stock count, price and Edit/Delete. 3) Add Medicine - form with name, category, composition, price, stock quantity, expiry date. 4) Orders - all customer orders with customer name, items, amount, status (Pending/Packed/Delivered) and Update Status button. Design: clean white and green medical theme, trust-inspiring professional pharmacy look.`
 };
+
+// ── App type detection — keyword matching, no API call needed ──────────────
+function detectAppType(idea) {
+  const t = idea.toLowerCase();
+  if (/astrology|horoscope|zodiac|kundali|jyotish|spiritual|tarot|numerology|astrologer/.test(t)) return 'astrology';
+  if (/hospital|doctor|patient|clinic|medical|physician|appointment|health|HealthCare/.test(t)) return 'hospital';
+  if (/school|student|teacher|college|university|education|course|class|learning|tutor/.test(t)) return 'education';
+  if (/real estate|property|flat|house|villa|plot|rent|apartment|pg|propfinder/.test(t)) return 'realestate';
+  if (/pharmacy|medicine|chemist|drug|medimart/.test(t)) return 'pharmacy';
+  if (/pet|dog|cat|vet|grooming|petpal|animal/.test(t)) return 'petcare';
+  if (/freelancer|portfolio|freelance|gig|digital agency|designer/.test(t)) return 'freelancer';
+  if (/gym|fitness|workout|exercise|trainer|health club|fitzone/.test(t)) return 'gym';
+  if (/salon|beauty|spa|hair|makeup|facial|nail|glowup/.test(t)) return 'salon';
+  if (/restaurant|food|menu|dish|cafe|kitchen|dine|zomato|spice/.test(t)) return 'restaurant';
+  if (/hotel|resort|homestay|accommodation|room|stay|grand stay/.test(t)) return 'hotel';
+  if (/shop|store|ecommerce|product|fashion|clothing|style store/.test(t)) return 'shop';
+  if (/coach|coaching|learnpro|online education|skill|course/.test(t)) return 'coaching';
+  return 'general';
+}
+
+// ── Per-category modify button sets ────────────────────────────────────────
+const MODIFY_SETS = {
+  astrology: [
+    ['🎨 Change Color',        'Change the theme to deep midnight blue with silver and gold accents for a more mystical look'],
+    ['📅 Add Booking System',  'Add a proper appointment booking with calendar date picker and available time slots'],
+    ['⭐ Add Horoscope Section','Add a daily horoscope section showing predictions for all 12 zodiac signs with emoji'],
+    ['💎 Add Premium Plans',   'Add monthly subscription plans (Silver ₹999/mo, Gold ₹2499/mo, Platinum ₹4999/mo) with benefits'],
+    ['🔮 Add More Services',   'Add more astrology services: Vastu Shastra, Career Reading, Business Astrology, Love Compatibility'],
+    ['📞 Add Contact Page',    'Add a contact section with WhatsApp button, email, and consultation request form'],
+    ['🌙 Make it More Mystical','Make the design look more mystical with stars, moons and cosmic animations'],
+    ['💫 Add Testimonials',    'Add a client testimonials section with star ratings and review cards'],
+  ],
+  hospital: [
+    ['🎨 Change Color',        'Change the theme to a clean blue and white medical color scheme'],
+    ['👨‍⚕️ Add More Doctors',    'Add a doctors listing with photos, specializations, experience, and ratings'],
+    ['📋 Add Medical Records', 'Add a medical history section for patients to view past prescriptions and diagnoses'],
+    ['🚑 Add Emergency Info',  'Add an emergency section with quick call button, first aid tips, and nearest hospital info'],
+    ['💊 Add Pharmacy Tab',    'Add a medicines/pharmacy tab where patients can view prescribed medications'],
+    ['🔔 Add Reminders',       'Add medicine reminder notifications and appointment reminder alerts'],
+    ['📞 Add Contact Page',    'Add a contact section with hospital address, phone, WhatsApp and directions map link'],
+    ['⭐ Add Ratings',         'Add a doctor rating and review system where patients can rate their experience'],
+  ],
+  realestate: [
+    ['🎨 Change Color',        'Change the theme to dark navy blue with gold for a luxury real estate feel'],
+    ['🏠 Add More Listings',   'Add 8 more property listings with different BHK, price ranges and locations'],
+    ['🔍 Add Search Filter',   'Add advanced search with price range slider, BHK filter, locality, and property type filter'],
+    ['📊 Add EMI Calculator',  'Add an EMI calculator where buyers can enter loan amount and see monthly installments'],
+    ['📸 Add Gallery View',    'Add a photo gallery section for each property with multiple interior images'],
+    ['📞 Add Lead Form',       'Add a contact/inquiry form where interested buyers can leave their number for callback'],
+    ['🗺️ Add Location Map',    'Add a map section with property location, nearby schools, hospitals, metro stations'],
+    ['💰 Add Price History',   'Add a price trend section showing property price changes over last 6 months'],
+  ],
+  pharmacy: [
+    ['🎨 Change Color',        'Change the theme to a clean white and green pharmacy color scheme'],
+    ['💊 Add More Medicines',  'Add 20 more medicines across all categories with realistic names, compositions and prices'],
+    ['🏷️ Add Discount Offers', 'Add an offers section with discount badges on selected medicines and combo packs'],
+    ['🚚 Add Delivery Tracking','Add an order tracking section showing live delivery status (Ordered > Packed > Dispatched > Delivered)'],
+    ['📋 Add Prescription Upload','Add a prescription upload feature where customers can upload their doctor prescription'],
+    ['🔔 Add Refill Reminder', 'Add a medicine refill reminder feature for regular medicines'],
+    ['📞 Add Contact Page',    'Add a contact section with pharmacy address, phone, WhatsApp and operating hours'],
+    ['💳 Add Wallet Points',   'Add a loyalty points/wallet system where customers earn points on every purchase'],
+  ],
+  petcare: [
+    ['🎨 Change Color',        'Change the theme to a warm orange and white with teal accents for a friendly pet look'],
+    ['🐾 Add More Services',   'Add more services: Pet Training, Pet Boarding, Pet Taxi, Emergency Pet Care'],
+    ['🐕 Add Pet Profiles',    'Add a detailed pet profile section with medical history, vaccination records and diet notes'],
+    ['📅 Add Schedule',        'Add a vaccination schedule and next appointment reminder for each pet'],
+    ['🛒 Add Pet Shop',        'Add a pet products shop with food, toys, accessories and grooming products'],
+    ['⭐ Add Reviews',         'Add a vet and groomer rating system with client photo testimonials'],
+    ['📞 Add Contact Page',    'Add emergency contact section with 24/7 vet helpline and WhatsApp button'],
+    ['🎉 Add Loyalty Program', 'Add a pet care loyalty program where owners earn paw points on every service'],
+  ],
+  freelancer: [
+    ['🎨 Change Color',        'Change the theme to a sleek dark charcoal and electric blue professional look'],
+    ['📁 Add More Projects',   'Add 6 more portfolio projects with different categories, tools used and results achieved'],
+    ['💼 Add Resume Section',  'Add a resume/skills section with skill bars, certifications, and work experience timeline'],
+    ['📊 Add Stats Section',   'Add an impact section showing: Projects Completed, Happy Clients, Years Experience, Revenue Generated'],
+    ['🎥 Add Video Reel',      'Add a showreel/demo video section at the top of the portfolio'],
+    ['💳 Add Payment Plans',   'Add clearer service packages with a comparison table showing what is included in each plan'],
+    ['📞 Add Contact Page',    'Add a contact section with inquiry form, WhatsApp button, and response time promise'],
+    ['⭐ Add Testimonials',    'Add a client testimonials section with photo, name, company, star rating and review text'],
+  ],
+  gym: [
+    ['🎨 Change Color',        'Change the theme to dark black with electric neon green for a high-energy gym feel'],
+    ['💪 Add Workout Plans',   'Add workout plan cards (Beginner/Intermediate/Advanced) with exercise list and video links'],
+    ['🥗 Add Diet Plans',      'Add a diet plan section with meal plans for muscle gain, fat loss and maintenance'],
+    ['📊 Add Progress Tracker','Add a body stats tracker where members can log weight, BMI and measurements over time'],
+    ['🏆 Add Leaderboard',     'Add a monthly leaderboard showing top members by attendance or workout completions'],
+    ['💰 Add Membership Plans','Add clear membership plan cards (Monthly ₹999, Quarterly ₹2499, Annual ₹7999) with features'],
+    ['📞 Add Contact Page',    'Add gym location, timing, phone and WhatsApp inquiry button'],
+    ['⭐ Add Trainer Profiles', 'Add certified trainer profile cards with specialization, experience and Book a Session button'],
+  ],
+  salon: [
+    ['🎨 Change Color',        'Change the theme to blush pink and gold for an ultra-luxury salon vibe'],
+    ['💄 Add More Services',   'Add more beauty services: Bridal Package, Hair Spa, Keratin Treatment, Threading, Waxing'],
+    ['📸 Add Before/After',    'Add a before and after transformation gallery section with client photos'],
+    ['🎁 Add Gift Cards',      'Add gift card purchase section (₹500, ₹1000, ₹2000) for birthday and anniversary gifting'],
+    ['💰 Add Membership',      'Add a salon membership card (Silver/Gold/Platinum) with monthly credits and discount perks'],
+    ['📅 Add Slot Booking',    'Improve the booking with real-time slot availability showing open and booked time slots'],
+    ['⭐ Add Stylist Profiles', 'Add individual stylist profile cards with specialization, ratings and Book This Stylist button'],
+    ['📞 Add Contact Page',    'Add salon address, WhatsApp, Instagram link and Google Maps direction button'],
+  ],
+  restaurant: [
+    ['🎨 Change Color',        'Change the main color to royal blue and silver for a more upscale restaurant look'],
+    ['➕ Add More Dishes',     'Add 10 more dishes across all categories with realistic Indian names, descriptions and prices'],
+    ['🔥 Add Offers Section',  'Add a special offers section with discounts, combo meals and daily specials with countdown timer'],
+    ['🍕 Make it Like Zomato', 'Redesign the UI to look exactly like Zomato with same card layout, fonts and color style'],
+    ['⭐ Add Reviews System',  'Add a dish rating and customer review system with star ratings and comment section'],
+    ['🚚 Add Order Tracking',  'Add a live order tracking page showing: Order Received > Preparing > Out for Delivery > Delivered'],
+    ['🎁 Add Loyalty Points',  'Add a loyalty points system where customers earn 1 point per ₹10 spent and can redeem them'],
+    ['📞 Add Contact Page',    'Add restaurant address, phone, WhatsApp, table booking form and Google Maps direction'],
+  ],
+  hotel: [
+    ['🎨 Change Color',        'Change the theme to deep black and gold for a 5-star luxury hotel feel'],
+    ['🏨 Add More Room Types', 'Add more room categories: Deluxe, Superior, Suite, Presidential with different pricing and amenities'],
+    ['🍽️ Add Restaurant Menu', 'Add an in-room dining/restaurant menu section with breakfast, lunch and dinner options'],
+    ['💆 Add Spa Services',    'Add a spa and wellness section with available treatments, pricing and booking'],
+    ['🚗 Add Cab Booking',     'Add airport transfer and local cab booking feature for hotel guests'],
+    ['⭐ Add Guest Reviews',   'Add a hotel review section with guest ratings, photos and testimonials'],
+    ['🎁 Add Loyalty Program', 'Add a hotel loyalty program with points, member tiers (Silver/Gold/Platinum) and rewards'],
+    ['📞 Add Contact Page',    'Add hotel address, reception number, WhatsApp concierge and directions map link'],
+  ],
+  education: [
+    ['🎨 Change Color',        'Change the theme to dark navy and yellow for a modern edtech feel like Byju\'s'],
+    ['📚 Add More Courses',    'Add 8 more courses with different subjects, duration, instructor name, rating and price'],
+    ['🎯 Add Quiz Feature',    'Add a quiz/test section where students can take topic-wise practice tests and see scores'],
+    ['📊 Add Progress Report', 'Add a detailed progress report showing completion percentage, test scores and study hours'],
+    ['🏆 Add Certificates',    'Add a certificates section showing earned course completion certificates with download option'],
+    ['💬 Add Discussion Forum','Add a Q&A discussion forum where students can ask doubts and teachers can answer'],
+    ['📞 Add Contact Page',    'Add contact form, WhatsApp support and free demo class booking option'],
+    ['🎥 Add Live Class Tab',  'Add a Live Classes tab showing upcoming scheduled sessions with Join button'],
+  ],
+  shop: [
+    ['🎨 Change Color',        'Change the theme to premium black and gold for a luxury fashion store look'],
+    ['➕ Add More Products',   'Add 12 more products across all categories with realistic names, sizes, colors and prices'],
+    ['🔍 Add Search & Filter', 'Add a product search bar and filter by price range, size, color and rating'],
+    ['⭐ Add Reviews System',  'Add a product rating and review system with verified buyer badges'],
+    ['🎁 Add Wishlist',        'Add a wishlist/save for later feature with heart icon on every product card'],
+    ['🚚 Add Order Tracking',  'Add order tracking showing: Ordered > Packed > Shipped > Out for Delivery > Delivered'],
+    ['💰 Add Flash Sale',      'Add a flash sale section with countdown timer, discount percentage and limited stock badges'],
+    ['📞 Add Contact Page',    'Add customer support section with WhatsApp, email, return policy and FAQ'],
+  ],
+  coaching: [
+    ['🎨 Change Color',        'Change theme to deep purple and gold for a premium coaching academy look'],
+    ['📚 Add More Courses',    'Add 6 more courses in different topics with instructor name, duration and price'],
+    ['🎯 Add Test Series',     'Add a test series section with topic-wise mock tests and performance analytics'],
+    ['📜 Add Certificates',    'Add a course completion certificate section that students can download'],
+    ['👨‍🏫 Add Faculty Section', 'Add a faculty/instructor profiles section with photo, qualification and experience'],
+    ['📞 Add Contact Page',    'Add institute address, phone, WhatsApp and free counseling session booking form'],
+    ['💰 Add EMI Option',      'Add an EMI/installment payment plan option for expensive courses'],
+    ['🏆 Add Success Stories', 'Add a student success stories/testimonials section with photo, name and achievement'],
+  ],
+  general: [
+    ['🎨 Change Color',        'Change the main color to blue and make it look more modern and professional'],
+    ['📞 Add Contact Page',    'Add a contact page with phone number, email, address and a WhatsApp button'],
+    ['✨ Make Premium',        'Make the design look more premium and luxurious with dark background and gold accents'],
+    ['➕ Add More Content',    'Add more items, services or content relevant to this app with realistic data'],
+    ['🏷️ Change Branding',     'Change the app name, logo and all branding to match a new brand identity'],
+    ['🔔 Add Notifications',   'Add a notification system for important updates and reminders'],
+    ['💫 Add Animations',      'Add smooth page transition animations and loading effects throughout the app'],
+    ['⭐ Add Reviews',         'Add a ratings and reviews section where users can share their feedback'],
+  ],
+};
+
+// ── Swap modify buttons based on detected app type ────────────────────────
+function updateModifyButtons(appType) {
+  const container = document.getElementById('quickModifyBtns');
+  if (!container) return;
+  const set = MODIFY_SETS[appType] || MODIFY_SETS['general'];
+
+  // Build new buttons
+  let html = '';
+  set.forEach(function(item) {
+    const label = item[0];
+    const prompt = item[1].replace(/'/g, "\\'");
+    html += `<button class="ex-btn" onclick="fillModify('${prompt}')">${label}</button>`;
+  });
+
+  // Fade out → swap → fade in
+  container.style.opacity = '0';
+  container.style.transition = 'opacity 0.3s';
+  setTimeout(function() {
+    container.innerHTML = html;
+    container.style.opacity = '1';
+  }, 300);
+}
 
 function fillExample(type) {
   document.getElementById('appPrompt').value = examples[type];
@@ -876,6 +1074,12 @@ If the user asked for a gym management app — build a gym management app.
 If the user asked for a hospital app — build a hospital app.
 If the user asked for a school app — build a school app.
 The screens, tabs, features, and data must match the user's actual idea, not a generic shop template.
+
+🚨 ABSOLUTE RULE #1 — NEVER BREAK THIS:
+The VERY FIRST thing a user sees when they open the app MUST be the Login/Signup screen.
+The app MUST NOT open directly into any dashboard, home screen, or any other page.
+onAuthStateChanged MUST control everything — if user is NOT logged in → show auth screen ONLY.
+If you skip the login screen, the app is WRONG. No exceptions.
 
 ━━ SCREEN 1: AUTH (shown first, covers full screen) ━━
 - Beautiful full-screen login/signup UI matching the app's theme and colors
@@ -1280,6 +1484,9 @@ FINAL REMINDER: If you are close to your token limit — STOP, close all open fu
 
     generatedCode = raw;
     originalIdea = userIdea;
+
+    // Swap modify buttons to match the app type — no extra API call needed
+    updateModifyButtons(detectAppType(userIdea));
 
     document.getElementById('loading').style.display = 'none';
     document.getElementById('result').style.display = 'block';
