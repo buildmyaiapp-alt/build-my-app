@@ -841,11 +841,40 @@ function prepareApp(html) {
 <\/script>`;
     html = html.replace('</body>', AUTH_REPLACE_SCRIPT + '\n</body>');
 
-    // Auto-inject logout bar before </body>
+    // ── WIPE APP COLLECTIONS ON FIRST OPEN ─────────────────────────────────────
+    // Deletes all docs in this app's Firestore collections when opened for first time
+    // Prevents any stale data from appearing. Owner adds fresh data during workshop.
+    const WIPE_SCRIPT = `<script>
+(function(){
+  var _wipeKey='_wiped_'+( typeof APP_PREFIX!=='undefined'?APP_PREFIX:'x');
+  if(sessionStorage.getItem(_wipeKey))return; // already wiped this session
+  sessionStorage.setItem(_wipeKey,'1');
+  function _doWipe(){
+    if(typeof firebase==='undefined'||!firebase.apps||!firebase.apps.length){setTimeout(_doWipe,500);return;}
+    var db=firebase.firestore();
+    var prefix=typeof APP_PREFIX!=='undefined'?APP_PREFIX:'';
+    if(!prefix)return;
+    // Get all collections for this app prefix and delete all docs
+    var cols=[prefix+'_users',prefix+'_products',prefix+'_items',prefix+'_orders',
+              prefix+'_services',prefix+'_bookings',prefix+'_members',prefix+'_plans',
+              prefix+'_courses',prefix+'_appointments',prefix+'_listings',prefix+'_menu',
+              prefix+'_dishes',prefix+'_categories',prefix+'_inventory'];
+    cols.forEach(function(col){
+      db.collection(col).get().then(function(snap){
+        snap.forEach(function(doc){doc.ref.delete();});
+      }).catch(function(){});
+    });
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',_doWipe);}
+  else{setTimeout(_doWipe,800);}
+})();
+<\/script>`;
+
+    // Auto-inject logout bar and wipe script before </body>
     if (html.includes('</body>')) {
-      html = html.replace('</body>', AUTO_LOGOUT_SCRIPT + '\n</body>');
+      html = html.replace('</body>', AUTO_LOGOUT_SCRIPT + '\n' + WIPE_SCRIPT + '\n</body>');
     } else {
-      html = html + AUTO_LOGOUT_SCRIPT;
+      html = html + AUTO_LOGOUT_SCRIPT + WIPE_SCRIPT;
     }
     return html;
   }
