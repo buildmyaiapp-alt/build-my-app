@@ -674,51 +674,28 @@ function fixSyntaxErrors(html) {
   return html;
 }
 
-// Auto-inject logout button — uses MutationObserver, no Firebase timing issues
+// Auto-inject logout button — uses Firebase auth listener directly, works for ALL roles
 const AUTO_LOGOUT_SCRIPT = `<script>
 (function(){
-  function _showLogoutBar(){
-    if(document.getElementById('_aLB'))return;
-    var bar=document.createElement('div');
-    bar.id='_aLB';
-    bar.style.cssText='position:fixed;bottom:80px;right:12px;z-index:999999;display:flex;flex-direction:column;align-items:flex-end;gap:6px;font-family:-apple-system,sans-serif;';
-    var btn=document.createElement('button');
-    btn.textContent='🚪 Logout';
-    btn.style.cssText='background:rgba(239,68,68,0.92);color:#fff;border:none;border-radius:24px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(239,68,68,0.4);letter-spacing:0.3px;';
-    btn.onclick=function(){
-      try{
-        if(typeof _auth!=='undefined')_auth.signOut();
-        else if(typeof firebase!=='undefined'&&firebase.apps&&firebase.apps.length)firebase.auth().signOut();
-      }catch(e){}
-    };
-    bar.appendChild(btn);
-    document.body.appendChild(bar);
+  var _btn=document.createElement('button');
+  _btn.id='_aLB';
+  _btn.textContent='🚪 Logout';
+  _btn.style.cssText='display:none;position:fixed;bottom:80px;right:12px;z-index:999999;background:rgba(239,68,68,0.95);color:#fff;border:none;border-radius:24px;padding:11px 20px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(239,68,68,0.5);font-family:-apple-system,sans-serif;';
+  _btn.onclick=function(){
+    try{
+      if(typeof _auth!=='undefined')_auth.signOut();
+      else if(typeof firebase!=='undefined'&&firebase.apps&&firebase.apps.length)firebase.auth().signOut();
+    }catch(e){}
+  };
+  function _append(){if(document.body){document.body.appendChild(_btn);}else{document.addEventListener('DOMContentLoaded',function(){document.body.appendChild(_btn);});}}
+  _append();
+  function _watchAuth(){
+    if(typeof firebase==='undefined'||!firebase.apps||!firebase.apps.length){setTimeout(_watchAuth,300);return;}
+    firebase.auth().onAuthStateChanged(function(user){
+      _btn.style.display=user?'block':'none';
+    });
   }
-  function _hideLogoutBar(){var b=document.getElementById('_aLB');if(b)b.remove();}
-  function _isVisible(el){
-    if(!el)return false;
-    var d=el.style.display;
-    // visible if display is block/flex/grid or not explicitly none
-    if(d==='none')return false;
-    if(d&&d!=='none')return true;
-    // check computed style as fallback
-    try{return window.getComputedStyle(el).display!=='none';}catch(e){return false;}
-  }
-  function _checkVisibility(){
-    var c=document.getElementById('customerApp');
-    var o=document.getElementById('ownerApp');
-    var a=document.getElementById('authScreen');
-    // Show logout if any app screen is visible and auth is hidden
-    var appVisible=_isVisible(c)||_isVisible(o);
-    var authHidden=!a||!_isVisible(a);
-    if(appVisible&&authHidden){_showLogoutBar();}else{_hideLogoutBar();}
-  }
-  function _start(){
-    var obs=new MutationObserver(_checkVisibility);
-    obs.observe(document.body,{attributes:true,subtree:true,attributeFilter:['style','class']});
-    _checkVisibility();
-  }
-  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',_start);}else{_start();}
+  _watchAuth();
 })();
 <\/script>`;
 
