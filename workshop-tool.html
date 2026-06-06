@@ -674,12 +674,53 @@ function fixSyntaxErrors(html) {
   return html;
 }
 
+// Auto-inject logout button script — works for every app regardless of what Claude generated
+const AUTO_LOGOUT_SCRIPT = `<script>
+(function(){
+  function _initLogout(){
+    if(typeof firebase==='undefined'||!firebase.apps||!firebase.apps.length){setTimeout(_initLogout,400);return;}
+    var _a=firebase.auth();
+    _a.onAuthStateChanged(function(user){
+      var old=document.getElementById('_autoLogoutBar');if(old)old.remove();
+      if(user){
+        _a.currentUser.getIdTokenResult&&_a.currentUser.getIdTokenResult().catch(function(){});
+        // Get user name/role from Firestore if possible
+        var bar=document.createElement('div');
+        bar.id='_autoLogoutBar';
+        bar.style.cssText='position:fixed;top:0;left:0;right:0;background:rgba(13,27,110,0.97);backdrop-filter:blur(10px);padding:8px 16px;display:flex;justify-content:space-between;align-items:center;z-index:99999;font-family:Inter,sans-serif;border-bottom:1px solid rgba(245,166,35,0.3);';
+        var nameSpan=document.createElement('span');
+        nameSpan.style.cssText='color:#F5A623;font-size:12px;font-weight:700;';
+        nameSpan.textContent='👤 '+( user.displayName||user.email.split('@')[0]);
+        var logoutBtn=document.createElement('button');
+        logoutBtn.textContent='🚪 Logout';
+        logoutBtn.style.cssText='background:rgba(239,68,68,0.2);color:#ef4444;border:1px solid rgba(239,68,68,0.4);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;';
+        logoutBtn.onclick=function(){_a.signOut();};
+        bar.appendChild(nameSpan);
+        bar.appendChild(logoutBtn);
+        document.body.appendChild(bar);
+        // Push content down so bar doesn't cover app
+        document.body.style.paddingTop='38px';
+      } else {
+        document.body.style.paddingTop='';
+      }
+    });
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',_initLogout);}else{_initLogout();}
+})();
+<\/script>`;
+
 function prepareApp(html) {
   html = fixTruncatedHTML(html);    // fix truncation first
   html = repairButtonScope(html);   // then repair button scope
   html = fixSyntaxErrors(html);     // then check/warn syntax errors
   // Firebase apps (all apps now) have their own complete JS — don't inject CORE_JS
   if (html.includes('firebase-app-compat') || html.includes('firebase.initializeApp')) {
+    // Auto-inject logout bar before </body>
+    if (html.includes('</body>')) {
+      html = html.replace('</body>', AUTO_LOGOUT_SCRIPT + '\n</body>');
+    } else {
+      html = html + AUTO_LOGOUT_SCRIPT;
+    }
     return html;
   }
   // Rare non-Firebase fallback: inject CORE_JS
@@ -699,6 +740,11 @@ function prepareDownload(html) {
   html = fixSyntaxErrors(html);
   // All new apps have Firebase compat built-in — return unchanged
   if (html.includes('firebase-app-compat') || html.includes('firebase.initializeApp')) {
+    if (html.includes('</body>')) {
+      html = html.replace('</body>', AUTO_LOGOUT_SCRIPT + '\n</body>');
+    } else {
+      html = html + AUTO_LOGOUT_SCRIPT;
+    }
     return html;
   }
   // Rare non-Firebase fallback: inject CORE_JS only
