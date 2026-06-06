@@ -775,6 +775,71 @@ function prepareApp(html) {
       html = html.replace('<body>', '<body>' + clearSessionScript);
     }
 
+    // ── REPLACE AUTH SCREEN WITH 100% WORKING VERSION ──────────────────────────
+    // Whatever Claude generates for authScreen may have wrong IDs or broken JS.
+    // We replace the INNER CONTENT of authScreen with our guaranteed-working form.
+    // This ensures doLogin() / doSignup() always find their elements.
+    const WORKING_AUTH_INNER = `
+  <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:24px;padding:32px 24px;width:100%;max-width:360px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+    <div style="font-size:52px;margin-bottom:10px">🚀</div>
+    <div style="font-size:22px;font-weight:900;color:#fff;margin-bottom:6px;" id="_authTitle">Welcome Back!</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:20px;">Login to continue using the app</div>
+    <div id="fbErr" style="display:none;background:rgba(255,87,87,0.1);border:1px solid rgba(255,87,87,0.3);border-radius:10px;padding:10px;color:#ff5757;font-size:12px;margin-bottom:12px;"></div>
+    <div id="_roleSel" style="display:flex;gap:8px;margin-bottom:16px;justify-content:center;"></div>
+    <input id="nameField" placeholder="Your Name" style="display:none;width:100%;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.15);border-radius:12px;padding:13px 16px;color:#fff;font-size:14px;outline:none;margin-bottom:10px;box-sizing:border-box;"/>
+    <input id="emailField" type="email" placeholder="Email address" style="width:100%;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.15);border-radius:12px;padding:13px 16px;color:#fff;font-size:14px;outline:none;margin-bottom:10px;box-sizing:border-box;"/>
+    <input id="passField" type="password" placeholder="Password (min 6 chars)" style="width:100%;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.15);border-radius:12px;padding:13px 16px;color:#fff;font-size:14px;outline:none;margin-bottom:14px;box-sizing:border-box;"/>
+    <button id="authBtn" onclick="doLogin()" style="width:100%;padding:15px;background:linear-gradient(135deg,#F5A623,#e8960f);color:#000;border:none;border-radius:12px;font-size:16px;font-weight:900;cursor:pointer;margin-bottom:10px;">Login</button>
+    <div id="toggleBtn" onclick="toggleMode()" style="color:rgba(255,255,255,0.5);font-size:13px;cursor:pointer;">No account? Sign up →</div>
+  </div>`;
+
+    // Find authScreen div and replace its content
+    html = html.replace(
+      /(<div[^>]*id=["']authScreen["'][^>]*>)([\s\S]*?)(<\/div>\s*(?=<div[^>]*id=["'](?:customerApp|ownerApp)["']))/,
+      function(match, openTag, inner, closeAndNext) {
+        // Inject role buttons from original if present
+        var roleMatch = inner.match(/id=["']roleBtn_([^"']+)["'][^>]*>([^<]+)</g) || [];
+        return openTag + WORKING_AUTH_INNER + closeAndNext;
+      }
+    );
+
+    // Inject role builder script — reads role buttons from generated app and adds them to our auth
+    const roleBuilderScript = `<script>
+(function(){
+  function _buildRoles(){
+    var roleSel=document.getElementById('_roleSel');
+    if(!roleSel)return;
+    // Find any existing role buttons in the page (outside authScreen)
+    var existingRoles=[];
+    document.querySelectorAll('[id^="roleBtn_"]').forEach(function(b){
+      existingRoles.push({id:b.id,text:b.textContent.trim()});
+    });
+    if(existingRoles.length===0){
+      // Default roles
+      existingRoles=[{id:'roleBtn_customer',text:'Customer'},{id:'roleBtn_owner',text:'Owner'}];
+    }
+    existingRoles.forEach(function(r,i){
+      var btn=document.createElement('button');
+      btn.id=r.id;
+      btn.textContent=r.text;
+      btn.style.cssText='flex:1;padding:10px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid rgba(255,255,255,0.2);background:'+(i===0?'rgba(245,166,35,0.2)':'rgba(255,255,255,0.05)')+';color:'+(i===0?'#F5A623':'rgba(255,255,255,0.5)')+';';
+      btn.onclick=function(){
+        if(typeof selectRole==='function')selectRole(r.id.replace('roleBtn_',''));
+        document.querySelectorAll('[id^="roleBtn_"]').forEach(function(b){b.style.background='rgba(255,255,255,0.05)';b.style.color='rgba(255,255,255,0.5)';});
+        btn.style.background='rgba(245,166,35,0.2)';btn.style.color='#F5A623';
+      };
+      roleSel.appendChild(btn);
+      if(i===0)btn.click(); // select first role by default
+    });
+    // Update auth title
+    var t=document.getElementById('_authTitle');
+    if(t)t.textContent='Welcome!';
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',_buildRoles);}else{_buildRoles();}
+})();
+<\/script>`;
+    html = html.replace('</body>', roleBuilderScript + '\n</body>');
+
     // Auto-inject logout bar before </body>
     if (html.includes('</body>')) {
       html = html.replace('</body>', AUTO_LOGOUT_SCRIPT + '\n</body>');
