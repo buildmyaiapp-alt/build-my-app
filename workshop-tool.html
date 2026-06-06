@@ -674,38 +674,40 @@ function fixSyntaxErrors(html) {
   return html;
 }
 
-// Auto-inject logout button script — works for every app regardless of what Claude generated
+// Auto-inject logout button — uses MutationObserver, no Firebase timing issues
 const AUTO_LOGOUT_SCRIPT = `<script>
 (function(){
-  function _initLogout(){
-    if(typeof firebase==='undefined'||!firebase.apps||!firebase.apps.length){setTimeout(_initLogout,400);return;}
-    var _a=firebase.auth();
-    _a.onAuthStateChanged(function(user){
-      var old=document.getElementById('_autoLogoutBar');if(old)old.remove();
-      if(user){
-        _a.currentUser.getIdTokenResult&&_a.currentUser.getIdTokenResult().catch(function(){});
-        // Get user name/role from Firestore if possible
-        var bar=document.createElement('div');
-        bar.id='_autoLogoutBar';
-        bar.style.cssText='position:fixed;top:0;left:0;right:0;background:rgba(13,27,110,0.97);backdrop-filter:blur(10px);padding:8px 16px;display:flex;justify-content:space-between;align-items:center;z-index:99999;font-family:Inter,sans-serif;border-bottom:1px solid rgba(245,166,35,0.3);';
-        var nameSpan=document.createElement('span');
-        nameSpan.style.cssText='color:#F5A623;font-size:12px;font-weight:700;';
-        nameSpan.textContent='👤 '+( user.displayName||user.email.split('@')[0]);
-        var logoutBtn=document.createElement('button');
-        logoutBtn.textContent='🚪 Logout';
-        logoutBtn.style.cssText='background:rgba(239,68,68,0.2);color:#ef4444;border:1px solid rgba(239,68,68,0.4);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;';
-        logoutBtn.onclick=function(){_a.signOut();};
-        bar.appendChild(nameSpan);
-        bar.appendChild(logoutBtn);
-        document.body.appendChild(bar);
-        // Push content down so bar doesn't cover app
-        document.body.style.paddingTop='38px';
-      } else {
-        document.body.style.paddingTop='';
-      }
-    });
+  function _showLogoutBar(){
+    if(document.getElementById('_aLB'))return;
+    var bar=document.createElement('div');
+    bar.id='_aLB';
+    bar.style.cssText='position:fixed;bottom:80px;right:12px;z-index:999999;display:flex;flex-direction:column;align-items:flex-end;gap:6px;font-family:-apple-system,sans-serif;';
+    var btn=document.createElement('button');
+    btn.textContent='🚪 Logout';
+    btn.style.cssText='background:rgba(239,68,68,0.92);color:#fff;border:none;border-radius:24px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(239,68,68,0.4);letter-spacing:0.3px;';
+    btn.onclick=function(){
+      try{
+        if(typeof _auth!=='undefined')_auth.signOut();
+        else if(typeof firebase!=='undefined'&&firebase.apps&&firebase.apps.length)firebase.auth().signOut();
+      }catch(e){}
+    };
+    bar.appendChild(btn);
+    document.body.appendChild(bar);
   }
-  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',_initLogout);}else{_initLogout();}
+  function _hideLogoutBar(){var b=document.getElementById('_aLB');if(b)b.remove();}
+  function _checkVisibility(){
+    var c=document.getElementById('customerApp');
+    var o=document.getElementById('ownerApp');
+    var cVis=c&&c.style.display&&c.style.display!=='none';
+    var oVis=o&&o.style.display&&o.style.display!=='none';
+    if(cVis||oVis){_showLogoutBar();}else{_hideLogoutBar();}
+  }
+  function _start(){
+    var obs=new MutationObserver(_checkVisibility);
+    obs.observe(document.body,{attributes:true,subtree:true,attributeFilter:['style','class']});
+    _checkVisibility();
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',_start);}else{_start();}
 })();
 <\/script>`;
 
