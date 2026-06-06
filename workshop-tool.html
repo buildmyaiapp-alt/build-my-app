@@ -1106,7 +1106,7 @@ var authMode='login';
 function toggleMode(){authMode=authMode==='login'?'signup':'login';var s=authMode==='signup';document.getElementById('nameField').style.display=s?'block':'none';document.getElementById('authBtn').textContent=s?'Sign Up':'Login';document.getElementById('toggleBtn').textContent=s?'Already have an account? Login':'Don\'t have an account? Sign Up';_showErr('');}
 function _showErr(m){var e=document.getElementById('fbErr');if(!e)return;e.textContent=m;e.style.display=m?'block':'none';}
 function doLogin(){var e=document.getElementById('emailField').value.trim(),p=document.getElementById('passField').value;if(!e||!p){_showErr('Enter email and password');return;}_showErr('Logging in...');_auth.signInWithEmailAndPassword(e,p).catch(function(err){_showErr(err.message);});}
-function doSignup(){var n=(document.getElementById('nameField')||{}).value||'',e=document.getElementById('emailField').value.trim(),p=document.getElementById('passField').value;if(!e||!p){_showErr('Enter email and password');return;}if(p.length<6){_showErr('Password min 6 characters');return;}_showErr('Creating account...');_auth.createUserWithEmailAndPassword(e,p).then(function(cred){return _db.collection(APP_PREFIX+'_users').doc(cred.user.uid).set({uid:cred.user.uid,name:n||e.split('@')[0],email:e,role:currentUserRole,createdAt:firebase.firestore.FieldValue.serverTimestamp()});}).then(function(){_showErr('');}).catch(function(err){_showErr(err.message);});}
+function doSignup(){try{var n=(document.getElementById('nameField')||{}).value||'',e=document.getElementById('emailField').value.trim(),p=document.getElementById('passField').value;if(!e||!p){_showErr('Enter email and password');return;}if(p.length<6){_showErr('Password min 6 characters');return;}_showErr('Creating account...');var _prefix=typeof APP_PREFIX!=='undefined'?APP_PREFIX:'app';var _role=typeof currentUserRole!=='undefined'?currentUserRole:'customer';_auth.createUserWithEmailAndPassword(e,p).then(function(cred){return _db.collection(_prefix+'_users').doc(cred.user.uid).set({uid:cred.user.uid,name:n||e.split('@')[0],email:e,role:_role,createdAt:firebase.firestore.FieldValue.serverTimestamp()});}).then(function(){_showErr('');}).catch(function(err){_showErr(err.message);});}catch(ex){_showErr(ex.message);}}
 
 ⚠️ CRITICAL INPUT IDs — use EXACTLY these IDs in your HTML inputs:
 - Name input: id="nameField"
@@ -1288,10 +1288,27 @@ This means:
   })
 
 ✅ ALWAYS do this — UI exists in HTML, just show it:
-  onAuthStateChanged(user => {
-    document.getElementById('authScreen').style.display = 'none';
-    document.getElementById('customerApp').style.display = 'block'; // just reveal it
-  })
+  _auth.onAuthStateChanged(function(user) {
+    if (user) {
+      document.getElementById('authScreen').style.display = 'none';
+      window.scrollTo(0, 0); // ← ALWAYS add this — fixes black top screen bug
+      // check role from Firestore then show correct screen
+      _db.collection(APP_PREFIX + '_users').doc(user.uid).get().then(function(doc) {
+        var role = doc.exists ? doc.data().role : 'customer';
+        if (role === 'owner' || role === 'admin') {
+          document.getElementById('ownerApp').style.display = 'block';
+        } else {
+          document.getElementById('customerApp').style.display = 'block';
+        }
+      });
+    } else {
+      document.getElementById('authScreen').style.display = 'flex';
+      document.getElementById('customerApp').style.display = 'none';
+      document.getElementById('ownerApp').style.display = 'none';
+    }
+  });
+
+⚠️ ALWAYS include window.scrollTo(0,0) when showing app screens — without it the app starts with a black top area
 
 ⚠️ BUTTONS — USE onclick ON EVERY BUTTON:
 
