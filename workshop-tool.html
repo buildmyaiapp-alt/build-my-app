@@ -1098,15 +1098,23 @@ EVERY app MUST have a visible Logout button. No exceptions.
 - var currentUserRole = '[first role]'; — DEFAULT to first role so signup works without clicking role button
 - selectRole() just updates the visual highlight and currentUserRole
 - Name field (signup only), Email field, Password field
-- Login button that calls _auth.signInWithEmailAndPassword()
-- Sign Up button that calls _auth.createUserWithEmailAndPassword() and saves to Firestore users collection with role
-- Working inline error display — ALWAYS make errors visible with BOTH textContent AND style.display='block'
-- Toggle between Login and Sign Up modes
-- ⚠️ CRITICAL: doSignup() must NEVER block or return if currentUserRole is empty — always use currentUserRole || '[first role]' with NO blocking check. Signup must work even if user never clicked a role button.
-- ⚠️ CRITICAL: The fbErr element MUST start with style="display:none" but your error function MUST set display:'block' — use this pattern:
-  function _showErr(msg){ var el=document.getElementById('fbErr'); if(!el)return; el.textContent=msg; el.style.display=msg?'block':'none'; }
-  Then call _showErr('Creating account...') and in .catch: _showErr(err.message)
-- ⚠️ CRITICAL: After createUserWithEmailAndPassword succeeds, write user to Firestore with .then().catch() — if Firestore write fails, show the error with _showErr(err.message) so user is never stuck on "Creating account..."
+- Login button onclick="doLogin()" — Sign Up button onclick="doSignup()" — Toggle button onclick="toggleMode()"
+- Working inline error display — ALWAYS make errors visible
+
+⚠️ COPY THIS EXACT AUTH JAVASCRIPT — DO NOT CHANGE FUNCTION NAMES:
+var authMode='login';
+function toggleMode(){authMode=authMode==='login'?'signup':'login';var s=authMode==='signup';document.getElementById('nameField').style.display=s?'block':'none';document.getElementById('authBtn').textContent=s?'Sign Up':'Login';document.getElementById('toggleBtn').textContent=s?'Already have an account? Login':'Don\'t have an account? Sign Up';_showErr('');}
+function _showErr(m){var e=document.getElementById('fbErr');if(!e)return;e.textContent=m;e.style.display=m?'block':'none';}
+function doLogin(){var e=document.getElementById('emailField').value.trim(),p=document.getElementById('passField').value;if(!e||!p){_showErr('Enter email and password');return;}_showErr('Logging in...');_auth.signInWithEmailAndPassword(e,p).catch(function(err){_showErr(err.message);});}
+function doSignup(){var n=(document.getElementById('nameField')||{}).value||'',e=document.getElementById('emailField').value.trim(),p=document.getElementById('passField').value;if(!e||!p){_showErr('Enter email and password');return;}if(p.length<6){_showErr('Password min 6 characters');return;}_showErr('Creating account...');_auth.createUserWithEmailAndPassword(e,p).then(function(cred){return _db.collection(APP_PREFIX+'_users').doc(cred.user.uid).set({uid:cred.user.uid,name:n||e.split('@')[0],email:e,role:currentUserRole,createdAt:firebase.firestore.FieldValue.serverTimestamp()});}).then(function(){_showErr('');}).catch(function(err){_showErr(err.message);});}
+
+⚠️ CRITICAL INPUT IDs — use EXACTLY these IDs in your HTML inputs:
+- Name input: id="nameField"
+- Email input: id="emailField"
+- Password input: id="passField"
+- Error div: id="fbErr" style="display:none"
+- Main button: id="authBtn" onclick="doLogin()"
+- Toggle button: id="toggleBtn" onclick="toggleMode()"
 
 ━━ SCREEN 2 & 3: BUILD THE DASHBOARDS THE USER ASKED FOR ━━
 - Build the exact screens, tabs, and features described in the user's idea
