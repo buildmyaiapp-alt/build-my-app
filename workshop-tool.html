@@ -677,25 +677,37 @@ function fixSyntaxErrors(html) {
 // Auto-inject logout button — uses Firebase auth listener directly, works for ALL roles
 const AUTO_LOGOUT_SCRIPT = `<script>
 (function(){
-  var _btn=document.createElement('button');
-  _btn.id='_aLB';
-  _btn.textContent='🚪 Logout';
-  _btn.style.cssText='display:none;position:fixed;bottom:80px;right:12px;z-index:999999;background:rgba(239,68,68,0.95);color:#fff;border:none;border-radius:24px;padding:11px 20px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(239,68,68,0.5);font-family:-apple-system,sans-serif;';
-  _btn.onclick=function(){
+  // Top bar with user name + logout — visible for ALL roles, impossible to miss
+  var _bar=document.createElement('div');
+  _bar.id='_aLB';
+  _bar.style.cssText='display:none;position:fixed;top:0;left:0;right:0;z-index:999999;background:rgba(13,27,110,0.97);backdrop-filter:blur(8px);padding:8px 16px;justify-content:space-between;align-items:center;font-family:-apple-system,sans-serif;border-bottom:1px solid rgba(245,166,35,0.3);box-shadow:0 2px 12px rgba(0,0,0,0.3);';
+  var _nameSpan=document.createElement('span');
+  _nameSpan.style.cssText='color:#F5A623;font-size:12px;font-weight:700;';
+  _nameSpan.textContent='👤 Welcome!';
+  var _logoutBtn=document.createElement('button');
+  _logoutBtn.textContent='🚪 Logout';
+  _logoutBtn.style.cssText='background:rgba(239,68,68,0.2);color:#ef4444;border:1px solid rgba(239,68,68,0.4);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:-apple-system,sans-serif;';
+  _logoutBtn.onclick=function(){
     try{
       if(typeof _auth!=='undefined')_auth.signOut();
       else if(typeof firebase!=='undefined'&&firebase.apps&&firebase.apps.length)firebase.auth().signOut();
     }catch(e){}
   };
-  function _append(){if(document.body){document.body.appendChild(_btn);}else{document.addEventListener('DOMContentLoaded',function(){document.body.appendChild(_btn);});}}
+  _bar.appendChild(_nameSpan);
+  _bar.appendChild(_logoutBtn);
+  function _append(){if(document.body){document.body.appendChild(_bar);}else{document.addEventListener('DOMContentLoaded',function(){document.body.appendChild(_bar);});}}
   _append();
   function _watchAuth(){
     if(typeof firebase==='undefined'||!firebase.apps||!firebase.apps.length){setTimeout(_watchAuth,300);return;}
     firebase.auth().onAuthStateChanged(function(user){
-      _btn.style.display=user?'block':'none';
       if(user){
-        // Scroll to top when user logs in — fixes black top screen bug
+        _bar.style.display='flex';
+        _nameSpan.textContent='👤 '+(user.displayName||user.email.split('@')[0]);
+        document.body.style.paddingTop='38px';
         setTimeout(function(){window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;},100);
+      } else {
+        _bar.style.display='none';
+        document.body.style.paddingTop='';
       }
     });
   }
