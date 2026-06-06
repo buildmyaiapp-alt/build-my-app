@@ -1277,6 +1277,18 @@ Collections should match the app type. Examples:
 
 Use these variables everywhere — NEVER hardcode collection names like 'users', 'products', 'orders'.
 
+🚨 ABSOLUTE RULE — NO HARDCODED SAMPLE DATA — EVER:
+NEVER create JavaScript arrays with sample/demo/fake data like:
+  var items = [{name:'Paneer Tikka', price:400}]  ← THIS IS WRONG. NEVER DO THIS.
+  var products = [{id:1, name:'Sample Product'}]   ← THIS IS WRONG. NEVER DO THIS.
+  var menuItems = [{...}, {...}]                   ← THIS IS WRONG. NEVER DO THIS.
+
+ALL data MUST come from Firestore using onSnapshot(). If the collection is empty, show:
+  <div style="text-align:center;padding:40px;opacity:0.5;">No items yet</div>
+
+This is non-negotiable. If you hardcode even ONE data item, the app is completely WRONG.
+The owner adds real data through the admin panel. The customer sees real data from Firestore.
+
 FIRESTORE RULES:
 - NEVER use .orderBy() with .where() — always sort in JS after fetching to avoid index errors
 - Use onSnapshot() for real-time data
