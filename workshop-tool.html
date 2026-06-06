@@ -728,24 +728,29 @@ function prepareApp(html) {
       }
     );
 
-    // ── AUTO SIGN OUT: clear old session on every new app open ──────────────────
-    // Prevents old logged-in user (e.g. "mansi") from showing in a new fresh app
-    const autoSignout = `<script>
+    // ── CLEAR OLD SESSION: wipe Firebase auth localStorage BEFORE Firebase loads ──
+    // This prevents old user (e.g. "mansi") from being restored by Firebase auth
+    // Runs synchronously before any Firebase CDN script — so auth starts fresh
+    const clearSessionScript = `<script>
 (function(){
-  function _clearOldSession(){
-    if(typeof firebase==='undefined'||!firebase.apps||!firebase.apps.length){setTimeout(_clearOldSession,300);return;}
-    // Sign out any existing user so every app opens fresh
-    var _storedKey='_app_session_'+( typeof APP_PREFIX!=='undefined'?APP_PREFIX:'default');
-    if(!sessionStorage.getItem(_storedKey)){
-      firebase.auth().signOut().then(function(){sessionStorage.setItem(_storedKey,'1');});
+  try{
+    var keys=[];
+    for(var i=0;i<localStorage.length;i++){
+      var k=localStorage.key(i);
+      if(k&&k.indexOf('firebase:')===0) keys.push(k);
     }
-  }
-  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',_clearOldSession);}else{setTimeout(_clearOldSession,200);}
+    keys.forEach(function(k){localStorage.removeItem(k);});
+  }catch(e){}
 })();
 <\/script>`;
 
-    // Inject auto-signout right after <body>
-    html = html.replace('<body>', '<body>' + autoSignout);
+    // Inject BEFORE first Firebase script tag — so auth cache is cleared before Firebase loads
+    if(html.includes('firebase-app-compat.js')) {
+      html = html.replace(/<script[^>]*firebase-app-compat\.js[^>]*><\/script>/,
+        clearSessionScript + '\n$&');
+    } else {
+      html = html.replace('<body>', '<body>' + clearSessionScript);
+    }
 
     // Auto-inject logout bar before </body>
     if (html.includes('</body>')) {
