@@ -1081,15 +1081,28 @@ The app MUST NOT open directly into any dashboard, home screen, or any other pag
 onAuthStateChanged MUST control everything — if user is NOT logged in → show auth screen ONLY.
 If you skip the login screen, the app is WRONG. No exceptions.
 
-🚨 ABSOLUTE RULE #2 — LOGOUT BUTTON IS MANDATORY:
-EVERY app MUST have a visible Logout button. No exceptions.
-- Place a Logout button in the PROFILE tab (last tab in bottom nav) for BOTH roles (customer AND admin/owner)
-- Logout button style: background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444;border-radius:12px;padding:12px 20px;width:100%;font-size:15px;font-weight:700;cursor:pointer;margin-top:24px
-- Logout button calls: _auth.signOut()
-- After signOut: show authScreen, hide customerApp and ownerApp
-- If there is no Profile tab, add one specifically for showing user info + logout button
-- The Profile tab shows: user's name, email, role badge, and the red Logout button
-- If you forget the logout button, the app is WRONG. No exceptions.
+🚨 ABSOLUTE RULE #2 — LOGOUT BUTTON IS MANDATORY IN BOTH ROLES:
+EVERY app MUST have a visible Logout button in BOTH customerApp AND ownerApp. No exceptions.
+
+FOR CUSTOMER ROLE (customerApp):
+- The LAST tab in the customer bottom nav MUST be a Profile tab (icon: 👤, label: Profile)
+- This Profile tab shows: user's name, email, role badge, AND a red Logout button
+- Logout button: <button onclick="doLogout()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444;border-radius:12px;padding:14px 20px;width:100%;font-size:15px;font-weight:700;cursor:pointer;margin-top:24px;">🚪 Logout</button>
+
+FOR OWNER/ADMIN ROLE (ownerApp):
+- The LAST tab in the owner bottom nav MUST be a Profile tab (icon: 👤, label: Profile)
+- Same logout button as above
+
+LOGOUT FUNCTION — add this in your script:
+function doLogout(){
+  _auth.signOut().then(function(){
+    document.getElementById('authScreen').style.display='flex';
+    document.getElementById('customerApp').style.display='none';
+    document.getElementById('ownerApp').style.display='none';
+  });
+}
+
+If EITHER role is missing the Profile tab or Logout button, the app is WRONG. No exceptions.
 
 ━━ SCREEN 1: AUTH (shown first, covers full screen) ━━
 - Beautiful full-screen login/signup UI matching the app's theme and colors
