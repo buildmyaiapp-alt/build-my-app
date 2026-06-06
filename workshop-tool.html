@@ -731,13 +731,26 @@ function prepareApp(html) {
 
     // ── UNIQUE APP PREFIX — handle var/const/let ────────────────────────────────
     const buildId = Date.now().toString(36).slice(-5);
+    let origPrefix = null;
     html = html.replace(
       /(?:var|const|let)\s+APP_PREFIX\s*=\s*['"]([^'"]+)['"]/g,
       function(match, prefix) {
         const clean = prefix.replace(/_[a-z0-9]{3,6}$/, '');
+        origPrefix = clean;
         return "var APP_PREFIX = '" + clean + '_' + buildId + "'";
       }
     );
+    // Also replace ALL hardcoded collection names that use the original prefix
+    // e.g. 'kitekitchen_items' → 'kitekitchen_abc12_items'
+    if (origPrefix) {
+      const escapedPrefix = origPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      html = html.replace(
+        new RegExp("(['\"])" + escapedPrefix + "_([a-zA-Z_]+)(['\"])", 'g'),
+        function(match, q1, colName, q2) {
+          return q1 + origPrefix + '_' + buildId + '_' + colName + q2;
+        }
+      );
+    }
 
     // ── CLEAR OLD SESSION: wipe Firebase auth from localStorage AND IndexedDB ───
     // Firebase uses IndexedDB for auth persistence — must clear both
