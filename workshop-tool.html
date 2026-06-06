@@ -715,6 +715,38 @@ function prepareApp(html) {
   html = fixSyntaxErrors(html);     // then check/warn syntax errors
   // Firebase apps (all apps now) have their own complete JS — don't inject CORE_JS
   if (html.includes('firebase-app-compat') || html.includes('firebase.initializeApp')) {
+
+    // ── UNIQUE APP PREFIX: add build-time suffix to APP_PREFIX ──────────────────
+    // Prevents data leaking between different app builds that share the same name
+    // e.g. two students both build "kitekitchen" — they now get kitekitchen_a3f2 and kitekitchen_b7d1
+    const buildId = Date.now().toString(36).slice(-5); // e.g. "m9x3k"
+    html = html.replace(
+      /var\s+APP_PREFIX\s*=\s*['"]([^'"]+)['"]/,
+      function(match, prefix) {
+        const cleanPrefix = prefix.replace(/_[a-z0-9]{4,6}$/, ''); // remove old suffix if any
+        return "var APP_PREFIX = '" + cleanPrefix + '_' + buildId + "'";
+      }
+    );
+
+    // ── AUTO SIGN OUT: clear old session on every new app open ──────────────────
+    // Prevents old logged-in user (e.g. "mansi") from showing in a new fresh app
+    const autoSignout = `<script>
+(function(){
+  function _clearOldSession(){
+    if(typeof firebase==='undefined'||!firebase.apps||!firebase.apps.length){setTimeout(_clearOldSession,300);return;}
+    // Sign out any existing user so every app opens fresh
+    var _storedKey='_app_session_'+( typeof APP_PREFIX!=='undefined'?APP_PREFIX:'default');
+    if(!sessionStorage.getItem(_storedKey)){
+      firebase.auth().signOut().then(function(){sessionStorage.setItem(_storedKey,'1');});
+    }
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',_clearOldSession);}else{setTimeout(_clearOldSession,200);}
+})();
+<\/script>`;
+
+    // Inject auto-signout right after <body>
+    html = html.replace('<body>', '<body>' + autoSignout);
+
     // Auto-inject logout bar before </body>
     if (html.includes('</body>')) {
       html = html.replace('</body>', AUTO_LOGOUT_SCRIPT + '\n</body>');
