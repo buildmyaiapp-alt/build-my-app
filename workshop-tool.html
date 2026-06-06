@@ -693,6 +693,10 @@ const AUTO_LOGOUT_SCRIPT = `<script>
     if(typeof firebase==='undefined'||!firebase.apps||!firebase.apps.length){setTimeout(_watchAuth,300);return;}
     firebase.auth().onAuthStateChanged(function(user){
       _btn.style.display=user?'block':'none';
+      if(user){
+        // Scroll to top when user logs in — fixes black top screen bug
+        setTimeout(function(){window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;},100);
+      }
     });
   }
   _watchAuth();
