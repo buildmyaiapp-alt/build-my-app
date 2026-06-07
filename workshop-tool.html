@@ -794,15 +794,18 @@ function prepareApp(html) {
     // Add role buttons based on what the app needs
     var roles=[];
     // Look for role hints in page text or use defaults
-    var bodyText=(document.body.innerText||'').toLowerCase();
-    if(bodyText.includes('owner'))roles.push({id:'owner',label:'Owner / Admin'});
-    if(bodyText.includes('admin'))roles.push({id:'admin',label:'Admin'});
-    if(bodyText.includes('member'))roles.push({id:'member',label:'Member'});
-    if(bodyText.includes('student'))roles.push({id:'student',label:'Student'});
-    if(bodyText.includes('teacher'))roles.push({id:'teacher',label:'Teacher'});
-    if(bodyText.includes('doctor'))roles.push({id:'doctor',label:'Doctor'});
-    if(bodyText.includes('patient'))roles.push({id:'patient',label:'Patient'});
-    if(bodyText.includes('driver'))roles.push({id:'driver',label:'Driver'});
+    // Detect roles from HTML source (more reliable than innerText)
+    var src=(document.documentElement.innerHTML||'').toLowerCase();
+    if(src.includes('ownerapp')||src.includes('owner-app')||src.includes("role==='owner'")||src.includes('role==\'owner\''))roles.push({id:'owner',label:'Owner'});
+    if(src.includes('adminapp')||src.includes("role==='admin'")||src.includes('role==\'admin\''))roles.push({id:'admin',label:'Admin'});
+    if(src.includes('memberapp')||src.includes("role==='member'")||src.includes('role==\'member\''))roles.push({id:'member',label:'Member'});
+    if(src.includes('studentapp')||src.includes("role==='student'")||src.includes('role==\'student\''))roles.push({id:'student',label:'Student'});
+    if(src.includes('teacherapp')||src.includes("role==='teacher'")||src.includes('role==\'teacher\''))roles.push({id:'teacher',label:'Teacher'});
+    if(src.includes('doctorapp')||src.includes("role==='doctor'")||src.includes('role==\'doctor\''))roles.push({id:'doctor',label:'Doctor'});
+    if(src.includes('patientapp')||src.includes("role==='patient'")||src.includes('role==\'patient\''))roles.push({id:'patient',label:'Patient'});
+    if(src.includes('driverapp')||src.includes("role==='driver'")||src.includes('role==\'driver\''))roles.push({id:'driver',label:'Driver'});
+    // Fallback: always add Owner if ownerApp div exists
+    if(roles.length===0&&document.getElementById('ownerApp'))roles.push({id:'owner',label:'Owner'});
     // Always add customer/user as first role
     var customerLabel='Customer';
     if(bodyText.includes('member')&&!bodyText.includes('customer'))customerLabel='Member';
@@ -1647,7 +1650,7 @@ function _showErr(m){var e=document.getElementById('fbErr');if(!e)return;e.textC
 function doLogin(){var e=document.getElementById('emailField').value.trim(),p=document.getElementById('passField').value;if(!e||!p){_showErr('Enter email and password');return;}_showErr('Logging in...');_auth.signInWithEmailAndPassword(e,p).catch(function(err){_showErr(err.message);});}
 function doSignup(){try{var n=(document.getElementById('nameField')||{}).value||'',e=document.getElementById('emailField').value.trim(),p=document.getElementById('passField').value;if(!e||!p){_showErr('Enter email and password');return;}if(p.length<6){_showErr('Password min 6 characters');return;}_showErr('Creating account...');var _prefix=typeof APP_PREFIX!=='undefined'?APP_PREFIX:'app';var _role=typeof currentUserRole!=='undefined'&&currentUserRole?currentUserRole:'customer';_auth.createUserWithEmailAndPassword(e,p).then(function(cred){return _db.collection(_prefix+'_users').doc(cred.user.uid).set({uid:cred.user.uid,name:n||e.split('@')[0],email:e,role:_role,createdAt:firebase.firestore.FieldValue.serverTimestamp()});}).then(function(){_showErr('');}).catch(function(err){_showErr(err.message);});}catch(ex){_showErr(ex.message);}}
 function fbLogout(){_auth.signOut();}
-function toggleMode(){var authMode=document.getElementById('nameField')?document.getElementById('nameField').style.display==='none':'login';var s=authMode;var nf=document.getElementById('nameField');if(nf)nf.style.display=nf.style.display==='none'?'block':'none';var ab=document.getElementById('authBtn');if(ab)ab.textContent=nf&&nf.style.display!=='none'?'Sign Up':'Login';var tb=document.getElementById('toggleBtn');if(tb)tb.textContent=nf&&nf.style.display!=='none'?'Already have account? Login':'No account? Sign up →';_showErr('');}
+function toggleMode(){var nf=document.getElementById('nameField');if(nf)nf.style.display=nf.style.display==='none'?'block':'none';var isSignup=nf&&nf.style.display!=='none';var ab=document.getElementById('authBtn');if(ab){ab.textContent=isSignup?'Sign Up':'Login';ab.onclick=isSignup?doSignup:doLogin;}var tb=document.getElementById('toggleBtn');if(tb)tb.textContent=isSignup?'Already have account? Login':'No account? Sign up →';_showErr('');}
 function toggleAuthMode(){toggleMode();}
 function showToast(m){var t=document.createElement('div');t.textContent=m;t.style.cssText='position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.9);color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;';document.body.appendChild(t);setTimeout(function(){t.remove();},2500);}
 function updateClock(){var n=new Date(),h=n.getHours(),m=n.getMinutes();var s=(h<10?'0':'')+h+':'+(m<10?'0':'')+m;document.querySelectorAll('.clock').forEach(function(c){c.textContent=s;});}
