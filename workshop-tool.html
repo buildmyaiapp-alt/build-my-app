@@ -1627,12 +1627,17 @@ var currentUser=null,currentUserRole='customer';
 var APP_PREFIX='myapp',USERS_COL=APP_PREFIX+'_users',PRODUCTS_COL=APP_PREFIX+'_products',ORDERS_COL=APP_PREFIX+'_orders';
 function _sd(id,v){var e=document.getElementById(id);if(e)e.style.display=v;}
 _auth.onAuthStateChanged(function(user){
-if(!user){currentUser=null;_sd('authScreen','flex');_sd('customerApp','none');_sd('ownerApp','none');return;}
+if(!user){currentUser=null;_sd('authScreen','flex');_sd('customerApp','none');_sd('ownerApp','none');var _b=document.getElementById('_aLB');if(_b)_b.style.display='none';document.body.style.paddingTop='';return;}
 _db.collection(USERS_COL).doc(user.uid).get().then(function(doc){
-currentUser=doc.exists?doc.data():{uid:user.uid,name:user.email,role:'customer'};
+currentUser=doc.exists?doc.data():{uid:user.uid,name:user.email.split('@')[0],email:user.email,role:currentUserRole||'customer'};
 _sd('authScreen','none');
-if(currentUser.role==='owner'){_sd('ownerApp','block');_sd('customerApp','none');loadOwnerDashboard();}
-else{_sd('customerApp','block');_sd('ownerApp','none');loadCustomerData();}
+// Show logout bar for ALL roles
+var _b=document.getElementById('_aLB');
+if(_b){_b.style.display='flex';var _ns=_b.querySelector('span');if(_ns)_ns.textContent='👤 '+(currentUser.name||user.email.split('@')[0]);}
+document.body.style.paddingTop='38px';
+window.scrollTo(0,0);
+if(currentUser.role==='owner'||currentUser.role==='admin'){_sd('ownerApp','block');_sd('customerApp','none');if(typeof loadOwnerDashboard==='function')loadOwnerDashboard();}
+else{_sd('customerApp','block');_sd('ownerApp','none');if(typeof loadCustomerData==='function')loadCustomerData();}
 });
 });
 function showTab(id){document.querySelectorAll('.tab-pane').forEach(function(t){t.classList.remove('active');});document.getElementById(id).classList.add('active');}
