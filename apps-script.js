@@ -5,9 +5,9 @@
 
 // ── CONFIG — Fill these in ──────────────────────────────────
 const CONFIG = {
-  SHEET_NAME:      'Batch 5',
+  SHEET_NAME:      'Batch 6',
   SENDER_NAME:     'Palash — AI App Workshop',
-  WORKSHOP_DATE:   '7th June 2026, 2:00 PM IST',
+  WORKSHOP_DATE:   '14th June 2026, 2:00 PM IST',
   WHATSAPP_API_KEY: '',
   WHATSAPP_NUMBER:  '',
 };
@@ -208,7 +208,7 @@ function sendEmail(name, email, paymentId) {
         <div style="background:linear-gradient(135deg,#e8f5e9,#d0f0da);border:2.5px solid #25D366;border-radius:16px;padding:20px;text-align:center;margin-bottom:24px;">
           <div style="font-size:13px;font-weight:800;color:#1a6b35;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">⚡ Step 1 — Join WhatsApp Group NOW</div>
           <div style="font-size:13px;color:#2e7d32;margin-bottom:14px;">Get the Zoom link, updates & reminders — all in the group</div>
-          <a href="https://chat.whatsapp.com/EzaxnH967Aw6Cx4aIoBbA1" style="display:block;background:#25D366;color:#fff;text-decoration:none;padding:16px 24px;border-radius:12px;font-size:16px;font-weight:900;box-shadow:0 6px 24px rgba(37,211,102,0.4);">💬 Join WhatsApp Group →</a>
+          <a href="https://chat.whatsapp.com/CctaMw4b06tCGVP4bVjVjF" style="display:block;background:#25D366;color:#fff;text-decoration:none;padding:16px 24px;border-radius:12px;font-size:16px;font-weight:900;box-shadow:0 6px 24px rgba(37,211,102,0.4);">💬 Join WhatsApp Group →</a>
         </div>
 
         <div class="steps">
