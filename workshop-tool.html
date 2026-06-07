@@ -911,6 +911,18 @@ function prepareDownload(html) {
 
 // Check if API key already saved + check server status on load
 window.onload = function() {
+  // Auto-save key from URL parameter ?key=sk-ant-...
+  // Palash shares: workshop-tool.html?key=sk-ant-api03-XXX
+  // Students click link → key auto-saved, no manual entry needed
+  try {
+    const urlKey = new URLSearchParams(window.location.search).get('key');
+    if (urlKey && urlKey.startsWith('sk-')) {
+      _saveKey(urlKey);
+      // Clean URL so key isn't visible
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  } catch(e) {}
+
   const saved = _getKey();
   if (saved) {
     document.getElementById('apiSetup').style.background = 'rgba(40,200,100,0.08)';
