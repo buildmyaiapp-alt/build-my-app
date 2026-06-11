@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>LearnAI - AI Learning Platform</title>
+<style>:root{--p:#3b82f6;--a:#60a5fa;--bg:#000d1a;--c:#001224;--t:#fff}*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}body{background:var(--bg);color:var(--t);overflow-x:hidden}#authScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:linear-gradient(135deg,#000d1a 0%,#001a3d 100%)}.auth-logo{font-size:64px;margin-bottom:12px;filter:drop-shadow(0 0 24px var(--p))}.auth-title{font-size:32px;font-weight:900;background:linear-gradient(135deg,var(--p),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}.auth-subtitle{font-size:14px;opacity:0.5;margin-bottom:32px}.auth-box{background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);border:1px solid rgba(59,130,246,0.2);padding:32px;border-radius:24px;width:100%;max-width:400px}.role-sel{display:flex;gap:10px;margin-bottom:20px}.role-btn{flex:1;padding:14px;background:rgba(59,130,246,0.08);border:2px solid rgba(59,130,246,0.2);border-radius:14px;color:rgba(255,255,255,0.5);font-weight:700;font-size:14px;cursor:pointer;transition:all 0.3s}.role-btn.sel{background:rgba(59,130,246,0.2);border-color:var(--p);color:#fff;box-shadow:0 0 20px rgba(59,130,246,0.3)}#nameField,#emailField,#passField{width:100%;padding:15px;margin-bottom:14px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.12);border-radius:14px;color:var(--t);font-size:15px;transition:all 0.3s}#nameField:focus,#emailField:focus,#passField:focus{outline:none;border-color:var(--p);box-shadow:0 0 0 4px rgba(59,130,246,0.1)}#authBtn{width:100%;padding:16px;background:linear-gradient(135deg,var(--p),var(--a));border:none;border-radius:14px;color:#fff;font-weight:800;font-size:17px;cursor:pointer;margin-bottom:12px;box-shadow:0 8px 32px rgba(59,130,246,0.4);transition:transform 0.2s}#authBtn:active{transform:scale(0.97)}#toggleBtn{display:block;text-align:center;color:rgba(255,255,255,0.5);font-size:14px;cursor:pointer;margin-top:16px}#toggleBtn:hover{color:var(--p)}#fbErr{display:none;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);padding:12px;border-radius:12px;margin-bottom:14px;font-size:13px;text-align:center;color:#ff6b6b}#customerApp,#ownerApp{display:none;max-width:430px;margin:0 auto;min-height:100vh;padding-bottom:86px}.hdr{padding:24px 20px;background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(96,165,250,0.05));border-radius:0 0 32px 32px;margin-bottom:20px}.hdr-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-size:12px;opacity:0.6}.hdr-badge{display:inline-block;background:rgba(59,130,246,0.2);border:1px solid rgba(59,130,246,0.3);border-radius:20px;padding:4px 14px;font-size:11px;font-weight:700;color:var(--a);letter-spacing:0.5px;margin-bottom:10px}.hdr h2{font-size:26px;font-weight:900;margin-bottom:4px;letter-spacing:-0.5px}.hdr p{font-size:14px;opacity:0.5}.search-box{margin:0 18px 18px;position:relative}.search-box input{width:100%;padding:14px 18px 14px 48px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:16px;color:var(--t);font-size:15px}.search-box input:focus{outline:none;border-color:var(--p)}.search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:20px;opacity:0.5}.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 18px 20px}.stat{background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(96,165,250,0.08));border:1px solid rgba(59,130,246,0.15);border-radius:18px;padding:18px;text-align:center}.stat .v{font-size:28px;font-weight:900;background:linear-gradient(135deg,var(--p),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:block;margin-bottom:4px}.stat .l{font-size:11px;opacity:0.5;text-transform:uppercase;letter-spacing:0.8px;font-weight:700}.tab-pane{display:none;padding:0 18px 20px}.tab-pane.active{display:block}.owner-pane{display:none;padding:0 18px 20px}.owner-pane.active{display:block}.sec-head{font-size:18px;font-weight:800;margin-bottom:14px;color:var(--t)}.course-card{background:var(--c);border:1px solid rgba(59,130,246,0.12);border-radius:18px;padding:16px;margin-bottom:14px;cursor:pointer;transition:all 0.3s}.course-card:active{transform:scale(0.98)}.course-top{display:flex;gap:14px;margin-bottom:12px}.course-icon{width:56px;height:56px;background:linear-gradient(135deg,var(--p),var(--a));border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}.course-info{flex:1}.course-title{font-size:16px;font-weight:800;margin-bottom:3px}.course-trainer{font-size:12px;opacity:0.5;margin-bottom:6px}.course-meta{display:flex;gap:10px;font-size:11px;opacity:0.6}.course-desc{font-size:13px;opacity:0.6;margin-bottom:12px;line-height:1.5}.course-bottom{display:flex;justify-content:space-between;align-items:center}.course-price{font-size:20px;font-weight:900;color:var(--p)}.enroll-btn{background:linear-gradient(135deg,var(--p),var(--a));color:#fff;border:none;padding:10px 24px;border-radius:12px;font-weight:700;font-size:13px;cursor:pointer}.cat-scroll{display:flex;gap:10px;overflow-x:auto;padding:0 18px 18px;scrollbar-width:none}.cat-scroll::-webkit-scrollbar{display:none}.cat-chip{background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);padding:10px 20px;border-radius:20px;font-size:13px;font-weight:700;color:rgba(255,255,255,0.6);white-space:nowrap;cursor:pointer}.cat-chip.active{background:rgba(59,130,246,0.25);color:var(--p);border-color:var(--p)}.progress-card{background:var(--c);border:1px solid rgba(59,130,246,0.12);border-radius:18px;padding:18px;margin-bottom:14px}.progress-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}.progress-title{font-size:15px;font-weight:800;margin-bottom:4px}.progress-status{font-size:11px;background:rgba(59,130,246,0.2);color:var(--a);padding:4px 12px;border-radius:12px;font-weight:700}.progress-bar-bg{height:8px;background:rgba(255,255,255,0.08);border-radius:10px;overflow:hidden;margin-bottom:12px}.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--p),var(--a));border-radius:10px;transition:width 0.5s}.progress-actions{display:flex;gap:8px}.progress-btn{flex:1;padding:10px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.2);border-radius:12px;color:var(--a);font-size:12px;font-weight:700;cursor:pointer}.prof-hero{background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(96,165,250,0.08));border-radius:20px;padding:28px;text-align:center;margin-bottom:20px;border:1px solid rgba(59,130,246,0.15)}.prof-av{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 14px;box-shadow:0 0 28px rgba(59,130,246,0.4)}.prof-name{font-size:22px;font-weight:900;margin-bottom:4px}.prof-email{font-size:13px;opacity:0.5;margin-bottom:10px}.prof-badge{display:inline-block;background:rgba(59,130,246,0.2);border:1px solid rgba(59,130,246,0.3);border-radius:20px;padding:5px 16px;font-size:12px;font-weight:700;color:var(--a)}.prof-section{background:var(--c);border:1px solid rgba(59,130,246,0.12);border-radius:18px;padding:18px;margin-bottom:14px}.prof-section h3{font-size:15px;font-weight:800;margin-bottom:14px;color:var(--p)}.achievement-item{display:flex;align-items:center;gap:12px;padding:12px;background:rgba(59,130,246,0.08);border-radius:12px;margin-bottom:8px}.achievement-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--p),var(--a));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px}.achievement-info{flex:1}.achievement-title{font-size:14px;font-weight:700;margin-bottom:2px}.achievement-desc{font-size:11px;opacity:0.5}.chatbot-section{background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(96,165,250,0.08));border:1px solid rgba(59,130,246,0.2);border-radius:18px;padding:20px;text-align:center}.chatbot-icon{font-size:48px;margin-bottom:12px}.chatbot-btn{background:linear-gradient(135deg,var(--p),var(--a));color:#fff;border:none;padding:14px 28px;border-radius:14px;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 8px 24px rgba(59,130,246,0.3)}.logout-btn{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444;border-radius:14px;padding:14px 20px;width:100%;font-size:15px;font-weight:700;cursor:pointer;margin-top:24px}.form-group{margin-bottom:16px}.lbl{display:block;font-size:12px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}.inp{width:100%;padding:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:var(--t);font-size:15px}.inp:focus{outline:none;border-color:var(--p)}textarea.inp{min-height:100px;resize:vertical}.big-btn{background:linear-gradient(135deg,var(--p),var(--a));color:#fff;border:none;padding:15px 24px;border-radius:14px;font-weight:800;font-size:16px;cursor:pointer;width:100%;box-shadow:0 8px 28px rgba(59,130,246,0.35);transition:transform 0.2s}.big-btn:active{transform:scale(0.97)}.manage-card{background:var(--c);border:1px solid rgba(59,130,246,0.12);border-radius:16px;padding:16px;margin-bottom:12px}.manage-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}.manage-title{font-size:15px;font-weight:800;margin-bottom:4px}.manage-status{font-size:11px;padding:4px 12px;border-radius:12px;font-weight:700}.published{background:rgba(16,185,129,0.2);color:#10b981}.draft{background:rgba(245,158,11,0.2);color:#f59e0b}.manage-info{font-size:12px;opacity:0.5;margin-bottom:12px}.manage-actions{display:flex;gap:8px}.manage-btn{flex:1;padding:9px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.2);border-radius:10px;color:var(--a);font-size:12px;font-weight:700;cursor:pointer}.delete-btn{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.3);color:#ef4444}.student-row{background:var(--c);border:1px solid rgba(59,130,246,0.12);border-radius:14px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px}.student-av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;flex-shrink:0}.student-info{flex:1}.student-name{font-size:14px;font-weight:700;margin-bottom:2px}.student-email{font-size:11px;opacity:0.5}.student-progress{font-size:12px;color:var(--p);font-weight:700}.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(0,13,26,0.97);backdrop-filter:blur(20px);border-top:1px solid rgba(59,130,246,0.15);display:flex;justify-content:space-around;padding:10px 0 16px;z-index:100}.nbtn{background:none;border:none;color:rgba(255,255,255,0.4);font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 16px;letter-spacing:0.3px;transition:all 0.3s}.nbtn.active{color:var(--p)}.nbtn.active .ni{filter:drop-shadow(0 0 8px var(--p))}.ni{font-size:22px}</style>
+</head>
+<body>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+var _app=firebase.initializeApp({apiKey:"AIzaSyDJC8ijJ-SknWzBUub7GTXSJ3EFeRfHC6c",authDomain:"build-my-app-3c629.firebaseapp.com",projectId:"build-my-app-3c629",storageBucket:"build-my-app-3c629.firebasestorage.app",messagingSenderId:"823433789308",appId:"1:823433789308:web:5a953ee43cd5cf2548aef9"});
+var _auth=firebase.auth(_app),_db=firebase.firestore(_app);
+var currentUser=null,currentUserRole='student';
+var APP_PREFIX='learnai',USERS_COL=APP_PREFIX+'_users',COURSES_COL=APP_PREFIX+'_courses',ENROLLMENTS_COL=APP_PREFIX+'_enrollments',BOOKINGS_COL=APP_PREFIX+'_bookings';
+var selectedCategory='All';
+function _sd(id,v){var e=document.getElementById(id);if(e)e.style.display=v;}
+_auth.onAuthStateChanged(function(user){if(!user){currentUser=null;_sd('authScreen','flex');_sd('customerApp','none');_sd('ownerApp','none');return;}_db.collection(USERS_COL).doc(user.uid).get().then(function(doc){currentUser=doc.exists?doc.data():{uid:user.uid,name:user.email.split('@')[0],email:user.email,role:currentUserRole||'student'};var r=currentUser.role;_sd('authScreen','none');window.scrollTo(0,0);if(r==='teacher'||r==='admin'){_sd('ownerApp','block');_sd('customerApp','none');try{loadTeacherDashboard();showOwnerTab('dashTab');}catch(e){}}else{_sd('customerApp','block');_sd('ownerApp','none');try{loadStudentData();showTab('homeTab');}catch(e){}}}).catch(function(){currentUser={uid:user.uid,name:user.email.split('@')[0],email:user.email,role:currentUserRole||'student'};var r=currentUser.role;_sd('authScreen','none');window.scrollTo(0,0);if(r==='teacher'||r==='admin'){_sd('ownerApp','block');_sd('customerApp','none');try{loadTeacherDashboard();showOwnerTab('dashTab');}catch(e){}}else{_sd('customerApp','block');_sd('ownerApp','none');try{loadStudentData();showTab('homeTab');}catch(e){}}});});
+function selectRole(r){currentUserRole=r;document.querySelectorAll('.role-btn').forEach(function(b){b.classList.remove('sel');});var s=document.getElementById('roleBtn_'+r);if(s)s.classList.add('sel');}
+function _showErr(m){var e=document.getElementById('fbErr');if(!e)return;e.textContent=m;e.style.display=m?'block':'none';}
+function doLogin(){var e=document.getElementById('emailField').value.trim(),p=document.getElementById('passField').value;if(!e||!p){_showErr('Enter email and password');return;}_showErr('Logging in...');_auth.signInWithEmailAndPassword(e,p).then(function(cred){var _role=currentUserRole||'student';currentUser={uid:cred.user.uid,name:e.split('@')[0],email:e,role:_role};_showErr('');_sd('authScreen','none');window.scrollTo(0,0);if(_role==='teacher'||_role==='admin'){_sd('ownerApp','block');_sd('customerApp','none');try{loadTeacherDashboard();showOwnerTab('dashTab');}catch(_x){}}else{_sd('customerApp','block');_sd('ownerApp','none');try{loadStudentData();showTab('homeTab');}catch(_x){}}}).catch(function(err){_showErr('Creating your account...');var n=(document.getElementById('nameField')||{}).value||'';var _role=currentUserRole||'student';_auth.createUserWithEmailAndPassword(e,p).then(function(cred){currentUser={uid:cred.user.uid,name:n||e.split('@')[0],email:e,role:_role};_showErr('');_sd('authScreen','none');window.scrollTo(0,0);if(_role==='teacher'||_role==='admin'){_sd('ownerApp','block');_sd('customerApp','none');try{loadTeacherDashboard();showOwnerTab('dashTab');}catch(_x){}}else{_sd('customerApp','block');_sd('ownerApp','none');try{loadStudentData();showTab('homeTab');}catch(_x){}}try{_db.collection(USERS_COL).doc(cred.user.uid).set({uid:cred.user.uid,name:n||e.split('@')[0],email:e,role:_role,createdAt:firebase.firestore.FieldValue.serverTimestamp()});}catch(_y){}}).catch(function(e2){_showErr(e2.message);});});}
+function doSignup(){try{var n=(document.getElementById('nameField')||{}).value||'',e=document.getElementById('emailField').value.trim(),p=document.getElementById('passField').value;if(!e||!p){_showErr('Enter email and password');return;}if(p.length<6){_showErr('Password min 6 characters');return;}_showErr('Creating account...');var _role=currentUserRole||'student';_auth.createUserWithEmailAndPassword(e,p).then(function(cred){currentUser={uid:cred.user.uid,name:n||e.split('@')[0],email:e,role:_role};_showErr('');_sd('authScreen','none');window.scrollTo(0,0);if(_role==='teacher'||_role==='admin'){_sd('ownerApp','block');_sd('customerApp','none');try{loadTeacherDashboard();showOwnerTab('dashTab');}catch(_x){}}else{_sd('customerApp','block');_sd('ownerApp','none');try{loadStudentData();showTab('homeTab');}catch(_x){}}try{_db.collection(USERS_COL).doc(cred.user.uid).set({uid:cred.user.uid,name:n||e.split('@')[0],email:e,role:_role,createdAt:firebase.firestore.FieldValue.serverTimestamp()});}catch(_y){}}).catch(function(err){_showErr(err.message);});}catch(ex){_showErr(ex.message);}}
+function toggleMode(){var nf=document.getElementById('nameField');if(nf)nf.style.display=nf.style.display==='none'?'block':'none';var isSignup=nf&&nf.style.display!=='none';var ab=document.getElementById('authBtn');if(ab){ab.textContent=isSignup?'Sign Up':'Login';ab.onclick=isSignup?doSignup:doLogin;}var tb=document.getElementById('toggleBtn');if(tb)tb.textContent=isSignup?'Already have account? Login':'No account? Sign up →';_showErr('');}
+function doLogout(){_auth.signOut();}
+function showTab(id){document.querySelectorAll('.tab-pane').forEach(function(t){t.classList.remove('active');});var el=document.getElementById(id);if(el)el.classList.add('active');var tabs=['homeTab','coursesTab','myCoursesTab','profileTab'];var btns=document.querySelectorAll('#customerApp .nbtn');btns.forEach(function(b){b.classList.remove('active');});var i=tabs.indexOf(id);if(i>=0&&btns[i])btns[i].classList.add('active');}
+function showOwnerTab(id){document.querySelectorAll('.owner-pane').forEach(function(t){t.classList.remove('active');});var el=document.getElementById(id);if(el)el.classList.add('active');var tabs=['dashTab','manageTab','addTab','studentsTab'];var btns=document.querySelectorAll('#ownerApp .nbtn');btns.forEach(function(b){b.classList.remove('active');});var i=tabs.indexOf(id);if(i>=0&&btns[i])btns[i].classList.add('active');}
+function loadStudentData(){var uid=_auth.currentUser.uid;var un=document.getElementById('userName');if(un&&currentUser)un.textContent=currentUser.name;_db.collection(ENROLLMENTS_COL).where('studentId','==',uid).onSnapshot(function(snap){var ec=snap.size;var el=document.getElementById('enrollCount');if(el)el.textContent=ec;});_db.collection(COURSES_COL).limit(4).onSnapshot(function(snap){var html='';snap.forEach(function(doc){var d=doc.data();html+='<div class="course-card" onclick="enrollInCourse(\''+doc.id+'\',\''+d.title+'\','+d.price+')"><div class="course-top"><div class="course-icon">🎓</div><div class="course-info"><div class="course-title">'+d.title+'</div><div class="course-trainer">by '+d.trainer+'</div><div class="course-meta"><span>⏱️ '+d.duration+'</span><span>📚 '+d.category+'</span></div></div></div><div class="course-desc">'+d.description+'</div><div class="course-bottom"><div class="course-price">₹'+d.price+'</div><button class="enroll-btn" onclick="event.stopPropagation();enrollInCourse(\''+doc.id+'\',\''+d.title+'\','+d.price+')">Enroll Now</button></div></div>';});document.getElementById('featuredList').innerHTML=html||'<div style="text-align:center;padding:40px;opacity:0.5;">No courses yet</div>';});loadAllCourses();loadMyCourses();}
+function loadAllCourses(){_db.collection(COURSES_COL).onSnapshot(function(snap){var html='';snap.forEach(function(doc){var d=doc.data();if(selectedCategory!=='All'&&d.category!==selectedCategory)return;html+='<div class="course-card" onclick="enrollInCourse(\''+doc.id+'\',\''+d.title+'\','+d.price+')"><div class="course-top"><div class="course-icon">🤖</div><div class="course-info"><div class="course-title">'+d.title+'</div><div class="course-trainer">by '+d.trainer+'</div><div class="course-meta"><span>⏱️ '+d.duration+'</span><span>📚 '+d.category+'</span></div></div></div><div class="course-desc">'+d.description+'</div><div class="course-bottom"><div class="course-price">₹'+d.price+'</div><button class="enroll-btn" onclick="event.stopPropagation();enrollInCourse(\''+doc.id+'\',\''+d.title+'\','+d.price+')">Enroll</button></div></div>';});document.getElementById('allCoursesList').innerHTML=html||'<div style="text-align:center;padding:40px;opacity:0.5;">No courses in this category</div>';});}
+function filterCategory(cat){selectedCategory=cat;document.querySelectorAll('.cat-chip').forEach(function(c){c.classList.remove('active');});event.target.classList.add('active');loadAllCourses();}
+function enrollInCourse(cid,title,price){if(!_auth.currentUser){showToast('Please login first');return;}_db.collection(ENROLLMENTS_COL).add({enrollmentId:Date.now().toString(),studentId:_auth.currentUser.uid,studentName:currentUser.name||_auth.currentUser.email.split('@')[0],studentEmail:_auth.currentUser.email,courseId:cid,courseTitle:title,price:price,progress:0,quizScore:0,certificateUrl:'',enrolledAt:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){showToast('Enrolled successfully in '+title);loadMyCourses();});} 
+function loadMyCourses(){var uid=_auth.currentUser.uid;_db.collection(ENROLLMENTS_COL).where('studentId','==',uid).onSnapshot(function(snap){var html='';snap.forEach(function(doc){var d=doc.data();var prog=d.progress||0;html+='<div class="progress-card"><div class="progress-header"><div><div class="progress-title">'+d.courseTitle+'</div><div style="font-size:12px;opacity:0.5;margin-top:4px;">Quiz Score: '+(d.quizScore||0)+'%</div></div><div class="progress-status">'+prog+'% Complete</div></div><div class="progress-bar-bg"><div class="progress-bar-fill" style="width:'+prog+'%"></div></div><div class="progress-actions"><button class="progress-btn" onclick="updateProgress(\''+doc.id+'\','+Math.min(prog+20,100)+')">Continue Learning</button><button class="progress-btn" onclick="takeQuiz(\''+doc.id+'\')">Take Quiz</button>'+(prog===100?'<button class="progress-btn" onclick="downloadCert(\''+doc.id+'\')">📜 Certificate</button>':'')+'</div></div>';});document.getElementById('myCoursesContent').innerHTML=html||'<div style="text-align:center;padding:40px;opacity:0.5;">No enrolled courses yet</div>';});}
+function updateProgress(eid,newProg){_db.collection(ENROLLMENTS_COL).doc(eid).update({progress:newProg}).then(function(){showToast('Progress updated to '+newProg+'%');});}
+function takeQuiz(eid){var score=Math.floor(Math.random()*30)+70;_db.collection(ENROLLMENTS_COL).doc(eid).update({quizScore:score}).then(function(){showToast('Quiz completed! Score: '+score+'%');loadMyCourses();});}
+function downloadCert(eid){showToast('Certificate downloaded! 📜');_db.collection(ENROLLMENTS_COL).doc(eid).update({certificateUrl:'https://example.com/cert/'+eid});}
+function bookLiveClass(){if(!_auth.currentUser){showToast('Please login first');return;}_db.collection(BOOKINGS_COL).add({bookingId:Date.now().toString(),studentId:_auth.currentUser.uid,studentName:currentUser.name||_auth.currentUser.email.split('@')[0],studentEmail:_auth.currentUser.email,teacherId:'',courseTitle:'AI Fundamentals Live Session',scheduledAt:new Date(Date.now()+86400000),status:'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){showToast('Live class booked successfully!');});}
+function openChatbot(){showToast('AI Mentor: Hi! How can I help you today? 🤖');}
+function loadTeacherDashboard(){var tid=_auth.currentUser.uid;_db.collection(ENROLLMENTS_COL).onSnapshot(function(snap){var total=snap.size;var revenue=0;snap.forEach(function(doc){revenue+=doc.data().price||0;});var el=document.getElementById('totalStudents');if(el)el.textContent=total;var rev=document.getElementById('totalRevenue');if(rev)rev.textContent='₹'+revenue;});_db.collection(COURSES_COL).where('teacherId','==',tid).onSnapshot(function(snap){var el=document.getElementById('totalCourses');if(el)el.textContent=snap.size;});_db.collection(ENROLLMENTS_COL).limit(5).onSnapshot(function(snap){var html='';snap.forEach(function(doc){var d=doc.data();html+='<div class="student-row"><div class="student-av">'+(d.studentName?d.studentName.charAt(0).toUpperCase():'S')+'</div><div class="student-info"><div class="student-name">'+d.studentName+'</div><div class="student-email">'+d.studentEmail+' • '+d.courseTitle+'</div></div><div class="student-progress">'+d.progress+'%</div></div>';});document.getElementById('recentEnroll').innerHTML=html||'<div style="text-align:center;padding:20px;opacity:0.5;">No enrollments yet</div>';});loadManageCourses();loadStudentsList();}
+function loadManageCourses(){var tid=_auth.currentUser.uid;_db.collection(COURSES_COL).where('teacherId','==',tid).onSnapshot(function(snap){var html='';snap.forEach(function(doc){var d=doc.data();var pub=d.published?'published':'draft';html+='<div class="manage-card"><div class="manage-top"><div><div class="manage-title">'+d.title+'</div><div class="manage-info">'+d.category+' • '+d.duration+' • ₹'+d.price+'</div></div><div class="manage-status '+pub+'">'+(d.published?'Published':'Draft')+'</div></div><div class="manage-actions"><button class="manage-btn" onclick="editCourse(\''+doc.id+'\')">✏️ Edit</button><button class="manage-btn" onclick="togglePublish(\''+doc.id+'\','+!d.published+')">'+(d.published?'Unpublish':'Publish')+'</button><button class="manage-btn delete-btn" onclick="deleteCourse(\''+doc.id+'\')">🗑️ Delete</button></div></div>';});document.getElementById('manageCoursesList').innerHTML=html||'<div style="text-align:center;padding:40px;opacity:0.5;">No courses yet. Add your first course!</div>';});}
+function addCourse(){var title=document.getElementById('courseTitle').value.trim();var trainer=document.getElementById('courseTrainer').value.trim();var desc=document.getElementById('courseDesc').value.trim();var price=document.getElementById('coursePrice').value.trim();var duration=document.getElementById('courseDuration').value.trim();var category=document.getElementById('courseCategory').value;if(!title||!trainer||!desc||!price||!duration){showToast('Please fill all fields');return;}_db.collection(COURSES_COL).add({title:title,trainer:trainer,description:desc,price:parseInt(price)||999,duration:duration,category:category,files:'lesson1.pdf, lesson2.pdf',published:false,teacherId:_auth.currentUser.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){showToast('Course added successfully!');document.getElementById('courseTitle').value='';document.getElementById('courseTrainer').value='';document.getElementById('courseDesc').value='';document.getElementById('coursePrice').value='999';document.getElementById('courseDuration').value='';loadManageCourses();});}
+function editCourse(cid){showToast('Edit mode - update course details');}
+function togglePublish(cid,status){_db.collection(COURSES_COL).doc(cid).update({published:status}).then(function(){showToast(status?'Course published':'Course unpublished');});}
+function deleteCourse(cid){if(confirm('Delete this course?')){_db.collection(COURSES_COL).doc(cid).delete().then(function(){showToast('Course deleted');});}}
+function loadStudentsList(){_db.collection(ENROLLMENTS_COL).onSnapshot(function(snap){var html='';var students={};snap.forEach(function(doc){var d=doc.data();if(!students[d.studentId]){students[d.studentId]={name:d.studentName,email:d.studentEmail,courses:0,progress:0};} students[d.studentId].courses++;students[d.studentId].progress+=d.progress||0;});Object.keys(students).forEach(function(sid){var s=students[sid];var avgProg=Math.round(s.progress/s.courses);html+='<div class="student-row"><div class="student-av">'+s.name.charAt(0).toUpperCase()+'</div><div class="student-info"><div class="student-name">'+s.name+'</div><div class="student-email">'+s.email+' • '+s.courses+' courses</div></div><div class="student-progress">'+avgProg+'%</div></div>';});document.getElementById('studentsList').innerHTML=html||'<div style="text-align:center;padding:40px;opacity:0.5;">No students yet</div>';});}
+function showToast(m){var t=document.createElement('div');t.textContent=m;t.style.cssText='position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);color:#fff;padding:12px 24px;border-radius:24px;font-size:14px;font-weight:600;z-index:9999;max-width:320px;text-align:center;';document.body.appendChild(t);setTimeout(function(){t.remove();},2500);}
+</script>
+
+<div id="authScreen" style="display:flex">
+<div class="auth-logo">🎓</div>
+<div class="auth-title">LearnAI</div>
+<div class="auth-subtitle">Master AI & Machine Learning</div>
+<div class="auth-box">
+<div class="role-sel">
+<button class="role-btn sel" id="roleBtn_student" onclick="selectRole('student')">👨‍🎓 Student</button>
+<button class="role-btn" id="roleBtn_teacher" onclick="selectRole('teacher')">👨‍🏫 Teacher</button>
+</div>
+<div id="fbErr"></div>
+<input type="text" id="nameField" placeholder="Full Name" style="display:none">
+<input type="email" id="emailField" placeholder="Email">
+<input type="password" id="passField" placeholder="Password">
+<button id="authBtn" onclick="doLogin()">Login</button>
+<div id="toggleBtn" onclick="toggleMode()">No account? Sign up →</div>
+</div>
+</div>
+
+<div id="customerApp" style="display:none">
+<div class="hdr">
+<div class="hdr-top"><span class="clock">09:41</span><span>📶 ▮▮▮</span></div>
+<div class="hdr-badge">STUDENT PORTAL</div>
+<h2>Hello, <span id="userName">Student</span>! 👋</h2>
+<p>Ready to learn something amazing today?</p>
+</div>
+
+<div class="stat-row">
+<div class="stat"><span class="v" id="enrollCount">0</span><span class="l">Enrolled</span></div>
+<div class="stat"><span class="v">12</span><span class="l">Live Classes</span></div>
+</div>
+
+<div class="tab-pane active" id="homeTab">
+<div class="search-box">
+<span class="search-icon">🔍</span>
+<input type="text" placeholder="Search courses...">
+</div>
+<div class="sec-head">🔥 Featured Courses</div>
+<div id="featuredList"></div>
+<div style="text-align:center;margin:20px 0"><button class="big-btn" onclick="showTab('coursesTab')">Browse All Courses</button></div>
+</div>
+
+<div class="tab-pane" id="coursesTab">
+<div class="cat-scroll">
+<button class="cat-chip active" onclick="filterCategory('All')">All</button>
+<button class="cat-chip" onclick="filterCategory('AI')">AI</button>
+<button class="cat-chip" onclick="filterCategory('ML')">Machine Learning</button>
+<button class="cat-chip" onclick="filterCategory('GenAI')">GenAI</button>
+<button class="cat-chip" onclick="filterCategory('Prompt')">Prompt Engineering</button>
+</div>
+<div id="allCoursesList"></div>
+</div>
+
+<div class="tab-pane" id="myCoursesTab">
+<div class="sec-head">📚 My Learning Journey</div>
+<div id="myCoursesContent"></div>
+</div>
+
+<div class="tab-pane" id="profileTab">
+<div class="prof-hero">
+<div class="prof-av">🎓</div>
+<div class="prof-name" id="profName">Student</div>
+<div class="prof-email" id="profEmail">student@learnai.com</div>
+<div class="prof-badge">STUDENT</div>
+</div>
+<div class="prof-section">
+<h3>🏆 Achievements</h3>
+<div class="achievement-item">
+<div class="achievement-icon">🥇</div>
+<div class="achievement-info">
+<div class="achievement-title">Quick Learner</div>
+<div class="achievement-desc">Completed 3 courses</div>
+</div>
+</div>
+<div class="achievement-item">
+<div class="achievement-icon">⭐</div>
+<div class="achievement-info">
+<div class="achievement-title">Quiz Master</div>
+<div class="achievement-desc">95% average score</div>
+</div>
+</div>
+</div>
+<div class="prof-section">
+<h3>📅 Live Class Bookings</h3>
+<button class="big-btn" onclick="bookLiveClass()" style="margin-top:10px">Book a Live Class</button>
+</div>
+<div class="chatbot-section">
+<div class="chatbot-icon">🤖</div>
+<h3 style="margin-bottom:10px">AI Mentor</h3>
+<p style="font-size:13px;opacity:0.6;margin-bottom:16px">Get instant help from your AI learning assistant</p>
+<button class="chatbot-btn" onclick="openChatbot()">Chat with AI Mentor</button>
+</div>
+<button class="logout-btn" onclick="doLogout()">🚪 Logout</button>
+</div>
+
+<div class="bnav">
+<button class="nbtn active" onclick="showTab('homeTab')"><span class="ni">🏠</span>Home</button>
+<button class="nbtn" onclick="showTab('coursesTab')"><span class="ni">📚</span>Courses</button>
+<button class="nbtn" onclick="showTab('myCoursesTab')"><span class="ni">🎯</span>My Courses</button>
+<button class="nbtn" onclick="showTab('profileTab')"><span class="ni">👤</span>Profile</button>
+</div>
+</div>
+
+<div id="ownerApp" style="display:none">
+<div class="hdr">
+<div class="hdr-top"><span class="clock">09:41</span><span>📶 ▮▮▮</span></div>
+<div class="hdr-badge">TEACHER DASHBOARD</div>
+<h2>Welcome, Teacher! 👨‍🏫</h2>
+<p>Manage your courses and students</p>
+</div>
+
+<div class="stat-row">
+<div class="stat"><span class="v" id="totalStudents">0</span><span class="l">Students</span></div>
+<div class="stat"><span class="v" id="totalCourses">0</span><span class="l">Courses</span></div>
+</div>
+
+<div class="owner-pane active" id="dashTab">
+<div class="stat-row">
+<div class="stat"><span class="v" id="totalRevenue">₹0</span><span class="l">Revenue</span></div>
+<div class="stat"><span class="v">24</span><span class="l">Enrollments</span></div>
+</div>
+<div class="sec-head">Recent Enrollments</div>
+<div id="recentEnroll"></div>
+</div>
+
+<div class="owner-pane" id="manageTab">
+<div class="sec-head">Manage Courses</div>
+<div id="manageCoursesList"></div>
+</div>
+
+<div class="owner-pane" id="addTab">
+<div class="sec-head">Add New Course</div>
+<div class="form-group">
+<label class="lbl">Course Title</label>
+<input type="text" class="inp" id="courseTitle" placeholder="e.g. AI Fundamentals">
+</div>
+<div class="form-group">
+<label class="lbl">Trainer Name</label>
+<input type="text" class="inp" id="courseTrainer" placeholder="Your name">
+</div>
+<div class="form-group">
+<label class="lbl">Description</label>
+<textarea class="inp" id="courseDesc" placeholder="Course overview and what students will learn"></textarea>
+</div>
+<div class="form-group">
+<label class="lbl">Price (₹)</label>
+<input type="number" class="inp" id="coursePrice" value="999">
+</div>
+<div class="form-group">
+<label class="lbl">Duration</label>
+<input type="text" class="inp" id="courseDuration" placeholder="e.g. 8 weeks">
+</div>
+<div class="form-group">
+<label class="lbl">Category</label>
+<select class="inp" id="courseCategory">
+<option>AI</option>
+<option>ML</option>
+<option>GenAI</option>
+<option>Prompt</option>
+</select>
+</div>
+<button class="big-btn" onclick="addCourse()">Create Course</button>
+</div>
+
+<div class="owner-pane" id="studentsTab">
+<div class="sec-head">All Students</div>
+<div id="studentsList"></div>
+</div>
+
+<div class="bnav">
+<button class="nbtn active" onclick="showOwnerTab('dashTab')"><span class="ni">📊</span>Dashboard</button>
+<button class="nbtn" onclick="showOwnerTab('manageTab')"><span class="ni">⚙️</span>Manage</button>
+<button class="nbtn" onclick="showOwnerTab('addTab')"><span class="ni">➕</span>Add Course</button>
+<button class="nbtn" onclick="showOwnerTab('studentsTab')"><span class="ni">👥</span>Students</button>
+</div>
+</div>
+
+<script>
+if(currentUser&&_auth.currentUser){document.getElementById('profName').textContent=currentUser.name;document.getElementById('profEmail').textContent=currentUser.email||_auth.currentUser.email;}
+</script>
+</body>
+</html>
