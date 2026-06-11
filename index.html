@@ -2454,8 +2454,10 @@
         paymentId: data.paymentId || 'LEAD'
       });
       const url = APPS_SCRIPT + '?' + params.toString();
-      // sendBeacon keeps request alive during page navigation
-      navigator.sendBeacon(url);
+      // GET request that survives page navigation (the Apps Script only accepts GET;
+      // navigator.sendBeacon sends a POST which the script rejects with 405).
+      // keepalive lets the request complete even as we redirect to Razorpay.
+      fetch(url, { method: 'GET', mode: 'no-cors', keepalive: true });
     } catch(err) {}
 
     // Backup to localStorage
