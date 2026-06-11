@@ -192,6 +192,18 @@
       <a href="#" target="_blank" style="background:#28c864;color:#000;padding:7px 14px;border-radius:8px;font-weight:800;font-size:13px;text-decoration:none;">Open Again ↗</a>
     </div>
 
+    <!-- CLOUD SYNC — save app to cloud so Claude can fix it, then reload -->
+    <div id="cloudSyncBar" style="display:none;background:linear-gradient(135deg,rgba(124,58,237,0.18),rgba(124,58,237,0.05));border:2px solid rgba(124,58,237,0.5);border-radius:14px;padding:14px 18px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <span style="font-size:20px;">☁️</span>
+        <div style="flex:1;min-width:200px;">
+          <div style="font-size:14px;font-weight:800;color:#c4b5fd;">Cloud Saved — App Code: <span id="cloudAppCode" style="color:#fff;font-family:monospace;letter-spacing:1px;background:rgba(0,0,0,0.3);padding:2px 8px;border-radius:6px;">—</span> <button onclick="copyAppCode()" style="background:none;border:none;color:#c4b5fd;cursor:pointer;font-size:14px;" title="Copy code">📋</button></div>
+          <div id="cloudSyncStatus" style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:3px;">Auto-saved. To fix a glitch: tell Claude this code + the problem, then click Reload.</div>
+        </div>
+        <button onclick="reloadFromCloud()" style="background:#7c3aed;color:#fff;border:none;padding:10px 18px;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;">🔄 Reload Fixed App</button>
+      </div>
+    </div>
+
     <!-- OPEN IN NEW TAB — fully working, no iframe restrictions -->
     <div style="background:linear-gradient(135deg,rgba(245,166,35,0.15),rgba(245,166,35,0.05));border:2px solid rgba(245,166,35,0.5);border-radius:16px;padding:20px 24px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
       <div>
@@ -252,8 +264,8 @@
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
         <span style="font-size:22px;">✏️</span>
         <div>
-          <div style="font-size:16px;font-weight:800;color:#fff;">Modify Your App</div>
-          <div style="font-size:13px;color:rgba(255,255,255,0.45);">Tell AI what to change — it will update your app instantly</div>
+          <div style="font-size:16px;font-weight:800;color:#fff;">Modify or Fix Your App</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.45);">Describe a change OR a problem/glitch — AI updates your existing app instantly. No need to rebuild.</div>
         </div>
       </div>
 
@@ -264,6 +276,7 @@
 
       <!-- QUICK CHANGE BUTTONS — updated dynamically after build -->
       <div id="quickModifyBtns" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+        <button class="ex-btn" onclick="fillModify('A problem is happening in the app — describe it here and AI will fix it without rebuilding. For example: the login button does nothing when clicked. Fix this glitch completely.')">🐛 Fix a Problem</button>
         <button class="ex-btn" onclick="fillModify('Change the main color to blue and make it look more professional')">🎨 Change Color</button>
         <button class="ex-btn" onclick="fillModify('Add a Contact Us page with phone number, email, address and a WhatsApp button')">📞 Add Contact Page</button>
         <button class="ex-btn" onclick="fillModify('Make the design look more premium and luxurious with gold and dark theme')">✨ Make Premium</button>
@@ -274,10 +287,10 @@
         <button class="ex-btn" onclick="fillModify('Add smooth animations and make all buttons more interactive and fun')">💫 Add Animations</button>
       </div>
 
-      <textarea id="modifyPrompt" style="width:100%;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:14px 16px;color:#fff;font-size:14px;font-family:'Inter',sans-serif;resize:vertical;min-height:80px;outline:none;margin-bottom:12px;" placeholder="Describe what you want to change — e.g. change color to green, add gallery page, rename app to FoodieHub..."></textarea>
+      <textarea id="modifyPrompt" style="width:100%;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:14px 16px;color:#fff;font-size:14px;font-family:'Inter',sans-serif;resize:vertical;min-height:80px;outline:none;margin-bottom:12px;" placeholder="Describe a change OR a glitch to fix — e.g. 'the cart button is not working, fix it', 'orders are not saving', 'change color to green', 'add a gallery page'..."></textarea>
 
       <button onclick="modifyApp()" id="modifyBtn" style="width:100%;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border:none;padding:15px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;transition:all 0.2s;">
-        ✏️ Apply My Changes
+        ✏️ Apply Change / Fix My App
       </button>
 
       <!-- MODIFY LOADING -->
@@ -1760,6 +1773,9 @@ FINAL REMINDER: If you are close to your token limit — STOP, close all open fu
     generatedCode = raw;
     originalIdea = userIdea;
 
+    // Auto-save this fresh build to the cloud with a NEW app code
+    cloudSave(true);
+
     // Swap modify buttons to match the app type — no extra API call needed
     updateModifyButtons(detectAppType(userIdea));
 
@@ -1781,6 +1797,66 @@ FINAL REMINDER: If you are close to your token limit — STOP, close all open fu
     document.getElementById('buildError').scrollIntoView({ behavior: 'smooth' });
   }
 }
+
+// ── CLOUD SYNC — store app code in Firestore so Claude can fix it remotely ──
+var FS_DOC = 'https://firestore.googleapis.com/v1/projects/build-my-app-3c629/databases/(default)/documents/_tool_apps/';
+function _genAppCode(){ return 'APP-' + Date.now().toString(36).toUpperCase().slice(-6); }
+function getAppCode(){
+  var c=''; try{ c=localStorage.getItem('tool_current_app_code')||''; }catch(e){}
+  if(!c){ c=_genAppCode(); try{ localStorage.setItem('tool_current_app_code',c);}catch(e){} }
+  return c;
+}
+function setAppCode(c){ try{ localStorage.setItem('tool_current_app_code',c);}catch(e){} }
+function showCloudBar(code, status){
+  var bar=document.getElementById('cloudSyncBar'); if(bar) bar.style.display='block';
+  var el=document.getElementById('cloudAppCode'); if(el) el.textContent=code;
+  if(status){ var s=document.getElementById('cloudSyncStatus'); if(s) s.textContent=status; }
+}
+function copyAppCode(){ var c=(document.getElementById('cloudAppCode')||{}).textContent||''; try{ navigator.clipboard.writeText(c); }catch(e){} }
+
+async function cloudSave(forceNew){
+  if(!generatedCode) return;
+  var code = forceNew ? _genAppCode() : getAppCode();
+  if(forceNew) setAppCode(code);
+  showCloudBar(code, '☁️ Saving to cloud...');
+  try{
+    var body={fields:{code:{stringValue:generatedCode}, updatedAt:{timestampValue:new Date().toISOString()}}};
+    var r=await fetch(FS_DOC+encodeURIComponent(code), {method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    if(r.ok){ showCloudBar(code, '✅ Saved to cloud. To fix a glitch: tell Claude code "'+code+'" + the problem, then click Reload Fixed App.'); }
+    else { showCloudBar(code, '⚠️ Cloud save failed (app may exceed 1MB). Download still works.'); }
+  }catch(e){ showCloudBar(code, '⚠️ Cloud save failed: '+e.message); }
+}
+
+async function cloudLoad(code){
+  try{
+    var r=await fetch(FS_DOC+encodeURIComponent(code));
+    if(!r.ok) return false;
+    var d=await r.json();
+    var html=d && d.fields && d.fields.code && d.fields.code.stringValue;
+    if(!html) return false;
+    generatedCode=html;
+    var res=document.getElementById('result'); if(res) res.style.display='block';
+    document.getElementById('previewFrame').srcdoc=prepareApp(generatedCode);
+    if(isMobileView){ var mf=document.getElementById('mobileFrame'); if(mf) mf.srcdoc=prepareApp(generatedCode); }
+    showCloudBar(code, '✅ Loaded latest version from cloud.');
+    if(res) res.scrollIntoView({behavior:'smooth'});
+    return true;
+  }catch(e){ return false; }
+}
+
+function reloadFromCloud(){
+  var code=getAppCode();
+  var s=document.getElementById('cloudSyncStatus'); if(s) s.textContent='🔄 Loading latest from cloud...';
+  cloudLoad(code).then(function(ok){ if(!ok){ var s2=document.getElementById('cloudSyncStatus'); if(s2) s2.textContent='Could not load code "'+code+'" — has it been saved yet?'; } });
+}
+
+// On page load, ?app=CODE loads that app from the cloud
+window.addEventListener('load', function(){
+  try{
+    var code=new URLSearchParams(location.search).get('app');
+    if(code){ setAppCode(code); cloudLoad(code); }
+  }catch(e){}
+});
 
 function toggleMobile() {
   isMobileView = !isMobileView;
@@ -1977,6 +2053,7 @@ ${generatedCode}`
     if (!fixed.includes('<!DOCTYPE') && !fixed.includes('<html')) throw new Error('Invalid response. Try again.');
 
     generatedCode = fixed;
+    cloudSave();
 
     function reloadIframe(frameId) {
       const old = document.getElementById(frameId);
@@ -2107,9 +2184,12 @@ ${generatedCode}`
     reloadIframe('previewFrame');
     if (isMobileView) reloadIframe('mobileFrame');
 
+    // Auto-save the modified/fixed app to the cloud (same app code)
+    setTimeout(function(){ cloudSave(); }, 3200);
+
     document.getElementById('modifyLoading').style.display = 'none';
     btn.disabled = false;
-    btn.textContent = '✏️ Apply My Changes';
+    btn.textContent = '✏️ Apply Change / Fix My App';
     document.getElementById('modifyPrompt').value = '';
 
     // Show success banner under the modify box
@@ -2122,7 +2202,7 @@ ${generatedCode}`
   } catch (err) {
     document.getElementById('modifyLoading').style.display = 'none';
     btn.disabled = false;
-    btn.textContent = '✏️ Apply My Changes';
+    btn.textContent = '✏️ Apply Change / Fix My App';
     const errEl = document.getElementById('modifyError');
     errEl.textContent = '❌ Error: ' + err.message + ' — Please try again.';
     errEl.style.display = 'block';
