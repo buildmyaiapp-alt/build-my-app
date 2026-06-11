@@ -201,6 +201,12 @@
           <div id="cloudSyncStatus" style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:3px;">Auto-saved. To fix a glitch: tell Claude this code + the problem, then click Reload.</div>
         </div>
         <button onclick="reloadFromCloud()" style="background:#7c3aed;color:#fff;border:none;padding:10px 18px;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;">🔄 Reload Fixed App</button>
+        <button onclick="openInNewTab()" style="background:#28c864;color:#000;border:none;padding:10px 18px;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;">↗ Open in New Tab</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;">
+        <span style="font-size:12px;color:rgba(255,255,255,0.5);">Load a saved app by its code:</span>
+        <input id="loadCodeInput" placeholder="APP-XXXXXX" style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 12px;color:#fff;font-size:13px;font-family:monospace;letter-spacing:1px;width:140px;outline:none;text-transform:uppercase;"/>
+        <button onclick="loadByCode()" style="background:rgba(124,58,237,0.6);color:#fff;border:1px solid rgba(124,58,237,0.8);padding:7px 16px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;">Load</button>
       </div>
     </div>
 
@@ -1848,6 +1854,23 @@ function reloadFromCloud(){
   var code=getAppCode();
   var s=document.getElementById('cloudSyncStatus'); if(s) s.textContent='🔄 Loading latest from cloud...';
   cloudLoad(code).then(function(ok){ if(!ok){ var s2=document.getElementById('cloudSyncStatus'); if(s2) s2.textContent='Could not load code "'+code+'" — has it been saved yet?'; } });
+}
+
+// Open the current app as a REAL page in a new tab (Safari-safe — Firebase login works there)
+function openInNewTab(){
+  var code=getAppCode();
+  if(!code){ alert('Build an app first.'); return; }
+  window.open('run.html?app='+encodeURIComponent(code), '_blank');
+}
+
+// Load any saved app by typing its code (reliable — does not depend on stored state)
+function loadByCode(){
+  var inp=document.getElementById('loadCodeInput');
+  var code=(inp&&inp.value||'').trim().toUpperCase();
+  if(!code){ if(inp) inp.focus(); return; }
+  setAppCode(code);
+  var s=document.getElementById('cloudSyncStatus'); if(s) s.textContent='🔄 Loading '+code+'...';
+  cloudLoad(code).then(function(ok){ if(!ok){ var s2=document.getElementById('cloudSyncStatus'); if(s2) s2.textContent='Could not find app "'+code+'". Check the code.'; } });
 }
 
 // On page load, ?app=CODE loads that app from the cloud
