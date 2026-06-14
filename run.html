@@ -37,8 +37,12 @@
       // hangs (Firestore read stalls), force-switch to the dashboard so users
       // never get stuck on "Creating account..."/login screens.
       var ROUTER = '<scr'+'ipt>(function(){function go(){try{var a=window._auth||(window.firebase&&firebase.apps&&firebase.apps.length&&firebase.auth());if(a&&a.currentUser){var as=document.getElementById("authScreen");if(as&&as.style.display!=="none"){var role=(window.currentUser&&window.currentUser.role)||window.currentUserRole||"customer";as.style.display="none";var ow=document.getElementById("ownerApp"),cu=document.getElementById("customerApp");if((role==="owner"||role==="admin"||role==="teacher"||role==="doctor"||role==="driver")&&ow){ow.style.display="block";if(cu)cu.style.display="none";["loadOwnerDashboard","loadTeacherDashboard","loadAdminData","loadDoctorData","loadDriverData"].forEach(function(f){try{if(typeof window[f]==="function")window[f]();}catch(e){}});}else if(cu){cu.style.display="block";if(ow)ow.style.display="none";["loadCustomerData","loadStudentData","loadMemberData","loadUserData","loadPatientData"].forEach(function(f){try{if(typeof window[f]==="function")window[f]();}catch(e){}});}window.scrollTo(0,0);}}}catch(e){}setTimeout(go,700);}setTimeout(go,1200);})();</scr'+'ipt>';
-      if(html.indexOf('</body>')!==-1){ html = html.replace('</body>', ROUTER+'</body>'); }
-      else { html = html + ROUTER; }
+      // Universal auth fix: if login fails because the account doesn't exist (or
+      // the Sign Up button is miswired to login), auto-create the account so no one
+      // ever gets "auth/invalid-credential".
+      var AUTHFIX = '<scr'+'ipt>(function(){function p(){try{if(window.firebase&&firebase.auth&&firebase.auth.Auth&&firebase.auth.Auth.prototype){var P=firebase.auth.Auth.prototype;if(!P.__bmaPatched){var o=P.signInWithEmailAndPassword;P.signInWithEmailAndPassword=function(e,pw){var s=this;return o.call(s,e,pw).catch(function(err){if(err&&(err.code==="auth/invalid-credential"||err.code==="auth/user-not-found"||err.code==="auth/wrong-password")){return s.createUserWithEmailAndPassword(e,pw);}throw err;});};P.__bmaPatched=true;}return;}}catch(e){}setTimeout(p,200);}p();})();</scr'+'ipt>';
+      if(html.indexOf('</body>')!==-1){ html = html.replace('</body>', AUTHFIX+ROUTER+'</body>'); }
+      else { html = html + AUTHFIX + ROUTER; }
       // Render the app as the FULL top-level page (real origin => Safari runs Firebase normally)
       document.open();
       document.write(html);
