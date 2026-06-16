@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Build Your Dream App in 30 Minutes Using AI — Live Workshop ₹99</title>
+<meta name="description" content="Learn to build your own professional app in just 30 minutes using AI — no coding, no developer needed. Live workshop on June 14, only ₹99."/>
+
+<!-- Facebook Pixel -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1489981779278274');
+fbq('track', 'PageView');
+fbq('track', 'ViewContent', { content_name: 'AI App Building Workshop - Landing V2' });
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1489981779278274&ev=PageView&noscript=1"/></noscript>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0B0B0F;
+  --bg2:#13131A;
+  --card:#1A1A23;
+  --line:#2A2A36;
+  --amber:#F5A623;
+  --gold:#FFD700;
+  --txt:#F2F2F5;
+  --muted:#9A9AA6;
+  --green:#22C55E;
+  --red:#EF4444;
+  --navy:#0d1b6e;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);line-height:1.55;-webkit-font-smoothing:antialiased;}
+img{max-width:100%;display:block;}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px;}
+.sec{padding:64px 0;}
+.sec-alt{background:var(--bg2);}
+.sec-title{font-size:clamp(24px,3.6vw,38px);font-weight:900;text-align:center;line-height:1.25;margin-bottom:14px;}
+.sec-sub{text-align:center;color:var(--muted);font-size:15px;max-width:640px;margin:0 auto 40px;}
+.hl{color:var(--amber);}
+.ul{text-decoration:underline;text-decoration-color:var(--amber);text-underline-offset:6px;}
+.mark{background:var(--amber);color:#000;padding:0 8px;border-radius:4px;}
+
+/* ── TOP BAR ── */
+.topbar{background:linear-gradient(90deg,#3a2800,#5a3e00);text-align:center;padding:9px 14px;font-size:13px;font-weight:800;color:var(--gold);letter-spacing:.2px;}
+
+/* ── HERO ── */
+.hero{padding:48px 0 56px;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(245,166,35,.14),transparent);text-align:center;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.35);color:var(--amber);font-size:12.5px;font-weight:800;padding:7px 16px;border-radius:30px;margin-bottom:20px;text-transform:uppercase;letter-spacing:1px;}
+.hero-badge .dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:blink 1.4s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{font-size:clamp(30px,5vw,52px);font-weight:900;line-height:1.15;margin-bottom:16px;}
+.hero-sub{font-size:clamp(15px,1.8vw,18px);color:var(--muted);max-width:620px;margin:0 auto 26px;}
+.hero-sub b{color:var(--txt);}
+.chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:28px;}
+.chip{background:var(--card);border:1px solid var(--line);border-radius:30px;padding:8px 18px;font-size:13px;font-weight:700;color:var(--txt);}
+.chip span{color:var(--amber);margin-right:6px;}
+.video-frame{max-width:720px;margin:0 auto 30px;border-radius:16px;overflow:hidden;border:2px solid rgba(245,166,35,.45);box-shadow:0 24px 70px rgba(0,0,0,.55);}
+.video-thumb{position:relative;width:100%;aspect-ratio:16/9;background:#000;cursor:pointer;}
+.video-thumb img{width:100%;height:100%;object-fit:cover;}
+.play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:76px;height:54px;background:#f00;border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 30px rgba(255,0,0,.45);}
+.play-btn::after{content:'';width:0;height:0;border-top:14px solid transparent;border-bottom:14px solid transparent;border-left:22px solid #fff;margin-left:5px;}
+
+/* ── CTA BUTTON ── */
+.cta{display:inline-block;background:linear-gradient(135deg,var(--amber),var(--gold));color:#000;font-weight:900;font-size:18px;padding:18px 44px;border-radius:50px;text-decoration:none;border:none;cursor:pointer;font-family:inherit;box-shadow:0 8px 30px rgba(245,166,35,.35);transition:transform .15s, box-shadow .15s;}
+.cta:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(245,166,35,.5);}
+.cta small{display:block;font-size:12px;font-weight:700;margin-top:3px;color:rgba(0,0,0,.65);}
+.cta-note{margin-top:14px;font-size:13px;color:var(--muted);}
+.cta-note b{color:var(--green);}
+
+/* ── TRUST STRIP ── */
+.trust{display:flex;flex-wrap:wrap;justify-content:center;gap:28px;padding:22px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg2);}
+.trust-item{font-size:13.5px;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:8px;}
+.trust-item b{color:var(--amber);font-size:20px;}
+
+/* ── STEPS ── */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.step{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px 24px;position:relative;}
+.step-num{position:absolute;top:-16px;left:24px;background:var(--amber);color:#000;font-weight:900;font-size:14px;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.step h3{font-size:17px;font-weight:800;margin:8px 0 8px;}
+.step p{font-size:13.5px;color:var(--muted);}
+
+/* ── AGENDA ── */
+.agenda{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.ag-card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+.ag-head{background:linear-gradient(90deg,#3a2800,#5a3e00);padding:14px 20px;font-weight:900;font-size:14px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;}
+.ag-body{padding:20px;}
+.ag-body li{list-style:none;font-size:13.5px;color:#CFCFD8;padding:9px 0 9px 26px;border-bottom:1px solid var(--line);position:relative;}
+.ag-body li:last-child{border-bottom:none;}
+.ag-body li::before{content:'✓';position:absolute;left:0;color:var(--amber);font-weight:900;}
+
+/* ── BONUSES ── */
+.bonuses{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
+.bonus{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;display:flex;gap:16px;align-items:flex-start;}
+.bonus-icon{font-size:30px;flex-shrink:0;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);width:58px;height:58px;border-radius:14px;display:flex;align-items:center;justify-content:center;}
+.bonus h3{font-size:16px;font-weight:800;margin-bottom:6px;}
+.bonus p{font-size:13px;color:var(--muted);}
+.bonus .val{display:inline-block;margin-top:10px;background:rgba(34,197,94,.12);color:var(--green);font-size:12px;font-weight:800;padding:3px 12px;border-radius:20px;}
+.bonus-total{margin-top:26px;text-align:center;background:linear-gradient(90deg,#1d1500,#2e2200);border:1px dashed rgba(245,166,35,.4);border-radius:14px;padding:18px;font-size:15px;font-weight:800;}
+.bonus-total b{color:var(--gold);font-size:20px;}
+
+/* ── PRICE ── */
+.price-box{max-width:520px;margin:0 auto;background:var(--card);border:2px solid var(--amber);border-radius:22px;padding:38px 30px;text-align:center;box-shadow:0 24px 70px rgba(245,166,35,.12);}
+.price-old{font-size:18px;color:var(--muted);text-decoration:line-through;}
+.price-now{font-size:64px;font-weight:900;color:var(--amber);line-height:1;margin:6px 0 4px;}
+.price-now sup{font-size:26px;}
+.price-tag{font-size:13px;color:var(--green);font-weight:800;margin-bottom:22px;}
+.price-list{text-align:left;margin:0 auto 26px;max-width:360px;}
+.price-list li{list-style:none;font-size:14px;padding:8px 0 8px 28px;position:relative;color:#D8D8E0;}
+.price-list li::before{content:'✅';position:absolute;left:0;font-size:13px;}
+.guarantee-box{max-width:640px;margin:34px auto 0;background:linear-gradient(135deg,#15200f,#0f1a0c);border:2px solid rgba(34,197,94,.4);border-radius:18px;padding:26px;text-align:center;}
+.guarantee-box h3{color:var(--green);font-size:20px;font-weight:900;margin-bottom:8px;}
+.guarantee-box p{font-size:13.5px;color:var(--muted);}
+
+/* ── ABOUT ── */
+.about{max-width:760px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:36px;display:grid;grid-template-columns:140px 1fr;gap:30px;align-items:center;}
+.about-photo{width:140px;height:140px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--gold));display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:900;color:#000;}
+.about h3{font-size:20px;font-weight:900;margin-bottom:10px;}
+.about p{font-size:14px;color:var(--muted);margin-bottom:8px;}
+
+/* ── FAQ ── */
+.faq{max-width:720px;margin:0 auto;}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:12px;overflow:hidden;}
+summary{padding:18px 50px 18px 20px;font-weight:800;font-size:15px;cursor:pointer;position:relative;list-style:none;}
+summary::-webkit-details-marker{display:none;}
+summary::after{content:'+';position:absolute;right:20px;top:50%;transform:translateY(-50%);color:var(--amber);font-size:22px;font-weight:900;}
+details[open] summary::after{content:'−';}
+.faq-body{padding:0 20px 18px;font-size:14px;color:var(--muted);}
+
+/* ── FOOTER ── */
+footer{background:#08080B;border-top:1px solid var(--line);padding:34px 20px 110px;text-align:center;font-size:12.5px;color:#55555F;}
+footer a{color:var(--amber);font-weight:700;text-decoration:none;}
+
+/* ── STICKY BAR ── */
+.sticky{position:fixed;left:0;right:0;bottom:0;background:rgba(11,11,15,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:10px 16px;display:flex;align-items:center;justify-content:center;gap:18px;z-index:999;}
+.sticky-price{font-weight:900;font-size:20px;color:var(--amber);}
+.sticky-price s{font-size:13px;color:var(--muted);margin-right:6px;}
+.sticky-txt{font-size:12px;color:var(--muted);font-weight:700;}
+.sticky .cta{padding:13px 28px;font-size:15px;}
+
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:9999;align-items:center;justify-content:center;padding:16px;}
+.modal{background:#fff;border-radius:20px;padding:36px 30px;max-width:460px;width:100%;position:relative;color:#222;max-height:92vh;overflow-y:auto;}
+.modal-x{position:absolute;top:14px;right:18px;background:none;border:none;font-size:26px;cursor:pointer;color:#999;}
+.modal-badge{background:#fff176;display:inline-block;padding:6px 18px;border-radius:30px;font-size:12.5px;font-weight:800;color:var(--navy);margin-bottom:12px;}
+.modal h2{font-size:21px;font-weight:900;color:var(--navy);line-height:1.3;}
+.modal .msub{font-size:13px;color:#777;margin:8px 0 22px;}
+.f-label{font-size:13px;font-weight:700;color:#333;display:block;margin-bottom:6px;}
+.f-input{width:100%;padding:13px 15px;border:2px solid #e0e0e0;border-radius:10px;font-size:15px;outline:none;font-family:inherit;margin-bottom:14px;}
+.f-input:focus{border-color:var(--navy);}
+.phone-row{display:flex;gap:10px;margin-bottom:18px;}
+.phone-cc{background:#f5f5f5;border:2px solid #e0e0e0;border-radius:10px;padding:13px 13px;font-size:15px;font-weight:700;color:#333;flex-shrink:0;}
+.phone-row .f-input{flex:1;margin-bottom:0;}
+.bump{cursor:pointer;background:linear-gradient(135deg,#fff8e1,#fff3cd);border:2.5px dashed #f59e0b;border-radius:14px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:flex-start;gap:12px;transition:all .2s;}
+.bump.on{background:linear-gradient(135deg,#fef3c7,#fde68a);border-style:solid;border-color:#d97706;}
+.bump-check{width:22px;height:22px;border-radius:6px;border:2.5px solid #f59e0b;background:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:2px;transition:all .2s;}
+.bump.on .bump-check{background:#f59e0b;}
+.bump-tag{font-size:11.5px;font-weight:900;color:#92400e;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
+.bump-title{font-size:15px;font-weight:900;color:#1a1a1a;margin-bottom:4px;}
+.bump-desc{font-size:12.5px;color:#555;line-height:1.5;margin-bottom:6px;}
+.bump-price{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:900;color:#e8251a;}
+.bump-price s{font-size:12.5px;color:#aaa;font-weight:600;}
+.bump-off{background:#16a34a;color:#fff;font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px;}
+.pay-btn{width:100%;background:linear-gradient(135deg,#e8251a,#ff4444);color:#fff;border:none;border-radius:50px;padding:17px;font-size:17px;font-weight:900;cursor:pointer;font-family:inherit;}
+.pay-secure{text-align:center;font-size:11.5px;color:#aaa;margin-top:10px;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:820px){
+  .steps,.agenda{grid-template-columns:1fr;}
+  .bonuses{grid-template-columns:1fr;}
+  .about{grid-template-columns:1fr;text-align:center;}
+  .about-photo{margin:0 auto;}
+  .sec{padding:46px 0;}
+  .sticky-txt{display:none;}
+  .hero{padding:30px 0 40px;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">★ 110% Money Back Guarantee — Build Your App in 30 Min or Get Full Refund + ₹25 Extra!</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-badge"><span class="dot"></span> Live Workshop · June 14 · 2:00 PM IST</div>
+    <h1>Build Your Dream App in<br/><span class="hl">30 Minutes</span> Using The Power of <span class="ul">A.I.</span></h1>
+    <p class="hero-sub">No coding. No developer. No tech background needed. Watch your app come alive <b>in front of your eyes — live</b>, and walk away with a working app you built yourself.</p>
+    <div class="chips">
+      <span class="chip"><span>✗</span>No Coding</span>
+      <span class="chip"><span>✗</span>No Developer</span>
+      <span class="chip"><span>✗</span>No Experience</span>
+    </div>
+    <div class="video-frame">
+      <div class="video-thumb" id="heroVideo" onclick="playVideo()">
+        <img src="https://i.ytimg.com/vi/MTdZrsozNrA/maxresdefault.jpg" alt="Watch before you enroll" onerror="this.src='https://i.ytimg.com/vi/MTdZrsozNrA/mqdefault.jpg'"/>
+        <div class="play-btn"></div>
+      </div>
+    </div>
+    <button class="cta enroll-btn">ENROLL NOW — ₹99 →<small>Get Bonuses Worth ₹24,997 Free</small></button>
+    <p class="cta-note">🔥 Only 49 seats left &nbsp;·&nbsp; <b>110% Money Back Guarantee</b></p>
+  </div>
+</section>
+
+<!-- TRUST STRIP -->
+<div class="trust">
+  <div class="trust-item"><b>500+</b> Students Trained</div>
+  <div class="trust-item"><b>30</b> Min To Your First App</div>
+  <div class="trust-item"><b>₹0</b> Spent On Developers</div>
+  <div class="trust-item"><b>110%</b> Money Back Guarantee</div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="sec">
+  <div class="wrap">
+    <h2 class="sec-title">After Helping <span class="hl">500+ Students</span> Build Apps —<br/>The Only System <span class="ul">You'll Ever Need</span></h2>
+    <p class="sec-sub">In just 30 minutes you can be ready to launch your dream app. Here's the exact 3-step system you'll master live:</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>💡 Describe Your Idea</h3>
+        <p>Tell AI what app you want — in plain Hindi or English. Food delivery, salon booking, gym app, anything. The AI App Formula gives you the exact prompts.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>⚡ Watch AI Build It Live</h3>
+        <p>Your app takes shape in real time — design, features, payments, login, notifications. All added by simply typing what you want.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>🚀 Publish & Share Same Day</h3>
+        <p>Get a shareable link instantly. Send it to customers and start getting orders the same day — and update it yourself anytime, forever free.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section class="sec sec-alt">
+  <div class="wrap">
+    <h2 class="sec-title">You Can Keep Paying Developers The Hard Way...<br/>Or <span class="mark">Learn The Skill That Changes Everything</span></h2>
+    <p class="sec-sub">A typical app from an agency costs ₹2-5 lakhs and takes 3-6 months. In this workshop, you build it yourself in 30 minutes — and you keep that skill for life.</p>
+    <div style="display:flex;justify-content:center;">
+      <button class="cta enroll-btn">YES! I WANT THIS SKILL — ₹99 →<small>Live on Zoom · June 14 · 2 PM</small></button>
+    </div>
+  </div>
+</section>
+
+<!-- AGENDA -->
+<section class="sec">
+  <div class="wrap">
+    <h2 class="sec-title">Results Driven Agenda For The<br/><span class="ul">30-Min App Building</span> Workshop</h2>
+    <p class="sec-sub">Everything is hands-on. You watch, you build, you launch — all in one live session.</p>
+    <div class="agenda">
+      <div class="ag-card">
+        <div class="ag-head">☀️ Part 01 — Build</div>
+        <ul class="ag-body">
+          <li>The AI App Formula — exact prompts that build any app instantly</li>
+          <li>Choose the right AI tool for your specific business type</li>
+          <li>Describe your idea — watch AI build it live in real time</li>
+          <li>The one mistake that makes most AI apps look unprofessional</li>
+        </ul>
+      </div>
+      <div class="ag-card">
+        <div class="ag-head">☀️ Part 02 — Power Up</div>
+        <ul class="ag-body">
+          <li>Add payment gateway — start accepting money instantly</li>
+          <li>Add booking system, login, push notifications — zero coding</li>
+          <li>Customize design — logo, colors, branding, all by typing</li>
+          <li>The 5-minute method to add any feature you can imagine</li>
+        </ul>
+      </div>
+      <div class="ag-card">
+        <div class="ag-head">☀️ Part 03 — Launch</div>
+        <ul class="ag-body">
+          <li>Publish your app and get a shareable link immediately</li>
+          <li>Send to customers — start getting orders the same day</li>
+          <li>How to update your app anytime on your own — forever free</li>
+          <li>Live Q&A — all your doubts answered by the instructor</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BONUSES -->
+<section class="sec sec-alt">
+  <div class="wrap">
+    <h2 class="sec-title">Get INSANE Bonuses <span class="hl">(Previously Sold For ₹24,997)</span></h2>
+    <p class="sec-sub">Enroll today and every single one of these is yours free:</p>
+    <div class="bonuses">
+      <div class="bonus">
+        <div class="bonus-icon">📜</div>
+        <div>
+          <h3>AI Prompt Cheat Sheet</h3>
+          <p>Copy-paste prompts that build any type of app — food, salon, gym, education, e-commerce and more.</p>
+          <span class="val">Worth ₹4,999</span>
+        </div>
+      </div>
+      <div class="bonus">
+        <div class="bonus-icon">🎥</div>
+        <div>
+          <h3>Lifetime Recording Access</h3>
+          <p>Can't attend live or want to rewatch? Get the complete workshop recording, yours forever. (₹199 plan)</p>
+          <span class="val">Worth ₹6,999</span>
+        </div>
+      </div>
+      <div class="bonus">
+        <div class="bonus-icon">💬</div>
+        <div>
+          <h3>Private WhatsApp Community</h3>
+          <p>Direct support from Palash and a community of app builders — get unstuck fast, share wins, find clients.</p>
+          <span class="val">Worth ₹7,999</span>
+        </div>
+      </div>
+      <div class="bonus">
+        <div class="bonus-icon">📘</div>
+        <div>
+          <h3>App Business Workbook & Cheat Sheets</h3>
+          <p>Step-by-step workbook to turn your app into a real business — pricing, customers, and growth.</p>
+          <span class="val">Worth ₹5,000</span>
+        </div>
+      </div>
+    </div>
+    <div class="bonus-total">Total Bonus Value: <b>₹24,997</b> — Yours FREE when you enroll today for just ₹99</div>
+  </div>
+</section>
+
+<!-- PRICE -->
+<section class="sec" id="book">
+  <div class="wrap">
+    <h2 class="sec-title">Your Investment Today</h2>
+    <p class="sec-sub">Less than the cost of one pizza — for a skill that saves you lakhs in developer fees.</p>
+    <div class="price-box">
+      <div class="price-old">Regular Price: ₹999</div>
+      <div class="price-now"><sup>₹</sup>99</div>
+      <div class="price-tag">⚡ 90% OFF — Today Only</div>
+      <ul class="price-list">
+        <li>Full live 30-min app building workshop</li>
+        <li>AI Prompt Cheat Sheet (₹4,999)</li>
+        <li>Private WhatsApp Community (₹7,999)</li>
+        <li>App Business Workbook (₹5,000)</li>
+        <li>110% Money Back Guarantee</li>
+      </ul>
+      <button class="cta enroll-btn">ENROLL NOW — ₹99 →<small>Seats filling fast for June 14</small></button>
+    </div>
+    <div class="guarantee-box">
+      <h3>🛡️ 110% Money Back Guarantee</h3>
+      <p>If you can't build your app in 30 minutes, you get your full ₹99 back <b style="color:var(--green);">plus ₹25 extra</b>. No questions asked. You literally cannot lose.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="sec sec-alt">
+  <div class="wrap">
+    <h2 class="sec-title">Meet Your <span class="hl">Instructor</span></h2>
+    <p class="sec-sub">Who is Palash and why should you care?</p>
+    <div class="about">
+      <div class="about-photo">P</div>
+      <div>
+        <h3>Palash Rajak</h3>
+        <p>Co-founder of a creative agency and creator of the AI App Building Workshop. Palash has helped <b style="color:var(--txt);">500+ students</b> — shop owners, freelancers, coaches and complete beginners — build their first app without writing a single line of code.</p>
+        <p>His promise is simple: if he can show a complete non-coder how to launch an app in 30 minutes, imagine what you can build for your business.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="sec">
+  <div class="wrap">
+    <h2 class="sec-title"><span class="hl">Frequently</span> Asked Questions</h2>
+    <div class="faq" style="margin-top:36px;">
+      <details>
+        <summary>Mujhe coding nahi aati — kya main app bana paunga?</summary>
+        <div class="faq-body">Bilkul! Is workshop ka pura system AI par based hai. Aapko sirf apne idea ko describe karna hai — AI sab build karega. 500+ non-coders already apne apps bana chuke hain.</div>
+      </details>
+      <details>
+        <summary>Kitne time mein app ban jayega?</summary>
+        <div class="faq-body">Workshop ke andar hi — sirf 30 minutes mein aapka app ready ho jayega. Live, real-time, step-by-step aapke saamne.</div>
+      </details>
+      <details>
+        <summary>Is there a guarantee?</summary>
+        <div class="faq-body">100% Money Back Guarantee. Agar workshop pasand nahi aayi — koi sawaal nahi, full refund. Simple.</div>
+      </details>
+      <details>
+        <summary>When can I access the bonuses?</summary>
+        <div class="faq-body">Immediately after enrollment — all bonuses are delivered to your WhatsApp and email right away.</div>
+      </details>
+      <details>
+        <summary>What if I can't attend live on June 14?</summary>
+        <div class="faq-body">Choose the ₹199 option at checkout — it includes lifetime access to the full workshop recording, so you can watch anytime.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>Copyright © 2026, AI App Building Workshop. All rights reserved.</p>
+  <p style="margin-top:8px;">This site is not a part of Meta™ Inc. All content is for informational and promotional purposes only. Results may vary.</p>
+  <p style="margin-top:14px;">
+    📞 Need help? Call or WhatsApp: <a href="tel:9109637004">9109637004</a> &nbsp;|&nbsp;
+    📧 <a href="mailto:buildmyaiapp@gmail.com">buildmyaiapp@gmail.com</a>
+  </p>
+</footer>
+
+<!-- STICKY BAR -->
+<div class="sticky">
+  <div>
+    <div class="sticky-price"><s>₹999</s>₹99</div>
+  </div>
+  <div class="sticky-txt">Get Bonuses worth ₹24,997 free · 🛡️ 110% Money Back Guarantee</div>
+  <button class="cta enroll-btn">ENROLL NOW →</button>
+</div>
+
+<!-- LEAD FORM MODAL -->
+<div id="rzp-modal" class="modal-bg">
+  <div class="modal">
+    <button class="modal-x" onclick="closeModal()">×</button>
+    <div style="text-align:center;">
+      <div class="modal-badge">🔥 ONLY 49 SEATS LEFT</div>
+      <h2>One Step Away From<br/>Building Your First App!</h2>
+      <p class="msub">Enter your details to proceed to payment</p>
+    </div>
+    <form id="rzp-form" onsubmit="startPayment(event)">
+      <label class="f-label">Full Name *</label>
+      <input id="rzp-name" class="f-input" type="text" placeholder="Enter your full name" required/>
+      <label class="f-label">Email Address *</label>
+      <input id="rzp-email" class="f-input" type="email" placeholder="Enter your email" required/>
+      <label class="f-label">WhatsApp Number *</label>
+      <div class="phone-row">
+        <div class="phone-cc">+91</div>
+        <input id="rzp-phone" class="f-input" type="tel" placeholder="10-digit mobile number" required maxlength="10" pattern="[0-9]{10}"/>
+      </div>
+      <!-- ORDER BUMP -->
+      <div id="bump-box" class="bump" onclick="toggleBump()">
+        <div class="bump-check" id="bump-check"></div>
+        <div>
+          <div class="bump-tag">⚡ Add-On — Check This Box!</div>
+          <div class="bump-title">🎥 Get the Full Workshop Recording</div>
+          <div class="bump-desc">Can't attend live? Miss anything? Get lifetime access to the complete recording — rewatch anytime, forever.</div>
+          <div class="bump-price">Only ₹100 extra <s>₹299</s> <span class="bump-off">67% OFF</span></div>
+        </div>
+      </div>
+      <button type="submit" id="rzp-pay-btn" class="pay-btn">🔒 Pay ₹99 &amp; Secure My Seat →</button>
+      <p class="pay-secure">🔐 100% Secure Payment via Razorpay &nbsp;|&nbsp; ✅ Money Back Guarantee</p>
+    </form>
+  </div>
+</div>
+
+<!-- PAYMENT LOGIC -->
+<script>
+const PAYMENT_LINK      = 'https://pages.razorpay.com/pl_SkNpn0hrFrJJYA/view'; // ₹99 — live only
+const PAYMENT_LINK_BUMP = 'https://pages.razorpay.com/pl_StwAUVFbFCMr3f/view'; // ₹199 — live + recording
+const WORKSHOP_DATE     = 'June 14';
+const APPS_SCRIPT       = 'https://script.google.com/macros/s/AKfycbxYRF3i6LijjVsaiVUYnO7l463kON3sOUPxCq-G0hmqkpRnL-NzGbgRyutD9SkY8XI9EA/exec';
+var bumpSelected = false;
+
+function playVideo(){
+  document.getElementById('heroVideo').innerHTML = '<iframe src="https://www.youtube.com/embed/MTdZrsozNrA?rel=0&autoplay=1&playsinline=1" frameborder="0" allow="autoplay;encrypted-media" allowfullscreen style="width:100%;height:100%;position:absolute;top:0;left:0;"></iframe>';
+}
+
+function toggleBump(){
+  bumpSelected = !bumpSelected;
+  var box = document.getElementById('bump-box');
+  var check = document.getElementById('bump-check');
+  var btn = document.getElementById('rzp-pay-btn');
+  if (bumpSelected) {
+    box.classList.add('on');
+    check.innerHTML = '✅';
+    btn.innerHTML = '🔒 Pay ₹199 &amp; Get Recording →';
+  } else {
+    box.classList.remove('on');
+    check.innerHTML = '';
+    btn.innerHTML = '🔒 Pay ₹99 &amp; Secure My Seat →';
+  }
+}
+
+document.querySelectorAll('.enroll-btn').forEach(function(btn){
+  btn.addEventListener('click', function(e){
+    e.preventDefault();
+    openModal();
+  });
+});
+
+function openModal(){
+  document.getElementById('rzp-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(){
+  document.getElementById('rzp-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+document.getElementById('rzp-modal').addEventListener('click', function(e){
+  if (e.target === this) closeModal();
+});
+
+function startPayment(e){
+  e.preventDefault();
+  var name  = document.getElementById('rzp-name').value.trim();
+  var email = document.getElementById('rzp-email').value.trim();
+  var rawPhone = document.getElementById('rzp-phone').value.trim();
+  var phone = '+91' + rawPhone;
+
+  if (!name || !email || !rawPhone || phone.length < 13) {
+    alert('Please fill all fields correctly.');
+    return;
+  }
+
+  var btn = document.getElementById('rzp-pay-btn');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Opening Payment...';
+
+  var amount = bumpSelected ? 19900 : 9900;
+  var leadData = { name: name, email: email, phone: phone, paymentId: 'PAYMENT_INITIATED', amount: amount };
+
+  try {
+    sessionStorage.setItem('buyer_name', name.split(' ')[0]);
+    sessionStorage.setItem('pending_lead', JSON.stringify(leadData));
+  } catch(err) {}
+
+  if (typeof fbq !== 'undefined') {
+    if (!sessionStorage.getItem('checkout_fired')) {
+      fbq('track', 'InitiateCheckout', { value: 99, currency: 'INR' });
+      fbq('track', 'Lead');
+      sessionStorage.setItem('checkout_fired', '1');
+    }
+  }
+
+  saveLead(leadData);
+
+  var activeLink = bumpSelected ? PAYMENT_LINK_BUMP : PAYMENT_LINK;
+  var finalLink = activeLink
+    + '?name='    + encodeURIComponent(name)
+    + '&email='   + encodeURIComponent(email)
+    + '&contact=' + encodeURIComponent(rawPhone);
+
+  window.location.href = finalLink;
+}
+
+function saveLead(data){
+  try {
+    var params = new URLSearchParams({
+      name:      data.name,
+      email:     data.email,
+      phone:     data.phone,
+      paymentId: data.paymentId || 'LEAD'
+    });
+    var url = APPS_SCRIPT + '?' + params.toString();
+    // GET request that survives the redirect to Razorpay. The Apps Script only
+    // accepts GET (doGet); navigator.sendBeacon sends a POST and is rejected (405).
+    fetch(url, { method: 'GET', mode: 'no-cors', keepalive: true });
+  } catch(err) {}
+  try {
+    var leads = JSON.parse(localStorage.getItem('rzp_leads') || '[]');
+    leads.push(Object.assign({}, data, { time: new Date().toISOString() }));
+    localStorage.setItem('rzp_leads', JSON.stringify(leads));
+  } catch(err) {}
+}
+</script>
+
+</body>
+</html>
