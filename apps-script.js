@@ -3,14 +3,23 @@
 // Handles: Google Sheet + Email + WhatsApp confirmation
 // ============================================================
 
-// ── CONFIG — Fill these in ──────────────────────────────────
+// ── CONFIG ───────────────────────────────────────────────────
+// SHEET_NAME is read from Sheet1!B1 in the spreadsheet.
+// To change the active batch: just update that ONE cell — no script edit needed.
 const CONFIG = {
-  SHEET_NAME:      'Batch 6',
+  SHEET_ID:        '18c0VazYcBZtgdFDzJK6baFb4ZQieb0_mhfWzzkIcKRA',
   SENDER_NAME:     'Palash — AI App Workshop',
-  WORKSHOP_DATE:   '14th June 2026, 2:00 PM IST',
+  WORKSHOP_DATE:   '28th June 2026, 2:00 PM IST',
   WHATSAPP_API_KEY: '',
   WHATSAPP_NUMBER:  '',
 };
+
+function getActiveBatch() {
+  const name = SpreadsheetApp.openById(CONFIG.SHEET_ID)
+    .getSheetByName('Sheet1').getRange('B1').getValue();
+  if (!name) throw new Error('Active batch not set! Put the tab name in Sheet1 cell B1.');
+  return name.toString().trim();
+}
 // ────────────────────────────────────────────────────────────
 
 function doPost(e) {
@@ -69,11 +78,12 @@ function doGet(e) {
 // 1. SAVE LEAD TO GOOGLE SHEET
 // ────────────────────────────────────────────────────────────
 function saveLead(name, email, phone, paymentId, amount, isRecording) {
-  const ss = SpreadsheetApp.openById('18c0VazYcBZtgdFDzJK6baFb4ZQieb0_mhfWzzkIcKRA');
-  let sheet = ss.getSheetByName(CONFIG.SHEET_NAME);
+  const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
+  const batchName = getActiveBatch();
+  let sheet = ss.getSheetByName(batchName);
 
   if (!sheet) {
-    sheet = ss.insertSheet(CONFIG.SHEET_NAME);
+    sheet = ss.insertSheet(batchName);
     sheet.appendRow([
       '📅 Date & Time', '👤 Name', '📧 Email',
       '📱 WhatsApp', '💳 Payment ID', '💰 Amount',
@@ -116,8 +126,8 @@ function saveLead(name, email, phone, paymentId, amount, isRecording) {
 // 2. UPDATE EXISTING ROW FROM INITIATED → PAID
 // ────────────────────────────────────────────────────────────
 function updateLeadStatus(phoneOrEmail, paymentId, amount, isRecording) {
-  const ss = SpreadsheetApp.openById('18c0VazYcBZtgdFDzJK6baFb4ZQieb0_mhfWzzkIcKRA');
-  const sheet = ss.getSheetByName(CONFIG.SHEET_NAME);
+  const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
+  const sheet = ss.getSheetByName(getActiveBatch());
   if (!sheet) return false;
 
   const data = sheet.getDataRange().getValues();
@@ -208,7 +218,7 @@ function sendEmail(name, email, paymentId) {
         <div style="background:linear-gradient(135deg,#e8f5e9,#d0f0da);border:2.5px solid #25D366;border-radius:16px;padding:20px;text-align:center;margin-bottom:24px;">
           <div style="font-size:13px;font-weight:800;color:#1a6b35;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">⚡ Step 1 — Join WhatsApp Group NOW</div>
           <div style="font-size:13px;color:#2e7d32;margin-bottom:14px;">Get the Zoom link, updates & reminders — all in the group</div>
-          <a href="https://chat.whatsapp.com/CctaMw4b06tCGVP4bVjVjF" style="display:block;background:#25D366;color:#fff;text-decoration:none;padding:16px 24px;border-radius:12px;font-size:16px;font-weight:900;box-shadow:0 6px 24px rgba(37,211,102,0.4);">💬 Join WhatsApp Group →</a>
+          <a href="https://chat.whatsapp.com/JxqwH8fYQTI0hEObivLnIo?s=cl&p=a&mlu=0" style="display:block;background:#25D366;color:#fff;text-decoration:none;padding:16px 24px;border-radius:12px;font-size:16px;font-weight:900;box-shadow:0 6px 24px rgba(37,211,102,0.4);">💬 Join WhatsApp Group →</a>
         </div>
 
         <div class="steps">
