@@ -6,8 +6,11 @@
 
 const http  = require('http');
 const https = require('https');
+const fs    = require('fs');
+const path  = require('path');
 const PORT  = process.env.PORT || 7824;
 const API_KEY = process.env.ANTHROPIC_API_KEY || '';
+const DIR  = __dirname;
 
 const ALLOWED_ORIGIN = '*';
 
@@ -28,9 +31,41 @@ http.createServer((req, res) => {
   }
 
   // Health check
-  if (req.method === 'GET' || req.url === '/health') {
+  if (req.method === 'GET' && req.url === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ status: 'ok', workshop: 'Build My App', keySet: !!API_KEY }));
+    return;
+  }
+
+  // Serve workshop-tool.html (and its static deps) on the SAME origin
+  // as the proxy, so the tool's relative fetch('/api/claude') works.
+  // Inject window._WEBINAR_MODE = true so the tool hides the API-key box.
+  if (req.method === 'GET') {
+    const reqUrl = new URL(req.url, `http://localhost:${PORT}`);
+    let pathname = reqUrl.pathname === '/' ? '/workshop-tool.html' : reqUrl.pathname;
+    const resolved = path.resolve(path.join(DIR, pathname));
+    if (!resolved.startsWith(path.resolve(DIR))) {
+      res.writeHead(403);
+      res.end('Forbidden');
+      return;
+    }
+    fs.readFile(resolved, 'utf8', (err, data) => {
+      if (err) {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('404 Not Found: ' + pathname);
+        return;
+      }
+      const ext = path.extname(resolved).toLowerCase();
+      if (ext === '.html') {
+        data = data.replace('<script>', '<script>window._WEBINAR_MODE = true;</script><script>', 1);
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      } else {
+        const mime = { '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png',
+          '.jpg': 'image/jpeg', '.svg': 'image/svg+xml' }[ext] || 'application/octet-stream';
+        res.writeHead(200, { 'Content-Type': mime });
+      }
+      res.end(data);
+    });
     return;
   }
 
