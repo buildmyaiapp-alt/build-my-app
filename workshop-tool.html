@@ -27,13 +27,13 @@
     .form-card textarea:focus{border-color:#F5A623;}
     .form-card textarea::placeholder{color:rgba(255,255,255,0.3);}
     .examples{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
-    .ex-btn{background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.3);color:#F5A623;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;}
-    .ex-btn:hover{background:rgba(245,166,35,0.25);}
+    .ex-btn{background:rgba(var(--pr),0.1);border:1px solid rgba(var(--pr),0.3);color:#F5A623;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+    .ex-btn:hover{background:rgba(var(--pr),0.25);}
     .build-btn{width:100%;background:linear-gradient(135deg,#F5A623,#e8960f);color:#000;border:none;padding:18px;border-radius:14px;font-size:18px;font-weight:900;cursor:pointer;margin-top:20px;transition:transform 0.2s,box-shadow 0.2s;letter-spacing:0.5px;}
-    .build-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 30px rgba(245,166,35,0.4);}
+    .build-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 30px rgba(var(--pr),0.4);}
     .build-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
     .loading{text-align:center;padding:40px;display:none;}
-    .spinner{width:48px;height:48px;border:4px solid rgba(245,166,35,0.2);border-top-color:#F5A623;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;}
+    .spinner{width:48px;height:48px;border:4px solid rgba(var(--pr),0.2);border-top-color:#F5A623;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;}
     @keyframes spin{to{transform:rotate(360deg);}}
     .loading p{color:rgba(255,255,255,0.6);font-size:15px;}
     .loading .step{color:#F5A623;font-weight:700;font-size:18px;margin-bottom:8px;}
@@ -44,8 +44,8 @@
     .action-btn{padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all 0.2s;}
     .btn-download{background:#25D366;color:#fff;}
     .btn-mobile{background:#0d1b6e;color:#fff;border:1px solid #F5A623;}
-    .btn-rebuild{background:rgba(245,166,35,0.15);color:#F5A623;border:1px solid rgba(245,166,35,0.3);}
-    .preview-wrap{border-radius:16px;overflow:hidden;border:2px solid rgba(245,166,35,0.3);background:#fff;}
+    .btn-rebuild{background:rgba(var(--pr),0.15);color:#F5A623;border:1px solid rgba(var(--pr),0.3);}
+    .preview-wrap{border-radius:16px;overflow:hidden;border:2px solid rgba(var(--pr),0.3);background:#fff;}
     .preview-toolbar{background:#1a1a2e;padding:10px 16px;display:flex;align-items:center;gap:8px;}
     .dot{width:12px;height:12px;border-radius:50%;}
     .dot-r{background:#ff5f57;}.dot-y{background:#febc2e;}.dot-g{background:#28c840;}
@@ -59,7 +59,7 @@
     .success-text{font-size:14px;color:rgba(255,255,255,0.8);line-height:1.5;}
     .success-text strong{color:#28c864;font-size:16px;display:block;margin-bottom:2px;}
     .footer{text-align:center;padding:32px;color:rgba(255,255,255,0.3);font-size:12px;}
-    .api-setup{background:rgba(245,166,35,0.08);border:2px solid rgba(245,166,35,0.4);border-radius:16px;padding:24px;margin-bottom:24px;}
+    .api-setup{background:rgba(var(--pr),0.08);border:2px solid rgba(var(--pr),0.4);border-radius:16px;padding:24px;margin-bottom:24px;}
     .api-setup h3{color:#F5A623;font-size:14px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
     .api-setup p{color:rgba(255,255,255,0.5);font-size:13px;margin-bottom:12px;}
     .api-row{display:flex;gap:10px;}
@@ -92,7 +92,7 @@
 <div class="main">
 
   <!-- SERVER SETUP BOX — shown when server not running -->
-  <div id="serverSetupBox" style="background:rgba(245,166,35,0.08);border:2px solid rgba(245,166,35,0.5);border-radius:16px;padding:20px 24px;margin-bottom:20px;">
+  <div id="serverSetupBox" style="background:rgba(var(--pr),0.08);border:2px solid rgba(var(--pr),0.5);border-radius:16px;padding:20px 24px;margin-bottom:20px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
       <span style="font-size:24px;">🖥️</span>
       <div>
@@ -211,7 +211,7 @@
     </div>
 
     <!-- OPEN IN NEW TAB — fully working, no iframe restrictions -->
-    <div style="background:linear-gradient(135deg,rgba(245,166,35,0.15),rgba(245,166,35,0.05));border:2px solid rgba(245,166,35,0.5);border-radius:16px;padding:20px 24px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+    <div style="background:linear-gradient(135deg,rgba(var(--pr),0.15),rgba(var(--pr),0.05));border:2px solid rgba(var(--pr),0.5);border-radius:16px;padding:20px 24px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
       <div>
         <div style="font-size:16px;font-weight:900;color:#F5A623;margin-bottom:4px;">🚀 Test Your Full App</div>
         <div style="font-size:13px;color:rgba(255,255,255,0.6);">Opens in a new tab — all buttons, login, Firebase, everything works here</div>
@@ -237,7 +237,7 @@
     <div id="tokenUsage" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 16px;margin-top:14px;font-size:12px;color:rgba(255,255,255,0.45);font-weight:600;text-align:center;display:block;"></div>
 
     <!-- DOWNLOAD + APK -->
-    <div style="background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.2);border-radius:16px;padding:20px;margin-top:20px;">
+    <div style="background:rgba(var(--pr),0.08);border:1px solid rgba(var(--pr),0.2);border-radius:16px;padding:20px;margin-top:20px;">
       <div style="font-size:15px;font-weight:800;color:#F5A623;margin-bottom:6px;">📦 Download & Install on Phone</div>
       <div style="font-size:13px;color:rgba(255,255,255,0.45);margin-bottom:14px;">Download your app, then follow the steps below to get it on your phone</div>
       <button onclick="downloadApp()" style="width:100%;background:#25D366;color:#fff;border:none;padding:14px;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer;margin-bottom:16px;">⬇️ Download My App (HTML File)</button>
@@ -699,7 +699,7 @@ const AUTO_LOGOUT_SCRIPT = `<script>
   // Top bar with user name + logout — visible for ALL roles, impossible to miss
   var _bar=document.createElement('div');
   _bar.id='_aLB';
-  _bar.style.cssText='display:none;position:fixed;top:0;left:0;right:0;z-index:999999;background:rgba(13,27,110,0.97);backdrop-filter:blur(8px);padding:8px 16px;justify-content:space-between;align-items:center;font-family:-apple-system,sans-serif;border-bottom:1px solid rgba(245,166,35,0.3);box-shadow:0 2px 12px rgba(0,0,0,0.3);';
+  _bar.style.cssText='display:none;position:fixed;top:0;left:0;right:0;z-index:999999;background:rgba(13,27,110,0.97);backdrop-filter:blur(8px);padding:8px 16px;justify-content:space-between;align-items:center;font-family:-apple-system,sans-serif;border-bottom:1px solid rgba(var(--pr),0.3);box-shadow:0 2px 12px rgba(0,0,0,0.3);';
   var _nameSpan=document.createElement('span');
   _nameSpan.style.cssText='color:#F5A623;font-size:12px;font-weight:700;';
   _nameSpan.textContent='👤 Welcome!';
@@ -838,12 +838,12 @@ function prepareApp(html) {
       roles.forEach(function(r,i){
         var btn=document.createElement('button');
         btn.textContent=r.label;
-        btn.style.cssText='flex:1;padding:10px 6px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid rgba(255,255,255,'+(i===0?'0.4':'0.15')+');background:rgba(245,166,35,'+(i===0?'0.25':'0.05')+');color:'+(i===0?'#F5A623':'rgba(255,255,255,0.5)')+';';
+        btn.style.cssText='flex:1;padding:10px 6px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid rgba(255,255,255,'+(i===0?'0.4':'0.15')+');background:rgba(var(--pr),'+(i===0?'0.25':'0.05')+');color:'+(i===0?'#F5A623':'rgba(255,255,255,0.5)')+';';
         btn.onclick=function(){
           if(typeof selectRole==='function')selectRole(r.id);
           if(typeof window.currentUserRole!=='undefined')window.currentUserRole=r.id;
-          document.querySelectorAll('#_roleSel button').forEach(function(b){b.style.background='rgba(245,166,35,0.05)';b.style.color='rgba(255,255,255,0.5)';b.style.borderColor='rgba(255,255,255,0.15)';});
-          btn.style.background='rgba(245,166,35,0.25)';btn.style.color='#F5A623';btn.style.borderColor='rgba(255,255,255,0.4)';
+          document.querySelectorAll('#_roleSel button').forEach(function(b){b.style.background='rgba(var(--pr),0.05)';b.style.color='rgba(255,255,255,0.5)';b.style.borderColor='rgba(255,255,255,0.15)';});
+          btn.style.background='rgba(var(--pr),0.25)';btn.style.color='#F5A623';btn.style.borderColor='rgba(255,255,255,0.4)';
         };
         roleSel.appendChild(btn);
         if(i===0){btn.click();if(typeof window.currentUserRole!=='undefined')window.currentUserRole=r.id;}
@@ -1453,17 +1453,19 @@ This applies to ALL roles that are "added by admin" before they create their acc
 DESIGN RULES — MAKE IT LOOK LIKE A REAL ₹10 LAKH APP:
 The app must look so impressive that students gasp. Use these exact patterns:
 
-COLOR PALETTES (pick based on app type):
-- Gym/Fitness: bg=#0a0a0f, primary=#6c3aed, accent=#a855f7, card=#12121a
-- Restaurant/Food: bg=#0d0a00, primary=#f59e0b, accent=#fbbf24, card=#1a1500
-- Salon/Beauty: bg=#0d000a, primary=#ec4899, accent=#f472b6, card=#1a0012
-- School/Education: bg=#000d1a, primary=#3b82f6, accent=#60a5fa, card=#001224
-- Hospital/Health: bg=#000d0a, primary=#10b981, accent=#34d399, card=#001a12
-- Shop/Ecommerce: bg=#0a000d, primary=#8b5cf6, accent=#a78bfa, card=#0f0015
-- Any other: bg=#0a0a0f, primary=#6c3aed, accent=#a855f7, card=#12121a
+COLOR PALETTES — COPY THE EXACT ROOT BLOCK into :root{} (must set --p, --p2, --pr, --bg, --c):
+- Gym/Fitness:    --p:#a855f7;--p2:#6c3aed;--pr:168,85,247;--bg:#0a0a0f;--c:#12121a
+- Restaurant:     --p:#f59e0b;--p2:#ef4444;--pr:245,158,11;--bg:#0d0a00;--c:#1a1500
+- Salon/Beauty:   --p:#ec4899;--p2:#f472b6;--pr:236,72,153;--bg:#0d000a;--c:#1a0012
+- School/Edu:     --p:#3b82f6;--p2:#60a5fa;--pr:59,130,246;--bg:#000d1a;--c:#001224
+- Hospital/Health:--p:#10b981;--p2:#34d399;--pr:16,185,129;--bg:#000d0a;--c:#001a12
+- Shop/Ecommerce: --p:#8b5cf6;--p2:#a78bfa;--pr:139,92,246;--bg:#0a000d;--c:#0f0015
+- Finance/Crypto: --p:#6366f1;--p2:#818cf8;--pr:99,102,241;--bg:#07071a;--c:#0f0f24
+- Food Delivery:  --p:#f97316;--p2:#fb923c;--pr:249,115,22;--bg:#0d0800;--c:#1a1000
+- Any other:      --p:#a855f7;--p2:#6c3aed;--pr:168,85,247;--bg:#0a0a0f;--c:#12121a
 
 AUTH SCREEN — must look stunning:
-- Full screen gradient background: linear-gradient(135deg, bg 0%, a darker shade of primary 100%)
+- Full screen gradient background: linear-gradient(135deg, var(--bg) 0%, rgba(var(--pr),.15) 100%)
 - App logo/icon as big emoji (60px) with glow effect: filter:drop-shadow(0 0 20px primary)
 - App name in bold 28px white text
 - Glassmorphism card for the form: background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:28px
@@ -1503,6 +1505,9 @@ CONTENT AREA: padding-bottom:100px so content doesn't hide behind nav
 
 MINIFY ALL CSS — single line, no spaces after colons/semicolons is fine
 No placeholder text, no TODO comments, no code comments
+
+⚠️ NEVER use <input type="time"> — the AM/PM section cannot be typed into by users.
+   Always use <input type="text" placeholder="e.g. 10:30 AM"> for time fields instead.
 
 TECHNICAL RULES:
 - Use firebase-app-compat.js, firebase-auth-compat.js, firebase-firestore-compat.js (compat not modules)
@@ -1643,15 +1648,21 @@ Missing JS functions = all buttons dead = total failure.
    so loadOwnerDashboard() etc. work even though they are written after the observer.
 
 ⚠️ CSS MUST BE A SINGLE MINIFIED LINE — example:
-  <style>:root{--p:#F5A623;--bg:#0a0a0a;--c:#1a1a1a;--t:#fff}*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,sans-serif}body{background:var(--bg);color:var(--t)}#authScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:linear-gradient(135deg,#0a0a0a,#1a0a00)}.auth-box{background:#111;padding:32px;border-radius:20px;width:100%;max-width:380px;border:1px solid rgba(245,166,35,.2)}.auth-box h1{font-size:28px;font-weight:900;text-align:center;background:linear-gradient(135deg,var(--p),#FF6B35);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}.auth-box>p{text-align:center;opacity:.5;margin-bottom:22px;font-size:13px}.role-sel{display:flex;gap:8px;margin-bottom:18px}.role-btn{flex:1;padding:12px;background:rgba(245,166,35,.07);border:1.5px solid rgba(245,166,35,.25);border-radius:12px;color:rgba(255,255,255,.45);font-weight:700;font-size:13px;cursor:pointer;transition:all .25s}.role-btn.sel{background:rgba(245,166,35,.15);border-color:var(--p);color:#fff}input{width:100%;padding:14px;margin-bottom:12px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;color:var(--t);font-size:15px;transition:border .2s}input:focus{outline:none;border-color:var(--p)}.abtn{width:100%;padding:15px;background:linear-gradient(135deg,var(--p),#FF6B35);border:none;border-radius:12px;color:#fff;font-weight:800;font-size:16px;cursor:pointer;margin-bottom:10px;box-shadow:0 4px 18px rgba(245,166,35,.3);transition:transform .2s}.abtn:active{transform:scale(.97)}.abtn.sec{background:transparent;border:1.5px solid rgba(245,166,35,.3);color:var(--p);box-shadow:none}.tog{text-align:center;margin-top:12px;color:rgba(255,255,255,.4);font-size:13px;cursor:pointer}.tog span{color:var(--p);font-weight:700}#fbErr{display:none;background:rgba(229,57,53,.1);border:1px solid rgba(229,57,53,.4);padding:10px;border-radius:10px;margin-bottom:12px;font-size:13px;text-align:center;color:#ff6b6b}#customerApp,#ownerApp{display:none;max-width:430px;margin:0 auto;min-height:100vh;padding-bottom:76px}.sbar{padding:7px 18px;display:flex;justify-content:space-between;font-size:11px;font-weight:700;letter-spacing:.5px;border-bottom:1px solid rgba(245,166,35,.1);background:rgba(245,166,35,.05)}.hdr{padding:22px 18px 18px;background:linear-gradient(180deg,rgba(245,166,35,.1) 0%,transparent 100%)}.hdr-badge{display:inline-block;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--p);margin-bottom:8px;letter-spacing:.5px}.hdr h2{font-size:24px;font-weight:900;margin-bottom:3px;letter-spacing:-.3px}.hdr p{opacity:.45;font-size:13px}.tab-pane,.owner-pane{display:none;padding:14px}.tab-pane.active,.owner-pane.active{display:block}.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(10,10,10,.97);backdrop-filter:blur(20px);border-top:1px solid rgba(245,166,35,.1);display:flex;justify-content:space-around;padding:9px 0 13px}.nbtn{background:none;border:none;color:rgba(255,255,255,.35);font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;padding:4px 14px;letter-spacing:.3px;transition:color .2s}.nbtn.active{color:var(--p)}.nbtn .ni{font-size:20px}.card{background:var(--c);border-radius:16px;padding:16px;margin-bottom:12px;border:1px solid rgba(245,166,35,.1)}.card h3{font-size:14px;font-weight:800;color:var(--p);margin-bottom:10px}.pcard{background:var(--c);border-radius:16px;padding:16px;margin-bottom:10px;border:1px solid rgba(245,166,35,.1)}.pcard-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}.pcard-name{font-weight:700;font-size:15px}.pcard-price{font-size:17px;font-weight:900;color:var(--p)}.pcard-desc{font-size:12px;opacity:.4;margin-bottom:10px}.stat-row{display:flex;gap:10px;margin-bottom:14px}.stat{flex:1;background:linear-gradient(135deg,rgba(245,166,35,.1),rgba(255,107,53,.07));border-radius:16px;padding:16px;text-align:center;border:1px solid rgba(245,166,35,.13)}.stat .v{font-size:26px;font-weight:900;background:linear-gradient(135deg,var(--p),#FF6B35);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.stat .l{font-size:10px;opacity:.4;text-transform:uppercase;letter-spacing:1px;font-weight:700}.lbl{display:block;font-size:11px;font-weight:700;color:rgba(245,166,35,.75);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}.inp{width:100%;padding:12px 14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:11px;color:var(--t);font-size:14px;margin-bottom:12px}.inp:focus{outline:none;border-color:var(--p)}.big-btn{background:linear-gradient(135deg,var(--p),#FF6B35);color:#fff;border:none;padding:14px 20px;border-radius:13px;font-weight:800;cursor:pointer;width:100%;font-size:15px;box-shadow:0 4px 18px rgba(245,166,35,.25);transition:transform .2s}.big-btn:active{transform:scale(.97)}.danger-btn{background:linear-gradient(135deg,#FF5252,#D50000);color:#fff;border:none;padding:14px 20px;border-radius:13px;font-weight:800;cursor:pointer;width:100%;font-size:15px;box-shadow:0 4px 18px rgba(255,82,82,.25)}.sec-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.sec-head h3{font-size:17px;font-weight:800}.sm-btn{background:rgba(245,166,35,.1);color:var(--p);border:1.5px solid rgba(245,166,35,.3);padding:9px 14px;border-radius:11px;font-weight:700;font-size:12px;cursor:pointer}.prof-hero{background:linear-gradient(135deg,rgba(245,166,35,.1),rgba(255,107,53,.08));border-radius:20px;padding:26px 20px;margin-bottom:14px;border:1px solid rgba(245,166,35,.12);text-align:center}.prof-av{width:66px;height:66px;border-radius:50%;background:linear-gradient(135deg,var(--p),#FF6B35);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 12px;box-shadow:0 0 22px rgba(245,166,35,.3)}.prof-name{font-size:20px;font-weight:900;margin-bottom:3px}.prof-email{font-size:12px;opacity:.4;margin-bottom:10px}.prof-badge{display:inline-block;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:20px;padding:4px 14px;font-size:11px;font-weight:700;color:var(--p)}.form-sec{background:rgba(245,166,35,.04);border:1px solid rgba(245,166,35,.1);border-radius:16px;padding:16px;margin-bottom:14px}.item-row{background:var(--c);border-radius:14px;padding:14px;margin-bottom:9px;display:flex;align-items:center;gap:12px;border:1px solid rgba(245,166,35,.1)}.item-av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--p),#FF6B35);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff;flex-shrink:0}</style>
+  <style>:root{--p:#F5A623;--p2:#FF6B35;--pr:245,166,35;--bg:#0a0a0a;--c:#1a1a1a;--t:#fff}*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,sans-serif}body{background:var(--bg);color:var(--t)}#authScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:linear-gradient(135deg,var(--bg),rgba(var(--pr),.15))}.auth-box{background:#111;padding:32px;border-radius:20px;width:100%;max-width:380px;border:1px solid rgba(var(--pr),.2)}.auth-box h1{font-size:28px;font-weight:900;text-align:center;background:linear-gradient(135deg,var(--p),var(--p2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}.auth-box>p{text-align:center;opacity:.5;margin-bottom:22px;font-size:13px}.role-sel{display:flex;gap:8px;margin-bottom:18px}.role-btn{flex:1;padding:12px;background:rgba(var(--pr),.07);border:1.5px solid rgba(var(--pr),.25);border-radius:12px;color:rgba(255,255,255,.45);font-weight:700;font-size:13px;cursor:pointer;transition:all .25s}.role-btn.sel{background:rgba(var(--pr),.15);border-color:var(--p);color:#fff}input{width:100%;padding:14px;margin-bottom:12px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;color:var(--t);font-size:15px;transition:border .2s}input:focus{outline:none;border-color:var(--p)}.abtn{width:100%;padding:15px;background:linear-gradient(135deg,var(--p),var(--p2));border:none;border-radius:12px;color:#fff;font-weight:800;font-size:16px;cursor:pointer;margin-bottom:10px;box-shadow:0 4px 18px rgba(var(--pr),.3);transition:transform .2s}.abtn:active{transform:scale(.97)}.abtn.sec{background:transparent;border:1.5px solid rgba(var(--pr),.3);color:var(--p);box-shadow:none}.tog{text-align:center;margin-top:12px;color:rgba(255,255,255,.4);font-size:13px;cursor:pointer}.tog span{color:var(--p);font-weight:700}#fbErr{display:none;background:rgba(229,57,53,.1);border:1px solid rgba(229,57,53,.4);padding:10px;border-radius:10px;margin-bottom:12px;font-size:13px;text-align:center;color:#ff6b6b}#customerApp,#ownerApp{display:none;max-width:430px;margin:0 auto;min-height:100vh;padding-bottom:76px}.sbar{padding:7px 18px;display:flex;justify-content:space-between;font-size:11px;font-weight:700;letter-spacing:.5px;border-bottom:1px solid rgba(var(--pr),.1);background:rgba(var(--pr),.05)}.hdr{padding:22px 18px 18px;background:linear-gradient(180deg,rgba(var(--pr),.1) 0%,transparent 100%)}.hdr-badge{display:inline-block;background:rgba(var(--pr),.1);border:1px solid rgba(var(--pr),.25);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--p);margin-bottom:8px;letter-spacing:.5px}.hdr h2{font-size:24px;font-weight:900;margin-bottom:3px;letter-spacing:-.3px}.hdr p{opacity:.45;font-size:13px}.tab-pane,.owner-pane{display:none;padding:14px}.tab-pane.active,.owner-pane.active{display:block}.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(10,10,10,.97);backdrop-filter:blur(20px);border-top:1px solid rgba(var(--pr),.1);display:flex;justify-content:space-around;padding:9px 0 13px}.nbtn{background:none;border:none;color:rgba(255,255,255,.35);font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;padding:4px 14px;letter-spacing:.3px;transition:color .2s}.nbtn.active{color:var(--p)}.nbtn .ni{font-size:20px}.card{background:var(--c);border-radius:16px;padding:16px;margin-bottom:12px;border:1px solid rgba(var(--pr),.1)}.card h3{font-size:14px;font-weight:800;color:var(--p);margin-bottom:10px}.pcard{background:var(--c);border-radius:16px;padding:16px;margin-bottom:10px;border:1px solid rgba(var(--pr),.1)}.pcard-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}.pcard-name{font-weight:700;font-size:15px}.pcard-price{font-size:17px;font-weight:900;color:var(--p)}.pcard-desc{font-size:12px;opacity:.4;margin-bottom:10px}.stat-row{display:flex;gap:10px;margin-bottom:14px}.stat{flex:1;background:linear-gradient(135deg,rgba(var(--pr),.1),rgba(var(--pr),.05));border-radius:16px;padding:16px;text-align:center;border:1px solid rgba(var(--pr),.13)}.stat .v{font-size:26px;font-weight:900;background:linear-gradient(135deg,var(--p),var(--p2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}.stat .l{font-size:10px;opacity:.4;text-transform:uppercase;letter-spacing:1px;font-weight:700}.lbl{display:block;font-size:11px;font-weight:700;color:rgba(var(--pr),.75);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}.inp{width:100%;padding:12px 14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:11px;color:var(--t);font-size:14px;margin-bottom:12px}.inp:focus{outline:none;border-color:var(--p)}.big-btn{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border:none;padding:14px 20px;border-radius:13px;font-weight:800;cursor:pointer;width:100%;font-size:15px;box-shadow:0 4px 18px rgba(var(--pr),.25);transition:transform .2s}.big-btn:active{transform:scale(.97)}.danger-btn{background:linear-gradient(135deg,#FF5252,#D50000);color:#fff;border:none;padding:14px 20px;border-radius:13px;font-weight:800;cursor:pointer;width:100%;font-size:15px;box-shadow:0 4px 18px rgba(255,82,82,.25)}.sec-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.sec-head h3{font-size:17px;font-weight:800}.sm-btn{background:rgba(var(--pr),.1);color:var(--p);border:1.5px solid rgba(var(--pr),.3);padding:9px 14px;border-radius:11px;font-weight:700;font-size:12px;cursor:pointer}.prof-hero{background:linear-gradient(135deg,rgba(var(--pr),.1),rgba(var(--pr),.05));border-radius:20px;padding:26px 20px;margin-bottom:14px;border:1px solid rgba(var(--pr),.12);text-align:center}.prof-av{width:66px;height:66px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--p2));display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 12px;box-shadow:0 0 22px rgba(var(--pr),.3)}.prof-name{font-size:20px;font-weight:900;margin-bottom:3px}.prof-email{font-size:12px;opacity:.4;margin-bottom:10px}.prof-badge{display:inline-block;background:rgba(var(--pr),.1);border:1px solid rgba(var(--pr),.3);border-radius:20px;padding:4px 14px;font-size:11px;font-weight:700;color:var(--p)}.form-sec{background:rgba(var(--pr),.04);border:1px solid rgba(var(--pr),.1);border-radius:16px;padding:16px;margin-bottom:14px}.item-row{background:var(--c);border-radius:14px;padding:14px;margin-bottom:9px;display:flex;align-items:center;gap:12px;border:1px solid rgba(var(--pr),.1)}.item-av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--p2));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff;flex-shrink:0}</style>
 
-  Note: Replace color values (--p, gradient colors) to match the app type:
-  - Gym: --p:#00E5FF with #7C4DFF gradient (neon cyan + purple)
-  - Restaurant: --p:#F5A623 with #FF6B35 gradient (orange + red-orange)
-  - Salon: --p:#FF80AB with #F48FB1 gradient (pink + rose)
-  - School: --p:#26C6DA with #00ACC1 gradient (teal + dark teal)
-  - Hospital: --p:#66BB6A with #43A047 gradient (green + dark green)
-  - Finance: --p:#7C4DFF with #5E35B1 gradient (purple + deep purple)
+  CRITICAL: You MUST replace ALL THREE color variables in :root to match the app type.
+  The base CSS uses rgba(var(--pr),...) everywhere — if you only change --p the rgba tints stay wrong.
+  Copy the entire root block for the app type:
+
+  Gym/Fitness:    :root{--p:#a855f7;--p2:#6c3aed;--pr:168,85,247;--bg:#0a0a0f;--c:#12121a;--t:#fff}
+  Restaurant:     :root{--p:#f59e0b;--p2:#ef4444;--pr:245,158,11;--bg:#0d0a00;--c:#1a1500;--t:#fff}
+  Salon/Beauty:   :root{--p:#ec4899;--p2:#f472b6;--pr:236,72,153;--bg:#0d000a;--c:#1a0012;--t:#fff}
+  School/Edu:     :root{--p:#3b82f6;--p2:#60a5fa;--pr:59,130,246;--bg:#000d1a;--c:#001224;--t:#fff}
+  Hospital:       :root{--p:#10b981;--p2:#34d399;--pr:16,185,129;--bg:#000d0a;--c:#001a12;--t:#fff}
+  Shop/Ecomm:     :root{--p:#8b5cf6;--p2:#a78bfa;--pr:139,92,246;--bg:#0a000d;--c:#0f0015;--t:#fff}
+  Finance/Crypto: :root{--p:#6366f1;--p2:#818cf8;--pr:99,102,241;--bg:#07071a;--c:#0f0f24;--t:#fff}
+  Food Delivery:  :root{--p:#f97316;--p2:#fb923c;--pr:249,115,22;--bg:#0d0800;--c:#1a1000;--t:#fff}
+  Default:        :root{--p:#a855f7;--p2:#6c3aed;--pr:168,85,247;--bg:#0a0a0f;--c:#12121a;--t:#fff}
 
 ⚠️ JS MUST BE COMPACT — NO BLANK LINES BETWEEN FUNCTIONS, NO COMMENTS, SHORT VAR NAMES:
   <script>
@@ -1979,8 +1990,8 @@ async function openFullApp() {
     );
     if (!useFallback) return;
     // Restore box style
-    box.style.borderColor = 'rgba(245,166,35,0.5)';
-    box.style.background = 'rgba(245,166,35,0.08)';
+    box.style.borderColor = 'rgba(var(--pr),0.5)';
+    box.style.background = 'rgba(var(--pr),0.08)';
   }
 
   // ── MODE 2: BLOB URL (fallback) ───────────────────────────────────────────────
