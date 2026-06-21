@@ -1,0 +1,2248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    #mobileWarning{display:none;background:#F5A623;color:#000;text-align:center;padding:12px 16px;font-weight:700;font-size:14px;}
+    @media(max-width:768px){#mobileWarning{display:block;}}
+  </style>
+  <title>Build My App — by Palash</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Inter',sans-serif;background:#060d2e;min-height:100vh;color:#fff;}
+    .header{background:linear-gradient(135deg,#0d1b6e,#1a237e);padding:20px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.1);}
+    .logo{font-size:22px;font-weight:900;color:#fff;}
+    .logo span{color:#F5A623;}
+    .badge{background:#F5A623;color:#000;font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;letter-spacing:1px;}
+    .main{max-width:900px;margin:0 auto;padding:40px 24px;}
+    .hero{text-align:center;margin-bottom:40px;}
+    .hero h1{font-size:36px;font-weight:900;line-height:1.2;margin-bottom:12px;}
+    .hero h1 span{color:#F5A623;}
+    .hero p{font-size:16px;color:rgba(255,255,255,0.6);line-height:1.6;}
+    .form-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:32px;margin-bottom:24px;}
+    .form-card label{display:block;font-size:13px;font-weight:700;color:#F5A623;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
+    .form-card textarea{width:100%;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:16px;color:#fff;font-size:15px;font-family:'Inter',sans-serif;resize:vertical;min-height:120px;outline:none;transition:border 0.2s;}
+    .form-card textarea:focus{border-color:#F5A623;}
+    .form-card textarea::placeholder{color:rgba(255,255,255,0.3);}
+    .examples{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+    .ex-btn{background:rgba(var(--pr),0.1);border:1px solid rgba(var(--pr),0.3);color:#F5A623;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+    .ex-btn:hover{background:rgba(var(--pr),0.25);}
+    .build-btn{width:100%;background:linear-gradient(135deg,#F5A623,#e8960f);color:#000;border:none;padding:18px;border-radius:14px;font-size:18px;font-weight:900;cursor:pointer;margin-top:20px;transition:transform 0.2s,box-shadow 0.2s;letter-spacing:0.5px;}
+    .build-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 30px rgba(var(--pr),0.4);}
+    .build-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+    .loading{text-align:center;padding:40px;display:none;}
+    .spinner{width:48px;height:48px;border:4px solid rgba(var(--pr),0.2);border-top-color:#F5A623;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .loading p{color:rgba(255,255,255,0.6);font-size:15px;}
+    .loading .step{color:#F5A623;font-weight:700;font-size:18px;margin-bottom:8px;}
+    .result{display:none;}
+    .result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+    .result-title{font-size:20px;font-weight:800;color:#fff;}
+    .result-actions{display:flex;gap:10px;flex-wrap:wrap;}
+    .action-btn{padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all 0.2s;}
+    .btn-download{background:#25D366;color:#fff;}
+    .btn-mobile{background:#0d1b6e;color:#fff;border:1px solid #F5A623;}
+    .btn-rebuild{background:rgba(var(--pr),0.15);color:#F5A623;border:1px solid rgba(var(--pr),0.3);}
+    .preview-wrap{border-radius:16px;overflow:hidden;border:2px solid rgba(var(--pr),0.3);background:#fff;}
+    .preview-toolbar{background:#1a1a2e;padding:10px 16px;display:flex;align-items:center;gap:8px;}
+    .dot{width:12px;height:12px;border-radius:50%;}
+    .dot-r{background:#ff5f57;}.dot-y{background:#febc2e;}.dot-g{background:#28c840;}
+    .preview-url{background:rgba(255,255,255,0.1);border-radius:6px;padding:4px 12px;font-size:12px;color:rgba(255,255,255,0.5);flex:1;margin-left:8px;}
+    iframe{width:100%;height:600px;border:none;display:block;}
+    .mobile-frame{width:375px;margin:0 auto;background:#1a1a2e;border-radius:36px;padding:12px;border:3px solid #333;display:none;}
+    .mobile-screen{border-radius:26px;overflow:hidden;height:650px;}
+    .mobile-screen iframe{height:650px;}
+    .success-banner{background:linear-gradient(135deg,rgba(40,200,100,0.15),rgba(40,200,100,0.05));border:1px solid rgba(40,200,100,0.3);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+    .success-icon{font-size:28px;}
+    .success-text{font-size:14px;color:rgba(255,255,255,0.8);line-height:1.5;}
+    .success-text strong{color:#28c864;font-size:16px;display:block;margin-bottom:2px;}
+    .footer{text-align:center;padding:32px;color:rgba(255,255,255,0.3);font-size:12px;}
+    .api-setup{background:rgba(var(--pr),0.08);border:2px solid rgba(var(--pr),0.4);border-radius:16px;padding:24px;margin-bottom:24px;}
+    .api-setup h3{color:#F5A623;font-size:14px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+    .api-setup p{color:rgba(255,255,255,0.5);font-size:13px;margin-bottom:12px;}
+    .api-row{display:flex;gap:10px;}
+    .api-input{flex:1;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:12px 16px;color:#fff;font-size:14px;font-family:'Inter',sans-serif;outline:none;}
+    .api-input:focus{border-color:#F5A623;}
+    .api-save-btn{background:#F5A623;color:#000;border:none;padding:12px 20px;border-radius:10px;font-weight:800;font-size:14px;cursor:pointer;white-space:nowrap;}
+    .api-status{font-size:13px;margin-top:8px;}
+    .api-status.ok{color:#28c864;}.api-status.err{color:#ff5f57;}
+    @media(max-width:600px){.hero h1{font-size:26px;}.result-actions{flex-direction:column;}.action-btn{width:100%;}iframe{height:450px;}.api-row{flex-direction:column;}}
+  </style>
+</head>
+<body>
+
+<!-- NO ENTRY SCREEN — tool opens directly -->
+
+<div id="mobileWarning">⚠️ This tool is designed for Laptop / PC. Please open on a computer for the best experience.</div>
+<div class="header">
+  <div class="logo">⚡ Build My <span>App</span></div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div id="serverPill" style="display:flex;align-items:center;gap:5px;background:rgba(255,165,0,0.15);border:1px solid rgba(255,165,0,0.4);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;" onclick="document.getElementById('serverSetupBox').style.display=document.getElementById('serverSetupBox').style.display==='none'?'block':'none'">
+      <span id="serverDot" style="width:8px;height:8px;border-radius:50%;background:#F5A623;display:inline-block;"></span>
+      <span id="serverPillText" style="color:#F5A623;">Server: OFF</span>
+    </div>
+    <button onclick="document.getElementById('apiSetup').style.display=document.getElementById('apiSetup').style.display==='none'?'block':'none'" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 10px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600;">🔑 API Key</button>
+    <a href="fix-buttons.html" target="_blank" style="background:rgba(124,58,237,0.2);border:1px solid rgba(124,58,237,0.5);color:#a78bfa;padding:5px 10px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:700;text-decoration:none;">🔧 Fix Tool</a>
+    <div class="badge">BY PALASH</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- SERVER SETUP BOX — shown when server not running -->
+  <div id="serverSetupBox" style="background:rgba(var(--pr),0.08);border:2px solid rgba(var(--pr),0.5);border-radius:16px;padding:20px 24px;margin-bottom:20px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <span style="font-size:24px;">🖥️</span>
+      <div>
+        <div style="font-size:15px;font-weight:900;color:#F5A623;">Start Local Server — Apps Open as Localhost</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.5);">Without the server, apps open as a blob URL which can cause issues</div>
+      </div>
+      <button onclick="document.getElementById('serverSetupBox').style.display='none'" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.4);font-size:18px;cursor:pointer;">✕</button>
+    </div>
+    <div style="background:rgba(0,0,0,0.35);border-radius:10px;padding:14px 16px;margin-bottom:10px;">
+      <div style="font-size:11px;color:#F5A623;font-weight:800;letter-spacing:1px;margin-bottom:6px;">MAC — Paste in Terminal:</div>
+      <div style="font-family:monospace;font-size:13px;color:#fff;word-break:break-all;">curl -fsSL https://raw.githubusercontent.com/buildmyaiapp-alt/build-my-app/main/start-server.py | python3</div>
+    </div>
+    <div style="background:rgba(0,0,0,0.35);border-radius:10px;padding:14px 16px;margin-bottom:10px;">
+      <div style="font-size:11px;color:#F5A623;font-weight:800;letter-spacing:1px;margin-bottom:6px;">WINDOWS — Paste in Command Prompt:</div>
+      <div style="font-family:monospace;font-size:13px;color:#fff;word-break:break-all;">curl -s https://raw.githubusercontent.com/buildmyaiapp-alt/build-my-app/main/start-server.py -o %TEMP%\bma.py && python %TEMP%\bma.py</div>
+    </div>
+    <div id="serverCheckResult" style="font-size:13px;color:rgba(255,255,255,0.5);text-align:center;">Checking for server...</div>
+  </div>
+
+  <!-- API KEY SETUP (hidden — workshop key is built in) -->
+  <div class="api-setup" id="apiSetup" style="display:none;">
+    <h3>🔑 Step 1 — Paste Your Claude API Key</h3>
+    <p>👇 Click inside the box below, paste your key (Cmd+V), then click Save:</p>
+    <div class="api-row">
+      <input type="text" class="api-input" id="apiKeyInput" placeholder="Click here first, then paste your sk-ant-api03-... key" autocomplete="off" spellcheck="false" style="font-size:13px;"/>
+      <button class="api-save-btn" id="apiSaveBtn" onclick="saveApiKey()">Save Key ✓</button>
+    </div>
+    <div class="api-status" id="apiStatus"></div>
+  </div>
+
+  <div class="hero">
+    <h1>Describe Your App.<br/><span>AI Builds It in 30 Seconds.</span></h1>
+    <p>No coding. No credits. No limits. Just type your idea and watch your app come to life.</p>
+  </div>
+
+  <div class="form-card">
+    <label>📝 Describe Your App</label>
+    <textarea id="appPrompt" maxlength="800" placeholder="Example: Build a restaurant app called Spice Kitchen for an Indian restaurant. It should have a Home page with hero banner and featured dishes, a Menu page with dish cards, a Cart page, and a Profile page. Use dark background with red and golden colors. Make it look premium like Zomato." oninput="updateCharCount(this)"></textarea>
+    <div id="charCount" style="text-align:right;font-size:12px;color:rgba(255,255,255,0.4);margin-top:4px;">0 / 800 characters</div>
+    <div style="margin-top:12px;">
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px;">⚡ Quick Examples — Click to use:</div>
+      <div class="examples">
+        <button class="ex-btn" onclick="fillExample('restaurant')">🍛 Restaurant App</button>
+        <button class="ex-btn" onclick="fillExample('gym')">💪 Gym App</button>
+        <button class="ex-btn" onclick="fillExample('shop')">🛍️ Shop App</button>
+        <button class="ex-btn" onclick="fillExample('salon')">💇 Salon App</button>
+        <button class="ex-btn" onclick="fillExample('coaching')">📚 Coaching App</button>
+        <button class="ex-btn" onclick="fillExample('hotel')">🏨 Hotel App</button>
+        <button class="ex-btn" onclick="fillExample('astrology')">🔮 Astrology App</button>
+        <button class="ex-btn" onclick="fillExample('hospital')">🏥 Hospital App</button>
+        <button class="ex-btn" onclick="fillExample('realestate')">🏠 Real Estate App</button>
+        <button class="ex-btn" onclick="fillExample('freelancer')">💼 Freelancer App</button>
+        <button class="ex-btn" onclick="fillExample('petcare')">🐾 Pet Care App</button>
+        <button class="ex-btn" onclick="fillExample('pharmacy')">💊 Pharmacy App</button>
+      </div>
+    </div>
+    <button class="build-btn" id="buildBtn" onclick="buildApp()">⚡ Build My App Now</button>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div class="step" id="loadingStep">🤖 AI is reading your idea...</div>
+    <p id="loadingMsg">Building your complete app. This takes about 20-30 seconds.</p>
+  </div>
+
+  <div id="buildError" style="display:none;background:rgba(255,95,87,0.12);border:2px solid rgba(255,95,87,0.4);border-radius:16px;padding:24px;margin-bottom:24px;text-align:center;">
+    <div style="font-size:32px;margin-bottom:8px;">❌</div>
+    <div id="buildErrorMsg" style="color:#ff5f57;font-weight:700;font-size:16px;margin-bottom:8px;"></div>
+    <div id="buildErrorDetail" style="color:rgba(255,255,255,0.5);font-size:13px;margin-bottom:16px;"></div>
+    <button onclick="document.getElementById('buildError').style.display='none'" style="background:#ff5f57;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-weight:700;cursor:pointer;">Dismiss & Try Again</button>
+  </div>
+
+  <div class="result" id="result">
+    <div class="success-banner">
+      <div class="success-icon">🎉</div>
+      <div class="success-text">
+        <strong>Your App is Ready!</strong>
+        You just built a real app in under 30 seconds — no coding needed!
+      </div>
+    </div>
+    <div class="result-header">
+      <div class="result-title">📱 Your App Preview</div>
+      <div class="result-actions">
+        <button class="action-btn btn-mobile" onclick="toggleMobile()">📱 Mobile View</button>
+        <button class="action-btn btn-download" onclick="downloadApp()">⬇️ Download App</button>
+        <button class="action-btn btn-rebuild" onclick="resetTool()">🔄 Build Another</button>
+      </div>
+    </div>
+
+    <!-- SERVER MODE BANNER — shown when local server is running -->
+    <div id="serverModeBanner" style="display:none;background:linear-gradient(135deg,rgba(40,200,100,0.2),rgba(40,200,100,0.08));border:2px solid rgba(40,200,100,0.5);border-radius:12px;padding:12px 18px;margin-bottom:12px;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span style="font-size:18px;">🖥️</span>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:800;color:#28c864;">Running on Local Server — Perfect Mode</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.5);">App served as real HTTP — Firebase, buttons, everything works 100%</div>
+      </div>
+      <a href="#" target="_blank" style="background:#28c864;color:#000;padding:7px 14px;border-radius:8px;font-weight:800;font-size:13px;text-decoration:none;">Open Again ↗</a>
+    </div>
+
+    <!-- CLOUD SYNC — save app to cloud so Claude can fix it, then reload -->
+    <div id="cloudSyncBar" style="display:none;background:linear-gradient(135deg,rgba(124,58,237,0.18),rgba(124,58,237,0.05));border:2px solid rgba(124,58,237,0.5);border-radius:14px;padding:14px 18px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <span style="font-size:20px;">☁️</span>
+        <div style="flex:1;min-width:200px;">
+          <div style="font-size:14px;font-weight:800;color:#c4b5fd;">Cloud Saved — App Code: <span id="cloudAppCode" style="color:#fff;font-family:monospace;letter-spacing:1px;background:rgba(0,0,0,0.3);padding:2px 8px;border-radius:6px;">—</span> <button onclick="copyAppCode()" style="background:none;border:none;color:#c4b5fd;cursor:pointer;font-size:14px;" title="Copy code">📋</button></div>
+          <div id="cloudSyncStatus" style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:3px;">Auto-saved. To fix a glitch: tell Claude this code + the problem, then click Reload.</div>
+        </div>
+        <button onclick="reloadFromCloud()" style="background:#7c3aed;color:#fff;border:none;padding:10px 18px;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;">🔄 Reload Fixed App</button>
+        <button onclick="openInNewTab()" style="background:#28c864;color:#000;border:none;padding:10px 18px;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;">↗ Open in New Tab</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;">
+        <span style="font-size:12px;color:rgba(255,255,255,0.5);">Load a saved app by its code:</span>
+        <input id="loadCodeInput" placeholder="APP-XXXXXX" style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 12px;color:#fff;font-size:13px;font-family:monospace;letter-spacing:1px;width:140px;outline:none;text-transform:uppercase;"/>
+        <button onclick="loadByCode()" style="background:rgba(124,58,237,0.6);color:#fff;border:1px solid rgba(124,58,237,0.8);padding:7px 16px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;">Load</button>
+      </div>
+    </div>
+
+    <!-- OPEN IN NEW TAB — fully working, no iframe restrictions -->
+    <div style="background:linear-gradient(135deg,rgba(var(--pr),0.15),rgba(var(--pr),0.05));border:2px solid rgba(var(--pr),0.5);border-radius:16px;padding:20px 24px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <div>
+        <div style="font-size:16px;font-weight:900;color:#F5A623;margin-bottom:4px;">🚀 Test Your Full App</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.6);">Opens in a new tab — all buttons, login, Firebase, everything works here</div>
+      </div>
+      <button onclick="openFullApp()" style="background:#F5A623;color:#000;border:none;padding:14px 28px;border-radius:12px;font-size:15px;font-weight:900;cursor:pointer;white-space:nowrap;">▶ Open Full App</button>
+    </div>
+
+    <div id="desktopView">
+      <div class="preview-wrap">
+        <div class="preview-toolbar">
+          <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          <div class="preview-url">Preview (limited) — use Open Full App for testing</div>
+        </div>
+        <iframe id="previewFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-popups-to-escape-sandbox"></iframe>
+      </div>
+    </div>
+    <div class="mobile-frame" id="mobileView">
+      <div class="mobile-screen">
+        <iframe id="mobileFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-popups-to-escape-sandbox"></iframe>
+      </div>
+    </div>
+    <!-- TOKEN USAGE -->
+    <div id="tokenUsage" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 16px;margin-top:14px;font-size:12px;color:rgba(255,255,255,0.45);font-weight:600;text-align:center;display:block;"></div>
+
+    <!-- DOWNLOAD + APK -->
+    <div style="background:rgba(var(--pr),0.08);border:1px solid rgba(var(--pr),0.2);border-radius:16px;padding:20px;margin-top:20px;">
+      <div style="font-size:15px;font-weight:800;color:#F5A623;margin-bottom:6px;">📦 Download & Install on Phone</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.45);margin-bottom:14px;">Download your app, then follow the steps below to get it on your phone</div>
+      <button onclick="downloadApp()" style="width:100%;background:#25D366;color:#fff;border:none;padding:14px;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer;margin-bottom:16px;">⬇️ Download My App (HTML File)</button>
+
+      <!-- Option 1: Add to Home Screen -->
+      <div style="background:rgba(40,200,100,0.08);border:1px solid rgba(40,200,100,0.25);border-radius:12px;padding:14px 16px;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:800;color:#28c864;margin-bottom:8px;">✅ EASIEST — Add to Home Screen (No APK needed)</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.9;">
+          <strong style="color:#fff;">Step 1:</strong> Send the downloaded file to your phone via WhatsApp<br/>
+          <strong style="color:#fff;">Step 2:</strong> Open the file in <strong style="color:#fff;">Chrome browser</strong> on your phone<br/>
+          <strong style="color:#fff;">Step 3:</strong> Tap the 3 dots menu → <strong style="color:#fff;">Add to Home Screen</strong><br/>
+          <strong style="color:#fff;">Step 4:</strong> App icon appears on your home screen — tap to open like a real app! 🎉
+        </div>
+      </div>
+
+      <!-- Option 2: APK via Netlify + GoNative -->
+      <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px 16px;">
+        <div style="font-size:13px;font-weight:800;color:#F5A623;margin-bottom:8px;">📦 ADVANCED — Get a Real APK File</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.9;">
+          <strong style="color:#fff;">Step 1:</strong> Download the file above &amp; rename it to <strong style="color:#fff;">index.html</strong><br/>
+          <strong style="color:#fff;">Step 2:</strong> Go to <a href="https://netlify.com/drop" target="_blank" style="color:#00C7B7;font-weight:700;">netlify.com/drop</a> → drag &amp; drop your <strong style="color:#fff;">index.html</strong> file → get a free live URL (e.g. <em>fluffy-bunny.netlify.app</em>)<br/>
+          <strong style="color:#fff;">Step 3:</strong> Go to <a href="https://gonative.io" target="_blank" style="color:#F5A623;font-weight:700;">gonative.io</a> → paste your Netlify URL → click <strong style="color:#fff;">Convert</strong> → Download APK<br/>
+          <strong style="color:#fff;">Step 4:</strong> Send APK to phone via WhatsApp → install it! 🎉
+        </div>
+      </div>
+    </div>
+
+    <!-- MODIFY SECTION -->
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:28px;margin-top:24px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <span style="font-size:22px;">✏️</span>
+        <div>
+          <div style="font-size:16px;font-weight:800;color:#fff;">Modify or Fix Your App</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.45);">Describe a change OR a problem/glitch — AI updates your existing app instantly. No need to rebuild.</div>
+        </div>
+      </div>
+
+      <!-- FIX ALL BUTTON — most prominent -->
+      <button onclick="fixAllButtons()" id="fixBtn" style="width:100%;background:linear-gradient(135deg,#e53935,#b71c1c);color:#fff;border:none;padding:16px;border-radius:12px;font-size:16px;font-weight:900;cursor:pointer;margin-bottom:12px;letter-spacing:0.3px;">
+        🔧 Fix All Buttons — Make Everything Work
+      </button>
+
+      <!-- QUICK CHANGE BUTTONS — updated dynamically after build -->
+      <div id="quickModifyBtns" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+        <button class="ex-btn" onclick="fillModify('A problem is happening in the app — describe it here and AI will fix it without rebuilding. For example: the login button does nothing when clicked. Fix this glitch completely.')">🐛 Fix a Problem</button>
+        <button class="ex-btn" onclick="fillModify('Change the main color to blue and make it look more professional')">🎨 Change Color</button>
+        <button class="ex-btn" onclick="fillModify('Add a Contact Us page with phone number, email, address and a WhatsApp button')">📞 Add Contact Page</button>
+        <button class="ex-btn" onclick="fillModify('Make the design look more premium and luxurious with gold and dark theme')">✨ Make Premium</button>
+        <button class="ex-btn" onclick="fillModify('Add more items to the menu/product list with realistic Indian names and prices')">➕ Add More Items</button>
+        <button class="ex-btn" onclick="fillModify('Change the app name, logo text and all branding')">🏷️ Change Branding</button>
+        <button class="ex-btn" onclick="fillModify('Add an Offers page showing discounts and deals with countdown timers')">🔥 Add Offers Page</button>
+        <button class="ex-btn" onclick="fillModify('Make it look exactly like Zomato with same layout, fonts and style')">🍕 Zomato Style</button>
+        <button class="ex-btn" onclick="fillModify('Add smooth animations and make all buttons more interactive and fun')">💫 Add Animations</button>
+      </div>
+
+      <textarea id="modifyPrompt" style="width:100%;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:14px 16px;color:#fff;font-size:14px;font-family:'Inter',sans-serif;resize:vertical;min-height:80px;outline:none;margin-bottom:12px;" placeholder="Describe a change OR a glitch to fix — e.g. 'the cart button is not working, fix it', 'orders are not saving', 'change color to green', 'add a gallery page'..."></textarea>
+
+      <button onclick="modifyApp()" id="modifyBtn" style="width:100%;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border:none;padding:15px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;transition:all 0.2s;">
+        ✏️ Apply Change / Fix My App
+      </button>
+
+      <!-- MODIFY LOADING -->
+      <div id="modifyLoading" style="display:none;text-align:center;padding:20px;">
+        <div class="spinner" style="border-top-color:#7c3aed;"></div>
+        <div style="color:#7c3aed;font-weight:700;margin-top:8px;">✏️ Updating your app...</div>
+        <div style="color:rgba(255,255,255,0.4);font-size:13px;margin-top:4px;">This takes 20-30 seconds</div>
+      </div>
+
+      <!-- SUCCESS BANNER -->
+      <div id="modifySuccess" style="display:none;align-items:center;gap:10px;background:rgba(40,200,100,0.15);border:1px solid rgba(40,200,100,0.4);border-radius:12px;padding:14px 18px;margin-top:12px;">
+        <span style="font-size:24px;">✅</span>
+        <div>
+          <div style="color:#28c864;font-weight:800;font-size:15px;">Changes applied!</div>
+          <div style="color:rgba(255,255,255,0.5);font-size:13px;">Your app has been updated — scroll up to see the preview</div>
+        </div>
+      </div>
+
+      <!-- ERROR -->
+      <div id="modifyError" style="display:none;background:rgba(255,95,87,0.1);border:1px solid rgba(255,95,87,0.3);border-radius:10px;padding:12px 16px;margin-top:12px;color:#ff5f57;font-size:13px;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">⚡ Build My App — AI App Building Workshop by Palash &nbsp;·&nbsp; buildmyaiapp.in</div>
+
+<script>
+let generatedCode = '';
+let originalIdea = '';
+let isMobileView = false;
+
+// ── Claude API fetch — works in both direct and webinar/proxy mode ─
+function _claudeFetch(apiKey, payload) {
+  if (window._WEBINAR_MODE || apiKey === '__proxy__') {
+    return fetch('/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  }
+  return fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify(payload)
+  });
+}
+
+// ── WEBINAR MODE — uses proxy server, no API key needed ──────────
+if (window._WEBINAR_MODE) {
+  // Hide API key section, show webinar banner
+  document.addEventListener('DOMContentLoaded', function() {
+    var setup = document.getElementById('apiSetup');
+    if (setup) setup.style.display = 'none';
+    // Inject webinar badge
+    var header = document.querySelector('.header-inner') || document.querySelector('header') || document.body.firstElementChild;
+    if (header) {
+      var badge = document.createElement('div');
+      badge.innerHTML = '🎓 Webinar Mode — Claude powered by your instructor';
+      badge.style.cssText = 'background:linear-gradient(135deg,#6c3aed,#a855f7);color:#fff;text-align:center;padding:8px 16px;font-size:13px;font-weight:700;letter-spacing:0.3px;';
+      document.body.insertBefore(badge, document.body.firstChild);
+    }
+  });
+}
+
+// ── API KEY SCREEN ────────────────────────────────────────────
+// Safari blocks localStorage for file:// URLs — use memory fallback
+function _saveKey(k) { try { localStorage.setItem('palash_api_key', k); } catch(e) {} window._memApiKey = k; }
+function _getKey() {
+  // Webinar mode: flag set by server injection OR detected by port 7824
+  if (window._WEBINAR_MODE || window.location.port === '7824') return '__proxy__';
+  try { return localStorage.getItem('palash_api_key') || window._memApiKey || ''; } catch(e) { return window._memApiKey || ''; }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Backup: attach buildApp via addEventListener in case onclick is blocked
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('buildBtn');
+  if (btn) btn.addEventListener('click', buildApp);
+  var saveBtn = document.getElementById('apiSaveBtn');
+  if (saveBtn) saveBtn.addEventListener('click', saveApiKey);
+});
+
+// Fallback core JS — only fills in functions Claude didn't write (uses typeof guards)
+const CORE_JS = `if(!window._coreLoaded){window._coreLoaded=true;
+if(typeof _cart==='undefined'){var _cart=[],_cartCount=0;}
+if(typeof showPage==='undefined'){window.showPage=function(id,el){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});var t=document.getElementById(id);if(t)t.classList.add('active');document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');};}
+if(typeof showToast==='undefined'){window.showToast=function(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:82px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;white-space:nowrap;pointer-events:none;';document.body.appendChild(t);setTimeout(function(){t.remove();},2500);};}
+if(typeof saveData==='undefined'){window.saveData=function(key,val){try{localStorage.setItem(key,JSON.stringify(val));}catch(e){}};window.loadData=function(key){try{return JSON.parse(localStorage.getItem(key)||'null');}catch(e){return null;}};}
+if(typeof addToCart==='undefined'){window.addToCart=function(name,price){_cart.push({name:name,price:Number(price)});_cartCount++;var b=document.getElementById('cartBadge');if(b){b.textContent=_cartCount;b.style.display='flex';}showToast(name+' added! \u{1F6D2}');if(typeof updateCartPage==='function')updateCartPage();};}
+if(typeof removeFromCart==='undefined'){window.removeFromCart=function(i){_cart.splice(i,1);_cartCount--;var b=document.getElementById('cartBadge');if(b){b.textContent=_cartCount>0?_cartCount:'';if(_cartCount<=0)b.style.display='none';}if(typeof updateCartPage==='function')updateCartPage();};}
+if(typeof updateCartPage==='undefined'){window.updateCartPage=function(){var list=document.getElementById('cartList');var total=document.getElementById('cartTotal');if(!list)return;if(_cart.length===0){list.innerHTML='<p style="text-align:center;padding:40px;opacity:0.5">Cart is empty</p>';if(total)total.textContent='₹0';return;}list.innerHTML=_cart.map(function(item,i){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid rgba(128,128,128,0.2)"><span>'+item.name+'</span><div style="display:flex;align-items:center;gap:10px"><span style="font-weight:700">₹'+item.price+'</span><button onclick="removeFromCart('+i+')" style="background:#ff5757;color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:15px;line-height:1">−</button></div></div>';}).join('');var sum=_cart.reduce(function(a,b){return a+b.price;},0);if(total)total.textContent='₹'+sum;};}
+if(typeof placeOrder==='undefined'){window.placeOrder=function(){if(_cart.length===0){showToast('Add items first!');return;}var items=[..._cart];var total=_cart.reduce(function(a,b){return a+b.price;},0);var order={id:'ORD'+Date.now(),items:items,total:total,date:new Date().toLocaleString(),status:'✅ Confirmed'};var orders=loadData('my_orders')||[];orders.unshift(order);saveData('my_orders',orders.slice(0,50));_cart=[];_cartCount=0;var b=document.getElementById('cartBadge');if(b){b.style.display='none';b.textContent='';}updateCartPage();showToast('\u{1F389} Order saved! ✅');};}
+if(typeof showMyOrders==='undefined'){window.showMyOrders=function(){var orders=(typeof loadData==='function'?loadData('my_orders'):null)||[];var el=document.getElementById('ordersList');if(!el)return;if(orders.length===0){el.innerHTML='<p style="text-align:center;padding:30px;opacity:0.5">No orders yet</p>';return;}el.innerHTML=orders.map(function(o){return'<div style="background:rgba(255,255,255,0.07);border-radius:12px;padding:14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-weight:700">#'+String(o.id).slice(-6)+'</span><span style="color:#4CAF50;font-weight:700">'+o.status+'</span></div><div style="font-size:12px;opacity:0.6;margin-bottom:4px">'+o.date+'</div><div style="font-weight:800;margin-top:6px;color:var(--primary,#F5A623)">Total: ₹'+o.total+'</div></div>';}).join('');};}
+setInterval(function(){var now=new Date();var h=now.getHours()%12||12;var m=String(now.getMinutes()).padStart(2,'0');var el=document.getElementById('statusTime');if(el)el.textContent=h+':'+m;},30000);
+}`;
+
+// Firebase HTML (auth screen + user bar) — fully inline styles, no CSS classes needed
+const FIREBASE_HTML = `<div id="fbAuthScreen" style="position:fixed;inset:0;background:#0d0d1a;display:flex;align-items:center;justify-content:center;z-index:9999;padding:24px;font-family:Inter,sans-serif;"><div style="background:#1a1a2e;border-radius:20px;padding:32px 24px;width:100%;max-width:360px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.5);"><div style="font-size:44px;margin-bottom:10px">🔐</div><div id="fbAuthTitle" style="font-size:22px;font-weight:900;color:#fff;margin-bottom:6px;">Welcome Back!</div><div id="fbAuthSub" style="font-size:13px;color:rgba(255,255,255,0.55);margin-bottom:20px;">Login to continue</div><div id="fbErr" style="color:#ff5757;font-size:12px;margin-bottom:8px;display:none;"></div><input id="fbName" placeholder="Your Name" style="display:none;width:100%;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:13px 16px;color:#fff;font-size:14px;outline:none;margin-bottom:10px;box-sizing:border-box;"/><input id="fbEmail" type="email" placeholder="Email address" style="width:100%;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:13px 16px;color:#fff;font-size:14px;outline:none;margin-bottom:10px;box-sizing:border-box;"/><input id="fbPass" type="password" placeholder="Password" style="width:100%;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:13px 16px;color:#fff;font-size:14px;outline:none;margin-bottom:14px;box-sizing:border-box;"/><button id="fbMainBtn" onclick="fbSubmit()" style="width:100%;padding:14px;background:#F5A623;color:#000;border:none;border-radius:10px;font-size:16px;font-weight:900;cursor:pointer;margin-bottom:10px;">Login</button><button id="fbToggleBtn" onclick="fbToggle()" style="background:none;border:none;color:#F5A623;font-size:13px;cursor:pointer;">Don't have an account? Sign Up</button></div></div>
+<div id="userBar" style="display:none;background:#1a1a2e;padding:8px 16px;justify-content:space-between;align-items:center;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.1);font-family:Inter,sans-serif;"><span id="userGreet" style="font-weight:700;color:#F5A623;"></span><button onclick="fbLogout()" style="background:rgba(255,87,87,0.15);color:#ff5757;border:1px solid rgba(255,87,87,0.3);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;">Logout</button></div>`;
+
+// FIREBASE_JS kept for reference but not used — all apps are built with compat SDK by Claude directly.
+
+// AUTO-REPAIR: make every onclick button work regardless of how Claude structured the code.
+//
+// STRATEGY — Two layers:
+//
+// FIX 1 (multiline ^): Only transform STANDALONE function declarations — i.e. lines that
+//   START with optional whitespace then "function" or "async function".
+//   This deliberately skips:
+//     window.X = function X(){}   ← already on window, DON'T touch
+//     callback(function X(){})    ← expression, DON'T touch
+//     { method: function X(){} }  ← object method, DON'T touch
+//   But DOES transform:
+//     function showTab(id) {      → var showTab = window.showTab = function showTab(id) {
+//     async function loadData() { → var loadData = window.loadData = async function loadData() {
+//   var X preserves local variable so internal refs (addEventListener('click',X)) work.
+//   window.X makes onclick="X()" work from any scope.
+//
+// FIX 2: Inject eval-based onclick rebinder INSIDE DOMContentLoaded.
+//   Catches arrow functions and const-assigned functions Fix 1 can't touch.
+//   eval() is DIRECT (lexical) so it sees DOMContentLoaded-scoped functions too.
+//
+function repairButtonScope(html) {
+  var scriptRe = /(<script(?!\s+src)[^>]*>)([\s\S]*?)(<\/script>)/gi;
+  return html.replace(scriptRe, function(fullTag, open, body, close) {
+    var newBody = body;
+
+    // ── FIX 1: multiline ^ ensures only standalone declarations are transformed ─
+    // ^(\s*)  = start of line with optional indent
+    // This means "window.X = function X(" is NEVER matched (not at line start)
+    newBody = newBody.replace(
+      /^(\s*)(async\s+)?function\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/gm,
+      function(match, indent, asyncKw, name) {
+        return indent + 'var ' + name + ' = window.' + name + ' = ' + (asyncKw || '') + 'function ' + name + '(';
+      }
+    );
+
+    // ── FIX 1b: const/let X = [async] function(...) — expose on window ───────────
+    // Handles: const showTab = function(id) { ... }
+    //          let doLogin = async function() { ... }
+    newBody = newBody.replace(
+      /^(\s*)(?:const|let)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=\s*(async\s+)?function\s*(?:[a-zA-Z_$][a-zA-Z0-9_$]*)?\s*\(/gm,
+      function(match, indent, name, asyncKw) {
+        return indent + 'var ' + name + ' = window.' + name + ' = ' + (asyncKw || '') + 'function ' + name + '(';
+      }
+    );
+
+    // ── FIX 1c: const/let X = [async] (params) => — expose on window ────────────
+    // Handles: const showTab = (id) => { ... }
+    //          const doLogin = async (email, pass) => { ... }
+    newBody = newBody.replace(
+      /^(\s*)(?:const|let)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=\s*(async\s+)?\(([^)]*)\)\s*=>/gm,
+      function(match, indent, name, asyncKw, params) {
+        return indent + 'var ' + name + ' = window.' + name + ' = ' + (asyncKw || '') + '(' + params + ') =>';
+      }
+    );
+
+    // ── FIX 1d: const/let X = async? singleParam => — expose on window ──────────
+    // Handles: const save = e => { ... }  /  const load = async key => { ... }
+    newBody = newBody.replace(
+      /^(\s*)(?:const|let)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=\s*(async\s+)?([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=>/gm,
+      function(match, indent, name, asyncKw, param) {
+        // Skip if param looks like a value (number, string) — it's an assignment not arrow fn
+        if (/^[0-9"']/.test(param)) return match;
+        return indent + 'var ' + name + ' = window.' + name + ' = ' + (asyncKw || '') + param + ' =>';
+      }
+    );
+
+    // ── FIX 3: __runWhenReady helper — blob URLs load instantly so               ─
+    // document.readyState is ALREADY "complete" when the script runs.             ─
+    // DOMContentLoaded never fires again → addEventListener callback is MISSED.   ─
+    // IMPORTANT: do the replacement FIRST, then inject helper so the helper's     ─
+    // own internal addEventListener("DOMContentLoaded") is NOT itself replaced.   ─
+    // Replace ALL ready-wait patterns — DOMContentLoaded, load, window.onload
+    newBody = newBody.replace(
+      /document\.addEventListener\s*\(\s*['"]DOMContentLoaded['"]\s*,\s*/g,
+      '__runWhenReady('
+    );
+    newBody = newBody.replace(
+      /window\.addEventListener\s*\(\s*['"]load['"]\s*,\s*/g,
+      '__runWhenReady('
+    );
+    // window.onload = function(){...}  →  __runWhenReady(function(){...})
+    newBody = newBody.replace(
+      /window\.onload\s*=\s*function\s*/g,
+      '__runWhenReady(function '
+    );
+    // window.onload = () => {...}  →  __runWhenReady(() => {...})
+    newBody = newBody.replace(
+      /window\.onload\s*=\s*(\(\s*\)|\s*)\s*=>/g,
+      '__runWhenReady(() =>'
+    );
+    // Now inject helper at very top (after replacements so it won't be touched)
+    // fn() runs directly — DOM already ready on blob URLs, no setTimeout delay
+    // Also inject _showBtnErr on window early + window.onerror so ANY crash is visible.
+    if (!newBody.includes('function __runWhenReady')) {
+      var readyHelper = 'function __runWhenReady(fn){if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",fn);}else{fn();}}';
+      // _showBtnErr defined on window early so every code path (observer, onerror, etc.) can use it
+      var earlyErr = 'if(!window._showBtnErr){window._showBtnErr=function(msg){try{var _t=document.createElement("div");_t.textContent="⚠️ "+msg;_t.style.cssText="position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#c62828;color:#fff;padding:10px 18px;border-radius:10px;z-index:99999;font-size:13px;max-width:90%;text-align:center;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);";_t.onclick=function(){_t.remove();};document.body.appendChild(_t);setTimeout(function(){if(_t.parentNode)_t.remove();},8000);}catch(e){}};}';
+      // window.onerror catches any script crash and shows it visually
+      var earlyOnerror = 'window.onerror=function(msg,s,l,c,err){if(window._showBtnErr)window._showBtnErr((err&&err.message)||msg);return false;};window.addEventListener("unhandledrejection",function(ev){if(window._showBtnErr)window._showBtnErr("Promise error: "+((ev.reason&&ev.reason.message)||ev.reason||"unknown"));});';
+      // DOM Guard: create authScreen/customerApp/ownerApp if missing (prevents "null is not an object" crash)
+      // Runs at DOMContentLoaded so body exists. Also patches document.getElementById to return a dummy
+      // element for these IDs if missing — so onAuthStateChanged never throws.
+      var domGuard = '(function(){function _ensureScreen(id,disp){if(!document.getElementById(id)){var d=document.createElement("div");d.id=id;d.style.cssText="display:"+(disp||"none")+";";document.body.appendChild(d);}}' +
+        'if(document.body){_ensureScreen("authScreen","flex");_ensureScreen("customerApp","none");_ensureScreen("ownerApp","none");}' +
+        'else{document.addEventListener("DOMContentLoaded",function(){_ensureScreen("authScreen","flex");_ensureScreen("customerApp","none");_ensureScreen("ownerApp","none");});}' +
+        '})();';
+      newBody = readyHelper + '\n' + earlyErr + '\n' + earlyOnerror + '\n' + domGuard + '\n' + newBody;
+    }
+
+    // ── FIX 2: new Function rebinder injected INSIDE every __runWhenReady block ──
+    // KEY CHANGE: (new Function("event", oc)).call(el, e) instead of eval(oc)
+    //   - new Function ALWAYS runs in GLOBAL scope — finds window.* functions reliably
+    //   - eval(oc) runs in local closure scope — can miss functions defined outside
+    //   - .call(el, e) sets `this` = button element and passes event (like native onclick)
+    // _showBtnErr is on window (set above) so ALL error paths can show the toast.
+    var errToast = 'if(!window._showBtnErr){window._showBtnErr=function(msg){try{var _t=document.createElement("div");_t.textContent="⚠️ "+msg;_t.style.cssText="position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#c62828;color:#fff;padding:10px 18px;border-radius:10px;z-index:99999;font-size:13px;max-width:90%;text-align:center;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);";_t.onclick=function(){_t.remove();};document.body.appendChild(_t);setTimeout(function(){if(_t.parentNode)_t.remove();},8000);}catch(e){}};}';
+    var evalRebind = errToast + 'try{document.querySelectorAll("[onclick]").forEach(function(el){if(el._ocDone)return;el._ocDone=true;var oc=el.getAttribute("onclick");el.removeAttribute("onclick");el.addEventListener("click",function(e){try{(new Function("event",oc)).call(el,e);}catch(ex){if(window._showBtnErr)window._showBtnErr(ex.message+" ["+oc.slice(0,40)+"]");console.error("btn-fail:",oc,ex);}});});}catch(_e){console.error("evalRebind crash",_e);}';
+    // MutationObserver: re-wire onclick buttons added dynamically AFTER login
+    // (innerHTML set inside onAuthStateChanged fires AFTER the initial evalRebind pass)
+    // interval runs for 30 seconds (60 * 500ms) to cover slow Firebase auth
+    var observerSetup = 'try{if(!window._moSetup){window._moSetup=true;var _rw=function(){try{document.querySelectorAll("[onclick]").forEach(function(el){if(el._ocDone)return;el._ocDone=true;var oc=el.getAttribute("onclick");el.removeAttribute("onclick");el.addEventListener("click",function(e){try{(new Function("event",oc)).call(el,e);}catch(ex){if(window._showBtnErr)window._showBtnErr(ex.message+" ["+oc.slice(0,40)+"]");console.error("btn-fail:",oc,ex);}});});}catch(e){}};if(document.body)new MutationObserver(function(){setTimeout(_rw,30);}).observe(document.body,{childList:true,subtree:true});var _ri=0;var _rint=setInterval(function(){_rw();if(++_ri>60)clearInterval(_rint);},500);}}catch(_me){console.error("observerSetup crash",_me);}';
+
+    // Brace-count to find the exact closing } of each __runWhenReady CALL
+    // Matches __runWhenReady(function — skips the helper definition itself
+    var dclRe = /__runWhenReady\s*\(\s*(async\s+)?function/g;
+    var dclPos = [], dm;
+    while ((dm = dclRe.exec(newBody)) !== null) dclPos.push(dm.index);
+
+    for (var mi = dclPos.length - 1; mi >= 0; mi--) {
+      var bs = newBody.indexOf('{', dclPos[mi]);
+      if (bs < 0) continue;
+      var depth = 0, be = -1;
+      for (var ci = bs; ci < newBody.length; ci++) {
+        if (newBody[ci] === '{') depth++;
+        else if (newBody[ci] === '}') { if (--depth === 0) { be = ci; break; } }
+      }
+      if (be >= 0) newBody = newBody.slice(0, be) + '\n' + evalRebind + '\n' + observerSetup + '\n' + newBody.slice(be);
+    }
+
+    // GLOBAL FALLBACK: run observer setup even if app has no DOMContentLoaded pattern
+    // window._moSetup flag prevents duplicate setup if already done inside __runWhenReady
+    newBody += '\n' + observerSetup;
+    newBody += '\nsetTimeout(function(){' + evalRebind + '\n' + observerSetup + '},300);';
+    newBody += '\nsetTimeout(function(){' + evalRebind + '},1500);';
+    newBody += '\nsetTimeout(function(){' + evalRebind + '},4000);';
+
+    // ── FIX 5: Runtime function finder — exposes object/class methods to window ──
+    // Handles patterns repairButtonScope regex CANNOT fix:
+    //   var app = { showTab: function(){} }  → window.showTab = app.showTab
+    //   class GymApp { showTab(){} }         → window.showTab = instance.showTab
+    //   (function(){ function foo(){} })()   → found via object scan
+    var runtimeScanner = '(function(){try{var _fns={};document.querySelectorAll("[onclick]").forEach(function(el){var m=(el.getAttribute("onclick")||"").match(/^([a-zA-Z_$][a-zA-Z0-9_$]*)\\s*[\\(]/);if(m)_fns[m[1]]=true;});Object.keys(_fns).forEach(function(name){if(typeof window[name]==="function")return;for(var key in window){try{var obj=window[key];if(obj&&typeof obj==="object"&&typeof obj[name]==="function"){window[name]=obj[name].bind(obj);return;}if(obj&&obj.prototype&&typeof obj.prototype[name]==="function"){window[name]=obj.prototype[name];return;}}catch(e){}}}); }catch(e){}})();';
+    newBody += '\n' + runtimeScanner;
+    newBody += '\nsetTimeout(function(){' + runtimeScanner + '},500);';
+    newBody += '\nsetTimeout(function(){' + runtimeScanner + '},2000);';
+
+    // ── EMERGENCY BLANK-SCREEN REVEALER ─────────────────────────────────────────
+    // KEY INSIGHT: Don't guess which element to show. Instead find the password/email
+    // input and walk UP the entire ancestor chain making every hidden element visible.
+    // This works for ANY structure — outer-wrapper, app-container, class names, anything.
+    var revealFn = [
+      '(function _reveal(){',
+      '  try{',
+      '    // If page already has visible content, do nothing',
+      '    var _vis=false;',
+      '    var _all=document.querySelectorAll("body *");',
+      '    for(var _i=0;_i<_all.length;_i++){if(_all[_i].offsetHeight>50&&_all[_i].textContent.trim().length>2){_vis=true;break;}}',
+      '    if(_vis)return;',
+      '    // MAIN STRATEGY: find the login form input and unmask all hidden ancestors',
+      '    var _inp=document.querySelector("input[type=password],input[type=email]");',
+      '    if(_inp){',
+      '      var _p=_inp.parentElement;',
+      '      while(_p&&_p!==document.body){',
+      '        if(window.getComputedStyle(_p).display==="none"||_p.style.display==="none")',
+      '          _p.style.cssText+=";display:flex!important;visibility:visible!important;";',
+      '        _p=_p.parentElement;',
+      '      }',
+      '      return;', // done — login form is now unmasked
+      '    }',
+      '    // FALLBACK: no inputs found — try by ID/class keywords then first child of body',
+      '    var _a=null;',
+      '    var _kn=["authScreen","loginScreen","auth-screen","login-screen","fbAuthScreen","signInScreen"];',
+      '    for(var _j=0;_j<_kn.length;_j++){if(document.getElementById(_kn[_j])){_a=document.getElementById(_kn[_j]);break;}}',
+      '    if(!_a){var _q=document.querySelectorAll("[id*=auth],[id*=Auth],[id*=login],[id*=Login],[class*=auth],[class*=login]");if(_q.length)_a=_q[0];}',
+      '    if(!_a){var _w=document.body.firstElementChild;_a=(_w&&_w.firstElementChild)||_w||document.body;}',
+      '    if(_a){',
+      '      _a.style.cssText+=";display:flex!important;visibility:visible!important;";',
+      '      var _par=_a.parentElement;',
+      '      while(_par&&_par!==document.body){if(window.getComputedStyle(_par).display==="none")_par.style.display="flex";_par=_par.parentElement;}',
+      '    }',
+      '  }catch(_e){}',
+      '})();'
+    ].join('\n');
+    // Run immediately (blob URLs are already loaded) + 300ms + 1000ms safety net
+    newBody += '\n' + revealFn;
+    newBody += '\nsetTimeout(function(){' + revealFn + '},300);';
+    newBody += '\nsetTimeout(function(){' + revealFn + '},1000);';
+
+    return open + newBody + '\n' + close;
+  });
+}
+
+// Detect and repair HTML truncated by token limit
+function fixTruncatedHTML(html) {
+  // Count open vs closed script tags
+  var opens  = (html.match(/<script(?:\s[^>]*)?>(?!.*src)/gi) || []).length;
+  var closes = (html.match(/<\/script>/gi) || []).length;
+
+  // If there's an unclosed <script>, close it properly
+  if (opens > closes) {
+    var lastScript = html.lastIndexOf('<script');
+    var scriptContent = html.slice(lastScript);
+    var braceDepth = 0, parenDepth = 0, bracketDepth = 0;
+    var inStr = false, strChar = '';
+    for (var i = 0; i < scriptContent.length; i++) {
+      var c = scriptContent[i];
+      if (inStr) { if (c === strChar && scriptContent[i-1] !== '\\') inStr = false; }
+      else if (c === '"' || c === "'" || c === '`') { inStr = true; strChar = c; }
+      else if (c === '{') braceDepth++;
+      else if (c === '}') braceDepth = Math.max(0, braceDepth - 1);
+      else if (c === '(') parenDepth++;
+      else if (c === ')') parenDepth = Math.max(0, parenDepth - 1);
+      else if (c === '[') bracketDepth++;
+      else if (c === ']') bracketDepth = Math.max(0, bracketDepth - 1);
+    }
+    var closing = '';
+    // Close in right order: ) ] }
+    while (parenDepth > 0)  { closing += ')'; parenDepth--; }
+    while (bracketDepth > 0){ closing += ']'; bracketDepth--; }
+    while (braceDepth > 0)  { closing += '}'; braceDepth--; }
+    html += closing + '\n// (truncated — auto-completed)\n<\/script>';
+  }
+
+  // Ensure </body> and </html> exist
+  if (!html.includes('</body>')) {
+    html += '\n</body>\n</html>';
+  } else if (!html.includes('</html>')) {
+    html += '\n</html>';
+  }
+
+  return html;
+}
+
+// CORE_JS fallback is still injected only for rare non-Firebase apps.
+// Check each script block for SyntaxErrors and inject a visible warning + auto-fix banner
+function fixSyntaxErrors(html) {
+  var scriptRe = /(<script(?!\s+src)[^>]*>)([\s\S]*?)(<\/script>)/gi;
+  html = html.replace(scriptRe, function(full, open, body, close) {
+    try { new Function(body); return full; }
+    catch(e) {
+      if (!(e instanceof SyntaxError)) return full;
+
+      // AGGRESSIVE AUTO-FIX: progressively trim from end until code parses
+      // Try cut points from 99% all the way down to 5% — injected code can be 60%+ of body
+      for (var pct = 0.99; pct >= 0.05; pct -= 0.03) {
+        var cutAt = Math.floor(body.length * pct);
+        // Find last clean boundary (closing brace or semicolon) before cut point
+        var boundary = -1;
+        for (var bi = cutAt; bi >= 50; bi--) {
+          if ((body[bi] === '}' || body[bi] === ';') &&
+              (body[bi+1] === '\n' || body[bi+1] === '\r' || bi === body.length-1)) {
+            boundary = bi;
+            break;
+          }
+        }
+        if (boundary < 0) continue;
+        var trimmed = body.slice(0, boundary + 1);
+        // Close any open braces
+        var depth = 0;
+        var inStr = false, sc = '';
+        for (var ci = 0; ci < trimmed.length; ci++) {
+          var ch = trimmed[ci];
+          if (inStr) { if (ch === sc && trimmed[ci-1] !== '\\') inStr = false; }
+          else if (ch === '"' || ch === "'" || ch === '`') { inStr = true; sc = ch; }
+          else if (ch === '{') depth++;
+          else if (ch === '}') depth = Math.max(0, depth - 1);
+        }
+        var closing = '';
+        while (depth-- > 0) closing += '}';
+        var candidate = trimmed + closing;
+        try { new Function(candidate); return open + candidate + '\n' + close; }
+        catch(e2) { continue; }
+      }
+      return full;
+    }
+  });
+  return html;
+}
+
+// Auto-inject logout button — uses Firebase auth listener directly, works for ALL roles
+const AUTO_LOGOUT_SCRIPT = `<script>
+(function(){
+  // Top bar with user name + logout — visible for ALL roles, impossible to miss
+  var _bar=document.createElement('div');
+  _bar.id='_aLB';
+  _bar.style.cssText='display:none;position:fixed;top:0;left:0;right:0;z-index:999999;background:rgba(13,27,110,0.97);backdrop-filter:blur(8px);padding:8px 16px;justify-content:space-between;align-items:center;font-family:-apple-system,sans-serif;border-bottom:1px solid rgba(var(--pr),0.3);box-shadow:0 2px 12px rgba(0,0,0,0.3);';
+  var _nameSpan=document.createElement('span');
+  _nameSpan.style.cssText='color:#F5A623;font-size:12px;font-weight:700;';
+  _nameSpan.textContent='👤 Welcome!';
+  var _logoutBtn=document.createElement('button');
+  _logoutBtn.textContent='🚪 Logout';
+  _logoutBtn.style.cssText='background:rgba(239,68,68,0.2);color:#ef4444;border:1px solid rgba(239,68,68,0.4);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:-apple-system,sans-serif;';
+  _logoutBtn.onclick=function(){
+    try{
+      if(typeof _auth!=='undefined')_auth.signOut();
+      else if(typeof firebase!=='undefined'&&firebase.apps&&firebase.apps.length)firebase.auth().signOut();
+    }catch(e){}
+  };
+  _bar.appendChild(_nameSpan);
+  _bar.appendChild(_logoutBtn);
+  function _append(){if(document.body){document.body.appendChild(_bar);}else{document.addEventListener('DOMContentLoaded',function(){document.body.appendChild(_bar);});}}
+  _append();
+  function _watchAuth(){
+    if(typeof firebase==='undefined'||!firebase.apps||!firebase.apps.length){setTimeout(_watchAuth,300);return;}
+    firebase.auth().onAuthStateChanged(function(user){
+      if(user){
+        _bar.style.display='flex';
+        _nameSpan.textContent='👤 '+(user.displayName||user.email.split('@')[0]);
+        document.body.style.paddingTop='38px';
+        setTimeout(function(){window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;},100);
+      } else {
+        _bar.style.display='none';
+        document.body.style.paddingTop='';
+      }
+    });
+  }
+  _watchAuth();
+})();
+<\/script>`;
+
+function prepareApp(html) {
+  html = fixTruncatedHTML(html);    // fix truncation first
+  html = repairButtonScope(html);   // then repair button scope
+  html = fixSyntaxErrors(html);     // then check/warn syntax errors
+  // Firebase apps (all apps now) have their own complete JS — don't inject CORE_JS
+  if (html.includes('firebase-app-compat') || html.includes('firebase.initializeApp')) {
+
+    // ── UNIQUE APP PREFIX — handle var/const/let ────────────────────────────────
+    const buildId = Date.now().toString(36).slice(-5);
+    let origPrefix = null;
+    html = html.replace(
+      /(?:var|const|let)\s+APP_PREFIX\s*=\s*['"]([^'"]+)['"]/g,
+      function(match, prefix) {
+        const clean = prefix.replace(/_[a-z0-9]{3,6}$/, '');
+        origPrefix = clean;
+        return "var APP_PREFIX = '" + clean + '_' + buildId + "'";
+      }
+    );
+    // Also replace ALL hardcoded collection names that use the original prefix
+    // e.g. 'kitekitchen_items' → 'kitekitchen_abc12_items'
+    if (origPrefix) {
+      const escapedPrefix = origPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      html = html.replace(
+        new RegExp("(['\"])" + escapedPrefix + "_([a-zA-Z_]+)(['\"])", 'g'),
+        function(match, q1, colName, q2) {
+          return q1 + origPrefix + '_' + buildId + '_' + colName + q2;
+        }
+      );
+    }
+
+    // ── CLEAR OLD SESSION: wipe Firebase auth from localStorage AND IndexedDB ───
+    // Firebase uses IndexedDB for auth persistence — must clear both
+    const clearSessionScript = `<script>
+(function(){
+  try{
+    // Clear localStorage
+    var keys=[];
+    for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('firebase')>=0)keys.push(k);}
+    keys.forEach(function(k){localStorage.removeItem(k);});
+    // Clear IndexedDB (where Firebase actually stores auth tokens)
+    var dbNames=['firebaseLocalStorageDb','firebase-heartbeat-database','firebase-installations-database'];
+    dbNames.forEach(function(n){try{indexedDB.deleteDatabase(n);}catch(e){}});
+  }catch(e){}
+})();
+<\/script>`;
+
+    // Inject as FIRST thing in <head> — must run before any Firebase script
+    if(html.includes('<head>')) {
+      html = html.replace('<head>', '<head>' + clearSessionScript);
+    } else if(html.includes('<body>')) {
+      html = html.replace('<body>', '<body>' + clearSessionScript);
+    }
+
+    // ── REPLACE AUTH SCREEN WITH 100% WORKING VERSION ──────────────────────────
+    // Inject script that replaces authScreen innerHTML at runtime — avoids regex issues
+    const AUTH_REPLACE_SCRIPT = `<script>
+(function(){
+  var _AUTH_HTML='<div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:24px;padding:32px 24px;width:100%;max-width:360px;text-align:center;font-family:-apple-system,sans-serif;">'
+  +'<div style="font-size:52px;margin-bottom:10px">🚀<\\/div>'
+  +'<div id="_authTitle" style="font-size:22px;font-weight:900;color:#fff;margin-bottom:6px;">Welcome!<\\/div>'
+  +'<div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:20px;">Select your role and sign in<\\/div>'
+  +'<div id="fbErr" style="display:none;background:rgba(255,87,87,0.1);border:1px solid rgba(255,87,87,0.3);border-radius:10px;padding:10px;color:#ff5757;font-size:12px;margin-bottom:12px;word-break:break-word;"><\\/div>'
+  +'<div id="_roleSel" style="display:flex;gap:8px;margin-bottom:16px;"><\\/div>'
+  +'<input id="nameField" placeholder="Your Full Name" style="display:none;width:100%;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.15);border-radius:12px;padding:13px 16px;color:#fff;font-size:15px;outline:none;margin-bottom:10px;box-sizing:border-box;" />'
+  +'<input id="emailField" type="email" placeholder="Email address" style="width:100%;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.15);border-radius:12px;padding:13px 16px;color:#fff;font-size:15px;outline:none;margin-bottom:10px;box-sizing:border-box;" />'
+  +'<input id="passField" type="password" placeholder="Password (min 6 chars)" style="width:100%;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.15);border-radius:12px;padding:13px 16px;color:#fff;font-size:15px;outline:none;margin-bottom:14px;box-sizing:border-box;" />'
+  +'<button id="authBtn" onclick="doLogin()" style="width:100%;padding:15px;background:linear-gradient(135deg,#F5A623,#e8960f);color:#000;border:none;border-radius:12px;font-size:16px;font-weight:900;cursor:pointer;margin-bottom:10px;">Login<\\/button>'
+  +'<div onclick="toggleMode()" style="color:rgba(255,255,255,0.5);font-size:13px;cursor:pointer;padding:6px;" id="toggleBtn">No account? Sign up →<\\/div>'
+  +'<\\/div>';
+
+  function _injectAuth(){
+    var scr=document.getElementById('authScreen');
+    if(!scr)return;
+    // Save the original background/style
+    var bg=scr.style.background||'#0d0d1a';
+    scr.innerHTML=_AUTH_HTML;
+    // Add role buttons based on what the app needs
+    var roles=[];
+    // Look for role hints in page text or use defaults
+    // Detect roles from HTML source (more reliable than innerText)
+    var src=(document.documentElement.innerHTML||'').toLowerCase();
+    if(src.includes('ownerapp')||src.includes('owner-app')||src.includes("role==='owner'")||src.includes('role==\'owner\''))roles.push({id:'owner',label:'Owner'});
+    if(src.includes('adminapp')||src.includes("role==='admin'")||src.includes('role==\'admin\''))roles.push({id:'admin',label:'Admin'});
+    if(src.includes('memberapp')||src.includes("role==='member'")||src.includes('role==\'member\''))roles.push({id:'member',label:'Member'});
+    if(src.includes('studentapp')||src.includes("role==='student'")||src.includes('role==\'student\''))roles.push({id:'student',label:'Student'});
+    if(src.includes('teacherapp')||src.includes("role==='teacher'")||src.includes('role==\'teacher\''))roles.push({id:'teacher',label:'Teacher'});
+    if(src.includes('doctorapp')||src.includes("role==='doctor'")||src.includes('role==\'doctor\''))roles.push({id:'doctor',label:'Doctor'});
+    if(src.includes('patientapp')||src.includes("role==='patient'")||src.includes('role==\'patient\''))roles.push({id:'patient',label:'Patient'});
+    if(src.includes('driverapp')||src.includes("role==='driver'")||src.includes('role==\'driver\''))roles.push({id:'driver',label:'Driver'});
+    // Fallback: always add Owner if ownerApp div exists
+    if(roles.length===0&&document.getElementById('ownerApp'))roles.push({id:'owner',label:'Owner'});
+    // Always add customer/user as first role
+    var customerLabel='Customer';
+    if(bodyText.includes('member')&&!bodyText.includes('customer'))customerLabel='Member';
+    if(bodyText.includes('student'))customerLabel='Student';
+    if(bodyText.includes('patient'))customerLabel='Patient';
+    roles.unshift({id:'customer',label:customerLabel});
+    // Deduplicate and keep max 3
+    var seen={};roles=roles.filter(function(r){if(seen[r.id])return false;seen[r.id]=1;return true;}).slice(0,3);
+    var roleSel=document.getElementById('_roleSel');
+    if(roleSel){
+      roles.forEach(function(r,i){
+        var btn=document.createElement('button');
+        btn.textContent=r.label;
+        btn.style.cssText='flex:1;padding:10px 6px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid rgba(255,255,255,'+(i===0?'0.4':'0.15')+');background:rgba(var(--pr),'+(i===0?'0.25':'0.05')+');color:'+(i===0?'#F5A623':'rgba(255,255,255,0.5)')+';';
+        btn.onclick=function(){
+          if(typeof selectRole==='function')selectRole(r.id);
+          if(typeof window.currentUserRole!=='undefined')window.currentUserRole=r.id;
+          document.querySelectorAll('#_roleSel button').forEach(function(b){b.style.background='rgba(var(--pr),0.05)';b.style.color='rgba(255,255,255,0.5)';b.style.borderColor='rgba(255,255,255,0.15)';});
+          btn.style.background='rgba(var(--pr),0.25)';btn.style.color='#F5A623';btn.style.borderColor='rgba(255,255,255,0.4)';
+        };
+        roleSel.appendChild(btn);
+        if(i===0){btn.click();if(typeof window.currentUserRole!=='undefined')window.currentUserRole=r.id;}
+      });
+    }
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',_injectAuth);}
+  else{_injectAuth();}
+})();
+<\/script>`;
+    html = html.replace('</body>', AUTH_REPLACE_SCRIPT + '\n</body>');
+
+    // ── WIPE APP COLLECTIONS ON FIRST OPEN ─────────────────────────────────────
+    // Deletes all docs in this app's Firestore collections when opened for first time
+    // Prevents any stale data from appearing. Owner adds fresh data during workshop.
+    const WIPE_SCRIPT = `<script>
+(function(){
+  var _wipeKey='_wiped_'+( typeof APP_PREFIX!=='undefined'?APP_PREFIX:'x');
+  if(sessionStorage.getItem(_wipeKey))return; // already wiped this session
+  sessionStorage.setItem(_wipeKey,'1');
+  function _doWipe(){
+    if(typeof firebase==='undefined'||!firebase.apps||!firebase.apps.length){setTimeout(_doWipe,500);return;}
+    var db=firebase.firestore();
+    var prefix=typeof APP_PREFIX!=='undefined'?APP_PREFIX:'';
+    if(!prefix)return;
+    // Get all collections for this app prefix and delete all docs
+    var cols=[prefix+'_users',prefix+'_products',prefix+'_items',prefix+'_orders',
+              prefix+'_services',prefix+'_bookings',prefix+'_members',prefix+'_plans',
+              prefix+'_courses',prefix+'_appointments',prefix+'_listings',prefix+'_menu',
+              prefix+'_dishes',prefix+'_categories',prefix+'_inventory'];
+    cols.forEach(function(col){
+      db.collection(col).get().then(function(snap){
+        snap.forEach(function(doc){doc.ref.delete();});
+      }).catch(function(){});
+    });
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',_doWipe);}
+  else{setTimeout(_doWipe,800);}
+})();
+<\/script>`;
+
+    // Auto-inject logout bar and wipe script before </body>
+    if (html.includes('</body>')) {
+      html = html.replace('</body>', AUTO_LOGOUT_SCRIPT + '\n' + WIPE_SCRIPT + '\n</body>');
+    } else {
+      html = html + AUTO_LOGOUT_SCRIPT + WIPE_SCRIPT;
+    }
+    return html;
+  }
+  // Rare non-Firebase fallback: inject CORE_JS
+  const C = String.fromCharCode;
+  const open  = C(60,115,99,114,105,112,116,62);
+  const close = C(60,47,115,99,114,105,112,116,62);
+  const bodyC = C(60,47,98,111,100,121,62);
+  const coreTag = open + CORE_JS + close;
+  if (html.includes(bodyC)) return html.replace(bodyC, coreTag + '\n' + bodyC);
+  return html + coreTag;
+}
+
+// DOWNLOAD: Apply all same fixes as prepareApp
+function prepareDownload(html) {
+  html = fixTruncatedHTML(html);
+  html = repairButtonScope(html);
+  html = fixSyntaxErrors(html);
+  // All new apps have Firebase compat built-in — return unchanged
+  if (html.includes('firebase-app-compat') || html.includes('firebase.initializeApp')) {
+    if (html.includes('</body>')) {
+      html = html.replace('</body>', AUTO_LOGOUT_SCRIPT + '\n</body>');
+    } else {
+      html = html + AUTO_LOGOUT_SCRIPT;
+    }
+    return html;
+  }
+  // Rare non-Firebase fallback: inject CORE_JS only
+  const C = String.fromCharCode;
+  const open  = C(60,115,99,114,105,112,116,62);
+  const close = C(60,47,115,99,114,105,112,116,62);
+  const bodyC = C(60,47,98,111,100,121,62);
+  const coreTag = open + CORE_JS + close;
+  if (html.includes(bodyC)) return html.replace(bodyC, coreTag + '\n' + bodyC);
+  return html + coreTag;
+}
+
+
+// Check if API key already saved + check server status on load
+window.onload = function() {
+  // Auto-save key from URL parameter ?key=sk-ant-...
+  // Palash shares: workshop-tool.html?key=sk-ant-api03-XXX
+  // Students click link → key auto-saved, no manual entry needed
+  try {
+    const urlKey = new URLSearchParams(window.location.search).get('key');
+    if (urlKey && urlKey.startsWith('sk-')) {
+      _saveKey(urlKey);
+      // Clean URL so key isn't visible
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  } catch(e) {}
+
+  const saved = _getKey();
+  if (saved) {
+    document.getElementById('apiSetup').style.background = 'rgba(40,200,100,0.08)';
+    document.getElementById('apiSetup').style.borderColor = 'rgba(40,200,100,0.4)';
+    document.getElementById('apiStatus').className = 'api-status ok';
+    document.getElementById('apiStatus').textContent = '✅ API key is saved and ready! Key: ' + saved.slice(0,12) + '...';
+    document.getElementById('apiKeyInput').placeholder = 'Key saved — paste new one to update';
+  } else {
+    // No key saved — show box and focus input automatically
+    document.getElementById('apiSetup').style.display = 'block';
+    setTimeout(function(){ document.getElementById('apiKeyInput').focus(); }, 300);
+  }
+
+  // ── SERVER STATUS CHECK ───────────────────────────────────────────────────────
+  // Check immediately, then every 5s so the pill updates as soon as server starts
+  async function pollServer() {
+    const online = await checkServerStatus();
+    updateServerPill(online);
+  }
+  pollServer();
+  setInterval(pollServer, 5000);
+};
+
+function saveApiKey() {
+  let key = document.getElementById('apiKeyInput').value.trim();
+  // If input field empty, try prompt dialog as fallback
+  if (!key) {
+    key = (window.prompt('Paste your Claude API key here:') || '').trim();
+  }
+  if (!key) {
+    document.getElementById('apiStatus').className = 'api-status err';
+    document.getElementById('apiStatus').textContent = '❌ No key entered';
+    return;
+  }
+  _saveKey(key);
+  document.getElementById('apiStatus').className = 'api-status ok';
+  document.getElementById('apiStatus').textContent = '✅ Key saved! Starts with: ' + key.slice(0,14) + '...';
+  document.getElementById('apiSetup').style.background = 'rgba(40,200,100,0.08)';
+  document.getElementById('apiSetup').style.borderColor = 'rgba(40,200,100,0.4)';
+  document.getElementById('apiKeyInput').value = '';
+}
+
+const examples = {
+  restaurant: `Build a beautiful restaurant app called Spice Kitchen for a premium Indian restaurant. Pages: 1) Home with hero banner, featured dishes with 4 cards, customer reviews, Order Now button. 2) Menu with category filter (Starters, Main Course, Desserts, Drinks) and dish grid with name, price, Add to Cart button. 3) Cart showing items with quantity, price, total and Proceed to Pay button. 4) Profile with user details. Bottom navigation bar. Design: dark background, deep red and golden colors, premium look like Zomato.`,
+  gym: `Build a fitness app called FitZone for a premium gym. Pages: 1) Home with hero banner, featured classes, Book a Class button. 2) Classes with filter (Yoga, HIIT, Zumba, Strength) and class cards with name, time, trainer, Book button. 3) My Bookings with confirmed bookings and Cancel option. 4) Profile with membership details. Bottom navigation. Design: dark background, electric blue and neon green, energetic feel.`,
+  shop: `Build a shop app called Style Store for fashion clothing. Pages: 1) Home with hero banner, new arrivals with 6 product cards. 2) Products with category filter (Men, Women, Kids) and product grid with name, price, Add to Cart. 3) Cart with items, quantity controls, total and Checkout. 4) Orders with history. Bottom navigation. Design: clean white background, black and gold colors, premium fashion brand look.`,
+  salon: `Build a salon booking app called GlowUp Salon. Pages: 1) Home with hero, services highlights, Book Now button. 2) Services with cards (Haircut, Facial, Manicure, Pedicure, Hair Color) showing name, duration, price and Book button. 3) My Appointments with upcoming bookings and Cancel option. 4) Profile. Bottom navigation. Design: rose gold and white, pink and gold accents, luxury spa feel.`,
+  coaching: `Build a coaching app called LearnPro for online education. Pages: 1) Home with featured courses, 4 course cards with topic, duration, price, Enroll button. 2) Courses with category filter and course grid. 3) My Courses with enrolled courses and progress bars. 4) Profile with student details. Bottom navigation. Design: dark navy, blue and yellow accents, modern edtech look.`,
+  hotel: `Build a hotel booking app called Grand Stay Hotel. Pages: 1) Home with hotel hero, star rating, amenities, Book Room button. 2) Rooms with room type cards showing name, bed type, price per night, Book Now. 3) My Bookings with check-in, check-out, total amount. 4) Profile. Bottom navigation. Design: dark luxury background, gold and cream colors, 5-star hotel feel.`,
+  astrology: `Build an astrology app called AstroGuru for professional astrologers. Roles: Astrologer (admin) and Client. Client pages: 1) Home with daily horoscope for their zodiac sign, featured services. 2) Services with cards (Birth Chart Reading ₹999, Tarot Reading ₹599, Numerology ₹499, Match Making ₹1499) with description, duration, Book Now button. 3) My Bookings showing upcoming and past consultations with astrologer name, service, date, status. 4) Profile with name, date of birth, zodiac sign. Astrologer pages: 1) Dashboard with today's bookings count, total clients, revenue stats. 2) Manage Bookings - list of all client bookings with Confirm/Cancel options. 3) Add Services - form to add new service with name, description, price, duration. 4) Profile. Design: deep purple/black background, gold and violet accents, mystical premium look with star and moon emojis throughout.`,
+  hospital: `Build a hospital appointment app called HealthCare Plus. Roles: Doctor (admin) and Patient. Patient pages: 1) Home with hero, specializations (Cardiology, Orthopedics, Pediatrics, Dermatology, General) as clickable cards. 2) Book Appointment - select doctor, date, time slot, reason for visit, confirm booking. 3) My Appointments - list of upcoming and past appointments with doctor name, date, status badge (Confirmed/Pending/Completed). 4) Profile with patient name, age, blood group, medical history notes. Doctor pages: 1) Dashboard with today's appointments count, total patients, pending requests. 2) Today's Appointments - list with patient name, time, reason, Mark as Done button. 3) All Patients - searchable list of patients who booked appointments. 4) Profile with specialization and available time slots. Design: clean white/light background, green and teal medical theme, professional clinical look.`,
+  realestate: `Build a real estate app called PropFinder for property listings. Roles: Agent (admin) and Buyer. Buyer pages: 1) Home with hero, property type filter (Flat, House, Villa, Plot, PG), featured listings grid. 2) Browse Properties - filter by type, BHK, price range; property cards with photo emoji, title, price, location, BHK, area. 3) Saved Properties - wishlist of saved properties with Remove option. 4) Profile with contact details and search preferences. Agent pages: 1) Dashboard with total listings, total inquiries, properties sold stats. 2) My Listings - list of all properties with status (Available/Sold) and Edit/Delete. 3) Add Property - form with property name, type, BHK, price, area sqft, location, description. 4) Inquiries - list of buyer messages/interests for each property. Design: dark background, indigo and gold colors, premium property portal look.`,
+  freelancer: `Build a freelancer portfolio app called FreelancePro for digital freelancers. Roles: Freelancer (admin) and Client. Client pages: 1) Home with freelancer hero photo area, name, tagline, skills badges, Hire Me button. 2) Portfolio - project cards with title, category (Web, Design, Video, SEO), description, View button. 3) Services - service packages (Basic ₹5000, Standard ₹15000, Premium ₹30000) with deliverables list and Order Now button. 4) Contact - send inquiry form with name, email, project description, budget, Submit button. Freelancer pages: 1) Dashboard - total projects, active orders, earnings this month, pending inquiries. 2) Manage Orders - list of client orders with status (New/In Progress/Completed) and Update Status button. 3) Add Portfolio - form to add new project with title, category, description, tools used. 4) Inquiries - list of client messages with client name, budget, date, Reply option. Design: dark charcoal background, electric indigo and white, modern professional look.`,
+  petcare: `Build a pet care app called PetPal for pet grooming and vet services. Roles: Vet/Groomer (admin) and Pet Owner. Pet Owner pages: 1) Home with hero, quick services (Grooming, Vaccination, Health Checkup, Deworming), upcoming appointment reminder. 2) Book Service - select service type, select pet type (Dog/Cat/Bird/Other), enter pet name and age, select date and time slot, add notes, Book button. 3) My Pets - list of registered pets with name, type, breed, age, Add New Pet button. 4) My Appointments - history of bookings with service name, pet name, date, status, and vet name. Vet pages: 1) Dashboard - today's bookings, total pets registered, total pet owners, monthly revenue. 2) Today's Appointments - list with pet name, owner name, service type, time, Mark Done button. 3) All Pets - list of all registered pets with owner contact details. 4) Services Management - add/remove services with name, description, price, duration. Design: warm orange and teal background, pet-friendly playful design with paw emojis, soft rounded cards.`,
+  pharmacy: `Build a pharmacy app called MediMart for an online pharmacy. Roles: Pharmacist (admin) and Customer. Customer pages: 1) Home with hero, medicine categories (Tablets, Syrups, Vitamins, Skincare, Baby Care, Surgical) as grid cards, search bar, Today's Offers. 2) Browse Medicines - filter by category; medicine cards with name, composition, brand, price, stock status, Add to Cart button. 3) Cart - items with quantity controls, subtotal, delivery charge, total and Place Order button. 4) My Orders - order history with medicine names, quantity, total amount, delivery status badge. Pharmacist pages: 1) Dashboard - total medicines, today's orders, low stock alerts, total revenue. 2) Manage Medicines - list of all medicines with stock count, price and Edit/Delete. 3) Add Medicine - form with name, category, composition, price, stock quantity, expiry date. 4) Orders - all customer orders with customer name, items, amount, status (Pending/Packed/Delivered) and Update Status button. Design: clean white and green medical theme, trust-inspiring professional pharmacy look.`
+};
+
+// ── App type detection — keyword matching, no API call needed ──────────────
+function detectAppType(idea) {
+  const t = idea.toLowerCase();
+  if (/astrology|horoscope|zodiac|kundali|jyotish|spiritual|tarot|numerology|astrologer/.test(t)) return 'astrology';
+  if (/hospital|doctor|patient|clinic|medical|physician|appointment|health|HealthCare/.test(t)) return 'hospital';
+  if (/school|student|teacher|college|university|education|course|class|learning|tutor/.test(t)) return 'education';
+  if (/real estate|property|flat|house|villa|plot|rent|apartment|pg|propfinder/.test(t)) return 'realestate';
+  if (/pharmacy|medicine|chemist|drug|medimart/.test(t)) return 'pharmacy';
+  if (/pet|dog|cat|vet|grooming|petpal|animal/.test(t)) return 'petcare';
+  if (/freelancer|portfolio|freelance|gig|digital agency|designer/.test(t)) return 'freelancer';
+  if (/gym|fitness|workout|exercise|trainer|health club|fitzone/.test(t)) return 'gym';
+  if (/salon|beauty|spa|hair|makeup|facial|nail|glowup/.test(t)) return 'salon';
+  if (/restaurant|food|menu|dish|cafe|kitchen|dine|zomato|spice/.test(t)) return 'restaurant';
+  if (/hotel|resort|homestay|accommodation|room|stay|grand stay/.test(t)) return 'hotel';
+  if (/shop|store|ecommerce|product|fashion|clothing|style store/.test(t)) return 'shop';
+  if (/coach|coaching|learnpro|online education|skill|course/.test(t)) return 'coaching';
+  return 'general';
+}
+
+// ── Per-category modify button sets ────────────────────────────────────────
+const MODIFY_SETS = {
+  astrology: [
+    ['🎨 Change Color',        'Change the theme to deep midnight blue with silver and gold accents for a more mystical look'],
+    ['📅 Add Booking System',  'Add a proper appointment booking with calendar date picker and available time slots'],
+    ['⭐ Add Horoscope Section','Add a daily horoscope section showing predictions for all 12 zodiac signs with emoji'],
+    ['💎 Add Premium Plans',   'Add monthly subscription plans (Silver ₹999/mo, Gold ₹2499/mo, Platinum ₹4999/mo) with benefits'],
+    ['🔮 Add More Services',   'Add more astrology services: Vastu Shastra, Career Reading, Business Astrology, Love Compatibility'],
+    ['📞 Add Contact Page',    'Add a contact section with WhatsApp button, email, and consultation request form'],
+    ['🌙 Make it More Mystical','Make the design look more mystical with stars, moons and cosmic animations'],
+    ['💫 Add Testimonials',    'Add a client testimonials section with star ratings and review cards'],
+  ],
+  hospital: [
+    ['🎨 Change Color',        'Change the theme to a clean blue and white medical color scheme'],
+    ['👨‍⚕️ Add More Doctors',    'Add a doctors listing with photos, specializations, experience, and ratings'],
+    ['📋 Add Medical Records', 'Add a medical history section for patients to view past prescriptions and diagnoses'],
+    ['🚑 Add Emergency Info',  'Add an emergency section with quick call button, first aid tips, and nearest hospital info'],
+    ['💊 Add Pharmacy Tab',    'Add a medicines/pharmacy tab where patients can view prescribed medications'],
+    ['🔔 Add Reminders',       'Add medicine reminder notifications and appointment reminder alerts'],
+    ['📞 Add Contact Page',    'Add a contact section with hospital address, phone, WhatsApp and directions map link'],
+    ['⭐ Add Ratings',         'Add a doctor rating and review system where patients can rate their experience'],
+  ],
+  realestate: [
+    ['🎨 Change Color',        'Change the theme to dark navy blue with gold for a luxury real estate feel'],
+    ['🏠 Add More Listings',   'Add 8 more property listings with different BHK, price ranges and locations'],
+    ['🔍 Add Search Filter',   'Add advanced search with price range slider, BHK filter, locality, and property type filter'],
+    ['📊 Add EMI Calculator',  'Add an EMI calculator where buyers can enter loan amount and see monthly installments'],
+    ['📸 Add Gallery View',    'Add a photo gallery section for each property with multiple interior images'],
+    ['📞 Add Lead Form',       'Add a contact/inquiry form where interested buyers can leave their number for callback'],
+    ['🗺️ Add Location Map',    'Add a map section with property location, nearby schools, hospitals, metro stations'],
+    ['💰 Add Price History',   'Add a price trend section showing property price changes over last 6 months'],
+  ],
+  pharmacy: [
+    ['🎨 Change Color',        'Change the theme to a clean white and green pharmacy color scheme'],
+    ['💊 Add More Medicines',  'Add 20 more medicines across all categories with realistic names, compositions and prices'],
+    ['🏷️ Add Discount Offers', 'Add an offers section with discount badges on selected medicines and combo packs'],
+    ['🚚 Add Delivery Tracking','Add an order tracking section showing live delivery status (Ordered > Packed > Dispatched > Delivered)'],
+    ['📋 Add Prescription Upload','Add a prescription upload feature where customers can upload their doctor prescription'],
+    ['🔔 Add Refill Reminder', 'Add a medicine refill reminder feature for regular medicines'],
+    ['📞 Add Contact Page',    'Add a contact section with pharmacy address, phone, WhatsApp and operating hours'],
+    ['💳 Add Wallet Points',   'Add a loyalty points/wallet system where customers earn points on every purchase'],
+  ],
+  petcare: [
+    ['🎨 Change Color',        'Change the theme to a warm orange and white with teal accents for a friendly pet look'],
+    ['🐾 Add More Services',   'Add more services: Pet Training, Pet Boarding, Pet Taxi, Emergency Pet Care'],
+    ['🐕 Add Pet Profiles',    'Add a detailed pet profile section with medical history, vaccination records and diet notes'],
+    ['📅 Add Schedule',        'Add a vaccination schedule and next appointment reminder for each pet'],
+    ['🛒 Add Pet Shop',        'Add a pet products shop with food, toys, accessories and grooming products'],
+    ['⭐ Add Reviews',         'Add a vet and groomer rating system with client photo testimonials'],
+    ['📞 Add Contact Page',    'Add emergency contact section with 24/7 vet helpline and WhatsApp button'],
+    ['🎉 Add Loyalty Program', 'Add a pet care loyalty program where owners earn paw points on every service'],
+  ],
+  freelancer: [
+    ['🎨 Change Color',        'Change the theme to a sleek dark charcoal and electric blue professional look'],
+    ['📁 Add More Projects',   'Add 6 more portfolio projects with different categories, tools used and results achieved'],
+    ['💼 Add Resume Section',  'Add a resume/skills section with skill bars, certifications, and work experience timeline'],
+    ['📊 Add Stats Section',   'Add an impact section showing: Projects Completed, Happy Clients, Years Experience, Revenue Generated'],
+    ['🎥 Add Video Reel',      'Add a showreel/demo video section at the top of the portfolio'],
+    ['💳 Add Payment Plans',   'Add clearer service packages with a comparison table showing what is included in each plan'],
+    ['📞 Add Contact Page',    'Add a contact section with inquiry form, WhatsApp button, and response time promise'],
+    ['⭐ Add Testimonials',    'Add a client testimonials section with photo, name, company, star rating and review text'],
+  ],
+  gym: [
+    ['🎨 Change Color',        'Change the theme to dark black with electric neon green for a high-energy gym feel'],
+    ['💪 Add Workout Plans',   'Add workout plan cards (Beginner/Intermediate/Advanced) with exercise list and video links'],
+    ['🥗 Add Diet Plans',      'Add a diet plan section with meal plans for muscle gain, fat loss and maintenance'],
+    ['📊 Add Progress Tracker','Add a body stats tracker where members can log weight, BMI and measurements over time'],
+    ['🏆 Add Leaderboard',     'Add a monthly leaderboard showing top members by attendance or workout completions'],
+    ['💰 Add Membership Plans','Add clear membership plan cards (Monthly ₹999, Quarterly ₹2499, Annual ₹7999) with features'],
+    ['📞 Add Contact Page',    'Add gym location, timing, phone and WhatsApp inquiry button'],
+    ['⭐ Add Trainer Profiles', 'Add certified trainer profile cards with specialization, experience and Book a Session button'],
+  ],
+  salon: [
+    ['🎨 Change Color',        'Change the theme to blush pink and gold for an ultra-luxury salon vibe'],
+    ['💄 Add More Services',   'Add more beauty services: Bridal Package, Hair Spa, Keratin Treatment, Threading, Waxing'],
+    ['📸 Add Before/After',    'Add a before and after transformation gallery section with client photos'],
+    ['🎁 Add Gift Cards',      'Add gift card purchase section (₹500, ₹1000, ₹2000) for birthday and anniversary gifting'],
+    ['💰 Add Membership',      'Add a salon membership card (Silver/Gold/Platinum) with monthly credits and discount perks'],
+    ['📅 Add Slot Booking',    'Improve the booking with real-time slot availability showing open and booked time slots'],
+    ['⭐ Add Stylist Profiles', 'Add individual stylist profile cards with specialization, ratings and Book This Stylist button'],
+    ['📞 Add Contact Page',    'Add salon address, WhatsApp, Instagram link and Google Maps direction button'],
+  ],
+  restaurant: [
+    ['🎨 Change Color',        'Change the main color to royal blue and silver for a more upscale restaurant look'],
+    ['➕ Add More Dishes',     'Add 10 more dishes across all categories with realistic Indian names, descriptions and prices'],
+    ['🔥 Add Offers Section',  'Add a special offers section with discounts, combo meals and daily specials with countdown timer'],
+    ['🍕 Make it Like Zomato', 'Redesign the UI to look exactly like Zomato with same card layout, fonts and color style'],
+    ['⭐ Add Reviews System',  'Add a dish rating and customer review system with star ratings and comment section'],
+    ['🚚 Add Order Tracking',  'Add a live order tracking page showing: Order Received > Preparing > Out for Delivery > Delivered'],
+    ['🎁 Add Loyalty Points',  'Add a loyalty points system where customers earn 1 point per ₹10 spent and can redeem them'],
+    ['📞 Add Contact Page',    'Add restaurant address, phone, WhatsApp, table booking form and Google Maps direction'],
+  ],
+  hotel: [
+    ['🎨 Change Color',        'Change the theme to deep black and gold for a 5-star luxury hotel feel'],
+    ['🏨 Add More Room Types', 'Add more room categories: Deluxe, Superior, Suite, Presidential with different pricing and amenities'],
+    ['🍽️ Add Restaurant Menu', 'Add an in-room dining/restaurant menu section with breakfast, lunch and dinner options'],
+    ['💆 Add Spa Services',    'Add a spa and wellness section with available treatments, pricing and booking'],
+    ['🚗 Add Cab Booking',     'Add airport transfer and local cab booking feature for hotel guests'],
+    ['⭐ Add Guest Reviews',   'Add a hotel review section with guest ratings, photos and testimonials'],
+    ['🎁 Add Loyalty Program', 'Add a hotel loyalty program with points, member tiers (Silver/Gold/Platinum) and rewards'],
+    ['📞 Add Contact Page',    'Add hotel address, reception number, WhatsApp concierge and directions map link'],
+  ],
+  education: [
+    ['🎨 Change Color',        'Change the theme to dark navy and yellow for a modern edtech feel like Byju\'s'],
+    ['📚 Add More Courses',    'Add 8 more courses with different subjects, duration, instructor name, rating and price'],
+    ['🎯 Add Quiz Feature',    'Add a quiz/test section where students can take topic-wise practice tests and see scores'],
+    ['📊 Add Progress Report', 'Add a detailed progress report showing completion percentage, test scores and study hours'],
+    ['🏆 Add Certificates',    'Add a certificates section showing earned course completion certificates with download option'],
+    ['💬 Add Discussion Forum','Add a Q&A discussion forum where students can ask doubts and teachers can answer'],
+    ['📞 Add Contact Page',    'Add contact form, WhatsApp support and free demo class booking option'],
+    ['🎥 Add Live Class Tab',  'Add a Live Classes tab showing upcoming scheduled sessions with Join button'],
+  ],
+  shop: [
+    ['🎨 Change Color',        'Change the theme to premium black and gold for a luxury fashion store look'],
+    ['➕ Add More Products',   'Add 12 more products across all categories with realistic names, sizes, colors and prices'],
+    ['🔍 Add Search & Filter', 'Add a product search bar and filter by price range, size, color and rating'],
+    ['⭐ Add Reviews System',  'Add a product rating and review system with verified buyer badges'],
+    ['🎁 Add Wishlist',        'Add a wishlist/save for later feature with heart icon on every product card'],
+    ['🚚 Add Order Tracking',  'Add order tracking showing: Ordered > Packed > Shipped > Out for Delivery > Delivered'],
+    ['💰 Add Flash Sale',      'Add a flash sale section with countdown timer, discount percentage and limited stock badges'],
+    ['📞 Add Contact Page',    'Add customer support section with WhatsApp, email, return policy and FAQ'],
+  ],
+  coaching: [
+    ['🎨 Change Color',        'Change theme to deep purple and gold for a premium coaching academy look'],
+    ['📚 Add More Courses',    'Add 6 more courses in different topics with instructor name, duration and price'],
+    ['🎯 Add Test Series',     'Add a test series section with topic-wise mock tests and performance analytics'],
+    ['📜 Add Certificates',    'Add a course completion certificate section that students can download'],
+    ['👨‍🏫 Add Faculty Section', 'Add a faculty/instructor profiles section with photo, qualification and experience'],
+    ['📞 Add Contact Page',    'Add institute address, phone, WhatsApp and free counseling session booking form'],
+    ['💰 Add EMI Option',      'Add an EMI/installment payment plan option for expensive courses'],
+    ['🏆 Add Success Stories', 'Add a student success stories/testimonials section with photo, name and achievement'],
+  ],
+  general: [
+    ['🎨 Change Color',        'Change the main color to blue and make it look more modern and professional'],
+    ['📞 Add Contact Page',    'Add a contact page with phone number, email, address and a WhatsApp button'],
+    ['✨ Make Premium',        'Make the design look more premium and luxurious with dark background and gold accents'],
+    ['➕ Add More Content',    'Add more items, services or content relevant to this app with realistic data'],
+    ['🏷️ Change Branding',     'Change the app name, logo and all branding to match a new brand identity'],
+    ['🔔 Add Notifications',   'Add a notification system for important updates and reminders'],
+    ['💫 Add Animations',      'Add smooth page transition animations and loading effects throughout the app'],
+    ['⭐ Add Reviews',         'Add a ratings and reviews section where users can share their feedback'],
+  ],
+};
+
+// ── Swap modify buttons based on detected app type ────────────────────────
+function updateModifyButtons(appType) {
+  const container = document.getElementById('quickModifyBtns');
+  if (!container) return;
+  const set = MODIFY_SETS[appType] || MODIFY_SETS['general'];
+
+  // Build new buttons
+  let html = '';
+  set.forEach(function(item) {
+    const label = item[0];
+    const prompt = item[1].replace(/'/g, "\\'");
+    html += `<button class="ex-btn" onclick="fillModify('${prompt}')">${label}</button>`;
+  });
+
+  // Fade out → swap → fade in
+  container.style.opacity = '0';
+  container.style.transition = 'opacity 0.3s';
+  setTimeout(function() {
+    container.innerHTML = html;
+    container.style.opacity = '1';
+  }, 300);
+}
+
+function fillExample(type) {
+  document.getElementById('appPrompt').value = examples[type];
+}
+
+async function buildApp() {
+  // INSTANT feedback — if you see this, the click is working
+  document.getElementById('buildBtn').textContent = '⏳ Starting...';
+  document.getElementById('buildBtn').style.background = '#666';
+
+  const userIdea = document.getElementById('appPrompt').value.trim();
+  if (userIdea.length > 800) {
+    alert('⚠️ Prompt too long! Keep it under 800 characters. Use the App Prompt Builder GPT to get a short, correct prompt.');
+    return;
+  }
+  if (!userIdea) {
+    document.getElementById('buildBtn').textContent = '⚡ Build My App Now';
+    document.getElementById('buildBtn').style.background = '';
+    document.getElementById('buildErrorMsg').textContent = '⚠️ Please type your app idea first!';
+    document.getElementById('buildErrorDetail').textContent = 'Click one of the example buttons above, or type your own app idea.';
+    document.getElementById('buildError').style.display = 'block';
+    return;
+  }
+
+  const apiKey = _getKey();
+  if (!apiKey) {
+    document.getElementById('buildBtn').textContent = '⚡ Build My App Now';
+    document.getElementById('buildBtn').style.background = '';
+    if (!window._WEBINAR_MODE) { document.getElementById('apiSetup').style.display = 'block'; }
+    document.getElementById('apiStatus').className = 'api-status err';
+    document.getElementById('apiStatus').textContent = '❌ Paste your API key above and click Save Key first!';
+    document.getElementById('apiSetup').scrollIntoView({behavior:'smooth'});
+    return;
+  }
+
+  document.getElementById('buildError').style.display = 'none';
+  document.getElementById('buildBtn').disabled = true;
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('result').style.display = 'none';
+
+  const steps = [
+    { step: '🤖 AI is reading your idea...', msg: 'Understanding what you want to build.' },
+    { step: '🎨 Designing your app layout...', msg: 'Creating pages, colors and navigation.' },
+    { step: '⚡ Writing app code...', msg: 'Building all your pages and features.' },
+    { step: '📱 Making it mobile-ready...', msg: 'Almost done! Polishing the final result.' },
+  ];
+
+  let stepIndex = 0;
+  const stepInterval = setInterval(() => {
+    if (stepIndex < steps.length) {
+      document.getElementById('loadingStep').textContent = steps[stepIndex].step;
+      document.getElementById('loadingMsg').textContent = steps[stepIndex].msg;
+      stepIndex++;
+    }
+  }, 6000);
+
+  try {
+    const response = await _claudeFetch(apiKey, {
+        model: 'claude-sonnet-4-5',
+        max_tokens: 18000,
+        thinking: { type: 'enabled', budget_tokens: 5000 },
+        system: `You are an expert software engineer. You write complete, production-quality single-file HTML apps. Every button has a real working onclick. Every form submits correctly. You never write TODO comments or placeholder content. You think deeply before writing and produce apps that look and feel like real products.
+
+CRITICAL — TOKEN BUDGET RULE:
+- You have 18,000 tokens available (the hard ceiling)
+- Write your entire app within 12,000 tokens (~48,000 characters)
+- The remaining 6,000 tokens are a safety buffer — NEVER touch them
+- This buffer guarantees nothing ever gets cut, no matter what
+
+Claude cannot count tokens but CAN count characters. Use that.
+The #1 cause of broken apps: Claude writes HTML first, runs out of space, JS functions get cut → buttons dead.
+
+⚠️ WRITE IN THIS ORDER — MOST IMPORTANT RULE:
+1. <style> block first (CSS) — always completes, never cut
+2. <script> block second (ALL JS) — write ALL functions before any HTML
+3. HTML last — authScreen, then app divs, then tab content
+
+Why: If output gets cut, JS is already written and complete. Only HTML tabs might be missing —
+that's harmless. If HTML is written first and JS is cut, ALL buttons break.
+
+CONCRETE SIZE LIMITS (fit inside 12,000 token / 48,000 char target):
+- CSS: max 12000 characters (single minified line)
+- JS: max 24000 characters (all functions combined)
+- HTML: max 12000 characters (auth + app screens + tabs)
+- Total: stay under 48000 characters
+
+When you have written ~42000 characters total, STOP adding features and close everything.
+The 6000 token buffer (24,000 chars) above your limit protects against any overrun.
+
+CSS MUST BE MINIFIED — SINGLE LINE, NO SPACES:
+- Write the ENTIRE <style> block as ONE line — no line breaks, no indentation
+- ✅ CORRECT: <style>body{background:#111;color:#fff}.btn{padding:12px;border-radius:8px}</style>
+- ❌ WRONG: multi-line CSS with indentation
+- Use short class names: .btn .card .hdr .sbar .nbtn
+- Use CSS variables: --p --bg --c
+
+JS MUST BE COMPACT — NO BLANK LINES, NO COMMENTS, SHORT NAMES:
+- Every function on ONE line — no indentation, no blank lines between functions
+- Zero comments in JS
+- Short var names: e=email, p=pass, n=name, el=element, d=doc, s=snap
+
+HTML MUST BE MINIMAL:
+- Use CSS classes, not inline style="" on every element
+- Short IDs: id="custApp" not id="customerDashboardApplication"
+
+FEATURE BUDGET — MAX 3 FEATURES PER TAB:
+- NEVER leave a function half-written — omit it entirely instead
+- NEVER add a feature you cannot finish within the size limit`,
+        messages: [{
+          role: 'user',
+          content: `Build a complete, production-ready Firebase mobile app for: ${userIdea}
+
+⚠️ MOST IMPORTANT RULE: READ THE USER'S IDEA CAREFULLY AND BUILD EXACTLY WHAT THEY ASKED FOR.
+Do NOT default to a restaurant/shop/product app unless the user specifically asked for one.
+If the user asked for a gym management app — build a gym management app.
+If the user asked for a hospital app — build a hospital app.
+If the user asked for a school app — build a school app.
+The screens, tabs, features, and data must match the user's actual idea, not a generic shop template.
+
+🚨 ABSOLUTE RULE #1 — NEVER BREAK THIS:
+The VERY FIRST thing a user sees when they open the app MUST be the Login/Signup screen.
+The app MUST NOT open directly into any dashboard, home screen, or any other page.
+onAuthStateChanged MUST control everything — if user is NOT logged in → show auth screen ONLY.
+If you skip the login screen, the app is WRONG. No exceptions.
+
+🚨 ABSOLUTE RULE #2 — LOGOUT BUTTON IS MANDATORY IN BOTH ROLES:
+EVERY app MUST have a visible Logout button in BOTH customerApp AND ownerApp. No exceptions.
+
+FOR CUSTOMER ROLE (customerApp):
+- The LAST tab in the customer bottom nav MUST be a Profile tab (icon: 👤, label: Profile)
+- This Profile tab shows: user's name, email, role badge, AND a red Logout button
+- Logout button: <button onclick="doLogout()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444;border-radius:12px;padding:14px 20px;width:100%;font-size:15px;font-weight:700;cursor:pointer;margin-top:24px;">🚪 Logout</button>
+
+FOR OWNER/ADMIN ROLE (ownerApp):
+- The LAST tab in the owner bottom nav MUST be a Profile tab (icon: 👤, label: Profile)
+- Same logout button as above
+
+LOGOUT FUNCTION — add this in your script:
+function doLogout(){
+  _auth.signOut().then(function(){
+    document.getElementById('authScreen').style.display='flex';
+    document.getElementById('customerApp').style.display='none';
+    document.getElementById('ownerApp').style.display='none';
+  });
+}
+
+If EITHER role is missing the Profile tab or Logout button, the app is WRONG. No exceptions.
+
+━━ SCREEN 1: AUTH (shown first, covers full screen) ━━
+- Beautiful full-screen login/signup UI matching the app's theme and colors
+- Role selection buttons matching the app type (e.g. for gym: "I am a Member" / "I am a Gym Owner", for school: "I am a Student" / "I am a Teacher", for shop: "I am a Customer" / "I am a Shop Owner")
+- FIRST role button must be visually pre-selected/highlighted on page load (set its opacity:1, others 0.5)
+- var currentUserRole = '[first role]'; — DEFAULT to first role so signup works without clicking role button
+- selectRole() just updates the visual highlight and currentUserRole
+- Name field (signup only), Email field, Password field
+- Login button onclick="doLogin()" — Sign Up button onclick="doSignup()" — Toggle button onclick="toggleMode()"
+- Working inline error display — ALWAYS make errors visible
+
+⚠️ COPY THIS EXACT AUTH JAVASCRIPT — DO NOT CHANGE FUNCTION NAMES:
+var authMode='login';
+function toggleMode(){authMode=authMode==='login'?'signup':'login';var s=authMode==='signup';document.getElementById('nameField').style.display=s?'block':'none';document.getElementById('authBtn').textContent=s?'Sign Up':'Login';document.getElementById('toggleBtn').textContent=s?'Already have an account? Login':'Don\'t have an account? Sign Up';_showErr('');}
+function _showErr(m){var e=document.getElementById('fbErr');if(!e)return;e.textContent=m;e.style.display=m?'block':'none';}
+function doLogin(){var e=document.getElementById('emailField').value.trim(),p=document.getElementById('passField').value;if(!e||!p){_showErr('Enter email and password');return;}_showErr('Logging in...');_auth.signInWithEmailAndPassword(e,p).catch(function(err){_showErr(err.message);});}
+function doSignup(){try{var n=(document.getElementById('nameField')||{}).value||'',e=document.getElementById('emailField').value.trim(),p=document.getElementById('passField').value;if(!e||!p){_showErr('Enter email and password');return;}if(p.length<6){_showErr('Password min 6 characters');return;}_showErr('Creating account...');var _prefix=typeof APP_PREFIX!=='undefined'?APP_PREFIX:'app';var _role=typeof currentUserRole!=='undefined'?currentUserRole:'customer';_auth.createUserWithEmailAndPassword(e,p).then(function(cred){return _db.collection(_prefix+'_users').doc(cred.user.uid).set({uid:cred.user.uid,name:n||e.split('@')[0],email:e,role:_role,createdAt:firebase.firestore.FieldValue.serverTimestamp()});}).then(function(){_showErr('');}).catch(function(err){_showErr(err.message);});}catch(ex){_showErr(ex.message);}}
+
+⚠️ CRITICAL INPUT IDs — use EXACTLY these IDs in your HTML inputs:
+- Name input: id="nameField"
+- Email input: id="emailField"
+- Password input: id="passField"
+- Error div: id="fbErr" style="display:none"
+- Main button: id="authBtn" onclick="doLogin()"
+- Toggle button: id="toggleBtn" onclick="toggleMode()"
+
+━━ SCREEN 2 & 3: BUILD THE DASHBOARDS THE USER ASKED FOR ━━
+- Build the exact screens, tabs, and features described in the user's idea
+- Use roles that make sense for the app type (gym owner/member, teacher/student, admin/user, etc.)
+- Each role gets its own full dashboard with relevant features
+- Bottom navigation bar with 4-5 tabs relevant to that role
+- All data stored in Firestore with real-time onSnapshot() updates
+- NEVER use .orderBy() with .where() — sort in JS instead to avoid Firestore index errors
+
+FIREBASE CONFIG (use exactly this, compat SDK not modules):
+CDN scripts to include (NO async or defer):
+  https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js
+  https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js
+  https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js
+
+Config object:
+  apiKey: "AIzaSyDJC8ijJ-SknWzBUub7GTXSJ3EFeRfHC6c"
+  authDomain: "build-my-app-3c629.firebaseapp.com"
+  projectId: "build-my-app-3c629"
+  storageBucket: "build-my-app-3c629.firebasestorage.app"
+  messagingSenderId: "823433789308"
+  appId: "1:823433789308:web:5a953ee43cd5cf2548aef9"
+
+⚠️ APP DATA ISOLATION — CRITICAL:
+Every app MUST use collection names prefixed with the app name so different apps never share data.
+Take the app name, make it lowercase, remove spaces and special characters, and use it as a prefix.
+Example: "Spice Kitchen" → prefix = "spicekitchen" → collections: spicekitchen_users, spicekitchen_products, spicekitchen_orders
+Example: "FitZone Gym" → prefix = "fitzonegym" → collections: fitzonegym_users, fitzonegym_members, fitzonegym_workouts
+Example: "MFC Gym" → prefix = "mfc" → collections: mfc_users, mfc_members, mfc_plans, mfc_payments
+Example: "GlowUp Salon" → prefix = "glowupsalon" → collections: glowupsalon_users, glowupsalon_bookings
+
+At the top of your script, define APP_PREFIX and name your collections based on what the app actually needs:
+  var APP_PREFIX = 'appname'; // ← use actual app name, lowercase, no spaces
+
+Collections should match the app type. Examples:
+- Shop app: [prefix]_users, [prefix]_products, [prefix]_orders
+- Gym app: [prefix]_users, [prefix]_members, [prefix]_plans, [prefix]_payments, [prefix]_attendance
+- School app: [prefix]_users, [prefix]_students, [prefix]_courses, [prefix]_assignments
+- Hospital app: [prefix]_users, [prefix]_patients, [prefix]_appointments, [prefix]_records
+- Salon app: [prefix]_users, [prefix]_bookings, [prefix]_services
+
+Use these variables everywhere — NEVER hardcode collection names like 'users', 'products', 'orders'.
+
+🚨 ABSOLUTE RULE — NO HARDCODED SAMPLE DATA — EVER:
+NEVER create JavaScript arrays with sample/demo/fake data like:
+  var items = [{name:'Paneer Tikka', price:400}]  ← THIS IS WRONG. NEVER DO THIS.
+  var products = [{id:1, name:'Sample Product'}]   ← THIS IS WRONG. NEVER DO THIS.
+  var menuItems = [{...}, {...}]                   ← THIS IS WRONG. NEVER DO THIS.
+
+ALL data MUST come from Firestore using onSnapshot(). If the collection is empty, show:
+  <div style="text-align:center;padding:40px;opacity:0.5;">No items yet</div>
+
+This is non-negotiable. If you hardcode even ONE data item, the app is completely WRONG.
+The owner adds real data through the admin panel. The customer sees real data from Firestore.
+
+FIRESTORE RULES:
+- NEVER use .orderBy() with .where() — always sort in JS after fetching to avoid index errors
+- Use onSnapshot() for real-time data
+- Use serverTimestamp() for createdAt fields
+- Always link records to the owner/admin using their Firebase UID
+
+⚠️ UNIVERSAL EMAIL-LINKING RULE — ALL APP TYPES (gym, school, hospital, salon, etc.):
+
+The core problem: When an admin/owner adds a person (member/student/patient/employee) by email,
+Firestore creates a doc with an auto-generated ID like "abc123". Later when that person creates
+their own Firebase account, their Auth UID is a COMPLETELY DIFFERENT ID like "xyz789".
+If you look up their data using their UID, you find nothing.
+
+THE FIX — always look up by email first, then use that doc ID to fetch their data:
+
+  // ✅ CORRECT — works for gym, school, hospital, salon, any app:
+  function loadUserDashboard() {
+    var userEmail = _auth.currentUser.email;
+    function showData(recordDocId) {
+      // use recordDocId to fetch plans/assignments/records/bookings etc.
+      _db.collection(DATA_COL).doc(recordDocId).onSnapshot(function(doc) { /* render */ });
+    }
+    // Step 1: find the record the admin created for this email
+    _db.collection(MEMBERS_COL).where('email','==',userEmail).limit(1).get().then(function(snap) {
+      if (!snap.empty) { showData(snap.docs[0].id); }  // ← use the admin-created doc ID
+      else { showData(_auth.currentUser.uid); }         // ← fallback if not pre-added
+    });
+  }
+
+This applies to ALL roles that are "added by admin" before they create their account:
+- Gym: member looks up workout/diet plans → query MEMBERS_COL by email → use that doc ID for PLANS_COL
+- School: student looks up assignments/grades → query STUDENTS_COL by email → use that doc ID for ASSIGNMENTS_COL
+- Hospital: patient looks up records/appointments → query PATIENTS_COL by email → use that doc ID for RECORDS_COL
+- Salon: customer looks up bookings → query CUSTOMERS_COL by email → use that doc ID for BOOKINGS_COL
+- Any app: if admin pre-adds people, ALWAYS look up by email first, NEVER by Auth UID alone
+
+❌ NEVER do this for pre-added users:
+  _db.collection(PLANS_COL).doc(_auth.currentUser.uid)  // ← UID ≠ member doc ID, finds nothing
+
+DESIGN RULES — MAKE IT LOOK LIKE A REAL ₹10 LAKH APP:
+The app must look so impressive that students gasp. Use these exact patterns:
+
+COLOR PALETTES — COPY THE EXACT ROOT BLOCK into :root{} (must set --p, --p2, --pr, --bg, --c):
+- Gym/Fitness:    --p:#a855f7;--p2:#6c3aed;--pr:168,85,247;--bg:#0a0a0f;--c:#12121a
+- Restaurant:     --p:#f59e0b;--p2:#ef4444;--pr:245,158,11;--bg:#0d0a00;--c:#1a1500
+- Salon/Beauty:   --p:#ec4899;--p2:#f472b6;--pr:236,72,153;--bg:#0d000a;--c:#1a0012
+- School/Edu:     --p:#3b82f6;--p2:#60a5fa;--pr:59,130,246;--bg:#000d1a;--c:#001224
+- Hospital/Health:--p:#10b981;--p2:#34d399;--pr:16,185,129;--bg:#000d0a;--c:#001a12
+- Shop/Ecommerce: --p:#8b5cf6;--p2:#a78bfa;--pr:139,92,246;--bg:#0a000d;--c:#0f0015
+- Finance/Crypto: --p:#6366f1;--p2:#818cf8;--pr:99,102,241;--bg:#07071a;--c:#0f0f24
+- Food Delivery:  --p:#f97316;--p2:#fb923c;--pr:249,115,22;--bg:#0d0800;--c:#1a1000
+- Any other:      --p:#a855f7;--p2:#6c3aed;--pr:168,85,247;--bg:#0a0a0f;--c:#12121a
+
+AUTH SCREEN — must look stunning:
+- Full screen gradient background: linear-gradient(135deg, var(--bg) 0%, rgba(var(--pr),.15) 100%)
+- App logo/icon as big emoji (60px) with glow effect: filter:drop-shadow(0 0 20px primary)
+- App name in bold 28px white text
+- Glassmorphism card for the form: background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:28px
+- Inputs: background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:14px 16px;color:#fff;font-size:16px;width:100%;outline:none
+- Primary button: background:linear-gradient(135deg,primary,accent);border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:700;color:#fff;width:100%;cursor:pointer;box-shadow:0 8px 32px rgba(primary,0.4)
+- Role selector: styled pill buttons with active state glowing
+
+DASHBOARD — premium mobile app feel:
+- Header: background:linear-gradient(135deg,primary,accent);padding:20px 20px 24px;border-radius:0 0 28px 28px;box-shadow:0 8px 32px rgba(primary,0.3)
+- Status bar in header: display:flex;justify-content:space-between;font-size:12px;opacity:0.8;margin-bottom:8px — show time on left, battery+wifi icons on right (use text symbols: ▮▮▮ for battery, ))) for wifi)
+- Welcome text: "Good morning, [Name]! 👋" in 20px bold white
+- Stats cards: display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px;margin-top:-16px — each card: background:card;border-radius:20px;padding:20px;border:1px solid rgba(255,255,255,0.08)
+- Stat card numbers in 28px bold primary color, labels in 12px gray
+- Section headers: color:#fff;font-size:16px;font-weight:700;padding:16px 16px 8px
+- Data cards: background:card;border-radius:16px;margin:8px 16px;padding:16px;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:12px
+- Avatar circles for people: width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,primary,accent);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff
+- Status badges: border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700 — active=rgba(16,185,129,0.2)+color:#10b981, pending=rgba(245,158,11,0.2)+color:#f59e0b
+
+BOTTOM NAV — glowing active tab:
+- background:#111;border-top:1px solid rgba(255,255,255,0.08);padding:8px 0 20px;display:flex;justify-content:around;position:fixed;bottom:0;width:100%;max-width:430px
+- Each tab button: flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;color:#666;font-size:10px;cursor:pointer;padding:8px 0
+- Active tab: color:primary — icon has glow: filter:drop-shadow(0 0 8px primary)
+- Tab icons: use emojis (🏠 📊 👥 ⚙️ 💳 📅 etc.)
+
+ACTION BUTTONS:
+- Primary: gradient button with shadow (as above)
+- Secondary: background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:12px 20px;color:#fff
+- Danger: background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444;border-radius:12px;padding:8px 16px
+- FAB (add button): position:fixed;bottom:90px;right:20px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,primary,accent);border:none;font-size:28px;color:#fff;box-shadow:0 8px 24px rgba(primary,0.5);cursor:pointer
+
+FORMS/MODALS:
+- Modal overlay: position:fixed;inset:0;background:rgba(0,0,0,0.8);display:flex;align-items:flex-end;z-index:999
+- Modal sheet: background:#1a1a2e;border-radius:24px 24px 0 0;padding:24px;width:100%;max-height:80vh;overflow-y:auto
+- Handle bar at top: width:40px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin:0 auto 20px
+
+CONTENT AREA: padding-bottom:100px so content doesn't hide behind nav
+
+MINIFY ALL CSS — single line, no spaces after colons/semicolons is fine
+No placeholder text, no TODO comments, no code comments
+
+⚠️ NEVER use <input type="time"> — the AM/PM section cannot be typed into by users.
+   Always use <input type="text" placeholder="e.g. 10:30 AM"> for time fields instead.
+
+TECHNICAL RULES:
+- Use firebase-app-compat.js, firebase-auth-compat.js, firebase-firestore-compat.js (compat not modules)
+- Firebase CDN script tags must have NO async or defer attribute — they must load synchronously
+- Initialize Firebase ABOVE DOMContentLoaded: const _app = firebase.initializeApp(config); const _auth = firebase.auth(_app); const _db = firebase.firestore(_app);
+- Use onSnapshot() for all real-time data (orders list, products list)
+- Use _auth.onAuthStateChanged() to detect login/logout and show correct screen
+- Cart state lives in a JS array; add/remove functions update it and re-render the cart tab
+- Place Order writes to Firestore and clears local cart
+- Approve Order button calls _db.collection('orders').doc(id).update({status:'approved'})
+
+⚠️ SCREEN IDs AND VISIBILITY — CRITICAL RULES:
+- Use EXACTLY these IDs for the 3 main screens: id="authScreen", id="customerApp", id="ownerApp"
+- Do NOT use "app-container", "app-wrapper", "main-screen" or any other wrapper div as a screen
+- The AUTH SCREEN must start VISIBLE in HTML: <div id="authScreen" style="display:flex;...">
+- customerApp and ownerApp start hidden: <div id="customerApp" style="display:none;">
+- onAuthStateChanged shows/hides the correct screen based on user role
+- NEVER wrap all screens in a container div — screens sit directly in body
+- This is critical: if authScreen starts as display:none the page will be completely blank
+
+⚠️ HTML STRUCTURE — THE MOST CRITICAL RULE — READ CAREFULLY:
+
+✅ ALL screens and ALL tabs must be FULLY WRITTEN IN HTML from the start.
+✅ onAuthStateChanged ONLY shows/hides elements — it NEVER builds UI with innerHTML.
+✅ Tab switching ONLY shows/hides pre-written tab divs — never rebuilds them.
+
+This means:
+- customerApp div contains ALL 4 customer tabs fully written in HTML
+- ownerApp div contains ALL 4 owner tabs fully written in HTML
+- Products list, orders list = these CAN use innerHTML inside onSnapshot (data only, not structure)
+- ALL navigation, buttons, forms, layouts = written in HTML, never created dynamically
+
+❌ NEVER do this — building UI after login:
+  onAuthStateChanged(user => {
+    customerApp.innerHTML = '<button>Home</button>...'; // WRONG — buttons won't work
+  })
+
+✅ ALWAYS do this — UI exists in HTML, just show it:
+  _auth.onAuthStateChanged(function(user) {
+    if (user) {
+      document.getElementById('authScreen').style.display = 'none';
+      window.scrollTo(0, 0); // ← ALWAYS add this — fixes black top screen bug
+      // check role from Firestore then show correct screen
+      _db.collection(APP_PREFIX + '_users').doc(user.uid).get().then(function(doc) {
+        var role = doc.exists ? doc.data().role : 'customer';
+        if (role === 'owner' || role === 'admin') {
+          document.getElementById('ownerApp').style.display = 'block';
+        } else {
+          document.getElementById('customerApp').style.display = 'block';
+        }
+      });
+    } else {
+      document.getElementById('authScreen').style.display = 'flex';
+      document.getElementById('customerApp').style.display = 'none';
+      document.getElementById('ownerApp').style.display = 'none';
+    }
+  });
+
+⚠️ ALWAYS include window.scrollTo(0,0) when showing app screens — without it the app starts with a black top area
+
+⚠️ BUTTONS — USE onclick ON EVERY BUTTON:
+
+✅ Every single button uses onclick="functionName()" — no exceptions:
+  <button onclick="doLogin()">Login</button>
+  <button onclick="addToCart('Burger', 199)">Add to Cart</button>
+  <button onclick="showTab('browseTab')">Browse</button>
+  <button onclick="approveOrder('orderId')">Approve</button>
+
+✅ ALL functions defined at TOP LEVEL of script — BEFORE document.addEventListener
+✅ Use ONLY the function keyword — NEVER const/let/arrow functions for anything called from onclick
+
+❌ NEVER use these patterns for onclick functions — buttons will BREAK:
+  // ❌ Object methods — showTab won't be on window:
+  var app = { showTab: function(id){} }
+
+  // ❌ Class methods — showTab won't be on window:
+  class App { showTab(id){} }
+
+  // ❌ IIFE — functions inside won't be on window:
+  (function(){ function showTab(){} })();
+
+  // ❌ Nested functions — won't be on window:
+  function init(){ function showTab(){} }
+
+✅ ONLY this pattern works for onclick:
+  function showTab(id) { ... }        ← standalone, top-level, function keyword
+
+REQUIRED FILE ORDER — THIS CONTROLS WHAT SURVIVES TOKEN TRUNCATION:
+
+Claude cannot count tokens but tokens always run out at the END of the output.
+So whatever you write LAST is what gets cut. Write the most important things FIRST.
+
+CORRECT ORDER (write in this exact sequence):
+  1. <!DOCTYPE html><html><head> — meta tags, title
+  2. <style> — ALL CSS in one minified line (written first = never cut)
+  3. Firebase CDN <script> tags — must load before app script
+  4. <script> — ALL JavaScript functions (written before HTML = rarely cut)
+  5. <body> — authScreen HTML
+  6. customerApp / ownerApp divs — tab content HTML (written last = may be cut, that's OK)
+  7. </body></html>
+
+Why this order works: If the output is cut at 90%, only some HTML tab content is missing.
+The CSS, Firebase, and ALL JS functions are already written and complete.
+Missing tab content = empty tab = ugly but functional.
+Missing JS functions = all buttons dead = total failure.
+
+❌ WRONG ORDER (current common mistake):
+  <head><style>...</style></head>
+  <body>
+    [ALL HTML written first — 60% of tokens]
+    <script>[JS functions — runs out of tokens here, gets cut]<\/script>
+  </body>
+
+✅ CORRECT ORDER:
+  <head>
+    <style>[minified CSS]</style>
+    [Firebase CDN scripts]
+    <script>[ALL JS — vars, onAuthStateChanged, ALL functions]<\/script>
+  </head>
+  <body>
+    [authScreen HTML]
+    [app HTML — tabs, content]
+  </body>
+
+⚠️ TAB SWITCHING — NEVER use querySelector('[onclick*="..."]') to find active nav button.
+   The onclick attribute gets removed at runtime. Use index-based approach instead:
+   var showTab = window.showTab = function showTab(id){
+     document.querySelectorAll('.tab-pane').forEach(function(t){t.classList.remove('active');});
+     var el=document.getElementById(id);if(el)el.classList.add('active');
+     var order=['tab1Id','tab2Id','tab3Id'];
+     var btns=document.querySelectorAll('#appDiv .nbtn');
+     btns.forEach(function(b){b.classList.remove('active');});
+     var i=order.indexOf(id);if(i>=0&&btns[i])btns[i].classList.add('active');
+   }
+
+⚠️ WITHIN THE SCRIPT: vars → onAuthStateChanged → all functions
+   onAuthStateChanged MUST come before all functions. JS hoists function declarations,
+   so loadOwnerDashboard() etc. work even though they are written after the observer.
+
+⚠️ CSS MUST BE A SINGLE MINIFIED LINE — example:
+  <style>:root{--p:#F5A623;--p2:#FF6B35;--pr:245,166,35;--bg:#0a0a0a;--c:#1a1a1a;--t:#fff}*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,sans-serif}body{background:var(--bg);color:var(--t)}#authScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:linear-gradient(135deg,var(--bg),rgba(var(--pr),.15))}.auth-box{background:#111;padding:32px;border-radius:20px;width:100%;max-width:380px;border:1px solid rgba(var(--pr),.2)}.auth-box h1{font-size:28px;font-weight:900;text-align:center;background:linear-gradient(135deg,var(--p),var(--p2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}.auth-box>p{text-align:center;opacity:.5;margin-bottom:22px;font-size:13px}.role-sel{display:flex;gap:8px;margin-bottom:18px}.role-btn{flex:1;padding:12px;background:rgba(var(--pr),.07);border:1.5px solid rgba(var(--pr),.25);border-radius:12px;color:rgba(255,255,255,.45);font-weight:700;font-size:13px;cursor:pointer;transition:all .25s}.role-btn.sel{background:rgba(var(--pr),.15);border-color:var(--p);color:#fff}input{width:100%;padding:14px;margin-bottom:12px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;color:var(--t);font-size:15px;transition:border .2s}input:focus{outline:none;border-color:var(--p)}.abtn{width:100%;padding:15px;background:linear-gradient(135deg,var(--p),var(--p2));border:none;border-radius:12px;color:#fff;font-weight:800;font-size:16px;cursor:pointer;margin-bottom:10px;box-shadow:0 4px 18px rgba(var(--pr),.3);transition:transform .2s}.abtn:active{transform:scale(.97)}.abtn.sec{background:transparent;border:1.5px solid rgba(var(--pr),.3);color:var(--p);box-shadow:none}.tog{text-align:center;margin-top:12px;color:rgba(255,255,255,.4);font-size:13px;cursor:pointer}.tog span{color:var(--p);font-weight:700}#fbErr{display:none;background:rgba(229,57,53,.1);border:1px solid rgba(229,57,53,.4);padding:10px;border-radius:10px;margin-bottom:12px;font-size:13px;text-align:center;color:#ff6b6b}#customerApp,#ownerApp{display:none;max-width:430px;margin:0 auto;min-height:100vh;padding-bottom:76px}.sbar{padding:7px 18px;display:flex;justify-content:space-between;font-size:11px;font-weight:700;letter-spacing:.5px;border-bottom:1px solid rgba(var(--pr),.1);background:rgba(var(--pr),.05)}.hdr{padding:22px 18px 18px;background:linear-gradient(180deg,rgba(var(--pr),.1) 0%,transparent 100%)}.hdr-badge{display:inline-block;background:rgba(var(--pr),.1);border:1px solid rgba(var(--pr),.25);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--p);margin-bottom:8px;letter-spacing:.5px}.hdr h2{font-size:24px;font-weight:900;margin-bottom:3px;letter-spacing:-.3px}.hdr p{opacity:.45;font-size:13px}.tab-pane,.owner-pane{display:none;padding:14px}.tab-pane.active,.owner-pane.active{display:block}.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(10,10,10,.97);backdrop-filter:blur(20px);border-top:1px solid rgba(var(--pr),.1);display:flex;justify-content:space-around;padding:9px 0 13px}.nbtn{background:none;border:none;color:rgba(255,255,255,.35);font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;padding:4px 14px;letter-spacing:.3px;transition:color .2s}.nbtn.active{color:var(--p)}.nbtn .ni{font-size:20px}.card{background:var(--c);border-radius:16px;padding:16px;margin-bottom:12px;border:1px solid rgba(var(--pr),.1)}.card h3{font-size:14px;font-weight:800;color:var(--p);margin-bottom:10px}.pcard{background:var(--c);border-radius:16px;padding:16px;margin-bottom:10px;border:1px solid rgba(var(--pr),.1)}.pcard-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}.pcard-name{font-weight:700;font-size:15px}.pcard-price{font-size:17px;font-weight:900;color:var(--p)}.pcard-desc{font-size:12px;opacity:.4;margin-bottom:10px}.stat-row{display:flex;gap:10px;margin-bottom:14px}.stat{flex:1;background:linear-gradient(135deg,rgba(var(--pr),.1),rgba(var(--pr),.05));border-radius:16px;padding:16px;text-align:center;border:1px solid rgba(var(--pr),.13)}.stat .v{font-size:26px;font-weight:900;background:linear-gradient(135deg,var(--p),var(--p2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}.stat .l{font-size:10px;opacity:.4;text-transform:uppercase;letter-spacing:1px;font-weight:700}.lbl{display:block;font-size:11px;font-weight:700;color:rgba(var(--pr),.75);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}.inp{width:100%;padding:12px 14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:11px;color:var(--t);font-size:14px;margin-bottom:12px}.inp:focus{outline:none;border-color:var(--p)}.big-btn{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border:none;padding:14px 20px;border-radius:13px;font-weight:800;cursor:pointer;width:100%;font-size:15px;box-shadow:0 4px 18px rgba(var(--pr),.25);transition:transform .2s}.big-btn:active{transform:scale(.97)}.danger-btn{background:linear-gradient(135deg,#FF5252,#D50000);color:#fff;border:none;padding:14px 20px;border-radius:13px;font-weight:800;cursor:pointer;width:100%;font-size:15px;box-shadow:0 4px 18px rgba(255,82,82,.25)}.sec-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.sec-head h3{font-size:17px;font-weight:800}.sm-btn{background:rgba(var(--pr),.1);color:var(--p);border:1.5px solid rgba(var(--pr),.3);padding:9px 14px;border-radius:11px;font-weight:700;font-size:12px;cursor:pointer}.prof-hero{background:linear-gradient(135deg,rgba(var(--pr),.1),rgba(var(--pr),.05));border-radius:20px;padding:26px 20px;margin-bottom:14px;border:1px solid rgba(var(--pr),.12);text-align:center}.prof-av{width:66px;height:66px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--p2));display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 12px;box-shadow:0 0 22px rgba(var(--pr),.3)}.prof-name{font-size:20px;font-weight:900;margin-bottom:3px}.prof-email{font-size:12px;opacity:.4;margin-bottom:10px}.prof-badge{display:inline-block;background:rgba(var(--pr),.1);border:1px solid rgba(var(--pr),.3);border-radius:20px;padding:4px 14px;font-size:11px;font-weight:700;color:var(--p)}.form-sec{background:rgba(var(--pr),.04);border:1px solid rgba(var(--pr),.1);border-radius:16px;padding:16px;margin-bottom:14px}.item-row{background:var(--c);border-radius:14px;padding:14px;margin-bottom:9px;display:flex;align-items:center;gap:12px;border:1px solid rgba(var(--pr),.1)}.item-av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--p2));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff;flex-shrink:0}</style>
+
+  CRITICAL: You MUST replace ALL THREE color variables in :root to match the app type.
+  The base CSS uses rgba(var(--pr),...) everywhere — if you only change --p the rgba tints stay wrong.
+  Copy the entire root block for the app type:
+
+  Gym/Fitness:    :root{--p:#a855f7;--p2:#6c3aed;--pr:168,85,247;--bg:#0a0a0f;--c:#12121a;--t:#fff}
+  Restaurant:     :root{--p:#f59e0b;--p2:#ef4444;--pr:245,158,11;--bg:#0d0a00;--c:#1a1500;--t:#fff}
+  Salon/Beauty:   :root{--p:#ec4899;--p2:#f472b6;--pr:236,72,153;--bg:#0d000a;--c:#1a0012;--t:#fff}
+  School/Edu:     :root{--p:#3b82f6;--p2:#60a5fa;--pr:59,130,246;--bg:#000d1a;--c:#001224;--t:#fff}
+  Hospital:       :root{--p:#10b981;--p2:#34d399;--pr:16,185,129;--bg:#000d0a;--c:#001a12;--t:#fff}
+  Shop/Ecomm:     :root{--p:#8b5cf6;--p2:#a78bfa;--pr:139,92,246;--bg:#0a000d;--c:#0f0015;--t:#fff}
+  Finance/Crypto: :root{--p:#6366f1;--p2:#818cf8;--pr:99,102,241;--bg:#07071a;--c:#0f0f24;--t:#fff}
+  Food Delivery:  :root{--p:#f97316;--p2:#fb923c;--pr:249,115,22;--bg:#0d0800;--c:#1a1000;--t:#fff}
+  Default:        :root{--p:#a855f7;--p2:#6c3aed;--pr:168,85,247;--bg:#0a0a0f;--c:#12121a;--t:#fff}
+
+⚠️ JS MUST BE COMPACT — NO BLANK LINES BETWEEN FUNCTIONS, NO COMMENTS, SHORT VAR NAMES:
+  <script>
+var _app=firebase.initializeApp({apiKey:"...",authDomain:"...",projectId:"...",storageBucket:"...",messagingSenderId:"...",appId:"..."});
+var _auth=firebase.auth(_app),_db=firebase.firestore(_app);
+var currentUser=null,currentUserRole='customer';
+var APP_PREFIX='myapp',USERS_COL=APP_PREFIX+'_users',PRODUCTS_COL=APP_PREFIX+'_products',ORDERS_COL=APP_PREFIX+'_orders';
+function _sd(id,v){var e=document.getElementById(id);if(e)e.style.display=v;}
+_auth.onAuthStateChanged(function(user){
+if(!user){currentUser=null;_sd('authScreen','flex');_sd('customerApp','none');_sd('ownerApp','none');var _b=document.getElementById('_aLB');if(_b)_b.style.display='none';document.body.style.paddingTop='';return;}
+_db.collection(USERS_COL).doc(user.uid).get().then(function(doc){
+currentUser=doc.exists?doc.data():{uid:user.uid,name:user.email.split('@')[0],email:user.email,role:currentUserRole||'customer'};
+_sd('authScreen','none');
+// Show logout bar for ALL roles
+var _b=document.getElementById('_aLB');
+if(_b){_b.style.display='flex';var _ns=_b.querySelector('span');if(_ns)_ns.textContent='👤 '+(currentUser.name||user.email.split('@')[0]);}
+document.body.style.paddingTop='38px';
+window.scrollTo(0,0);
+if(currentUser.role==='owner'||currentUser.role==='admin'){_sd('ownerApp','block');_sd('customerApp','none');if(typeof loadOwnerDashboard==='function')loadOwnerDashboard();}
+else{_sd('customerApp','block');_sd('ownerApp','none');if(typeof loadCustomerData==='function')loadCustomerData();}
+});
+});
+function showTab(id){document.querySelectorAll('.tab-pane').forEach(function(t){t.classList.remove('active');});document.getElementById(id).classList.add('active');}
+function showOwnerTab(id){document.querySelectorAll('.owner-pane').forEach(function(t){t.classList.remove('active');});document.getElementById(id).classList.add('active');}
+function selectRole(r){currentUserRole=r;document.querySelectorAll('.role-btn').forEach(function(b){b.classList.remove('sel');});var s=document.getElementById('roleBtn_'+r);if(s)s.classList.add('sel');}
+function _showErr(m){var e=document.getElementById('fbErr');if(!e)return;e.textContent=m;e.style.display=m?'block':'none';e.style.color=m.includes('ing...')?'#999':'#ff6b6b';}
+function doLogin(){var e=document.getElementById('emailField').value.trim(),p=document.getElementById('passField').value;if(!e||!p){_showErr('Enter email and password');return;}_showErr('Logging in...');_auth.signInWithEmailAndPassword(e,p).catch(function(err){_showErr(err.message);});}
+function doSignup(){try{var n=(document.getElementById('nameField')||{}).value||'',e=document.getElementById('emailField').value.trim(),p=document.getElementById('passField').value;if(!e||!p){_showErr('Enter email and password');return;}if(p.length<6){_showErr('Password min 6 characters');return;}_showErr('Creating account...');var _prefix=typeof APP_PREFIX!=='undefined'?APP_PREFIX:'app';var _role=typeof currentUserRole!=='undefined'&&currentUserRole?currentUserRole:'customer';_auth.createUserWithEmailAndPassword(e,p).then(function(cred){return _db.collection(_prefix+'_users').doc(cred.user.uid).set({uid:cred.user.uid,name:n||e.split('@')[0],email:e,role:_role,createdAt:firebase.firestore.FieldValue.serverTimestamp()});}).then(function(){_showErr('');}).catch(function(err){_showErr(err.message);});}catch(ex){_showErr(ex.message);}}
+function fbLogout(){_auth.signOut();}
+function toggleMode(){var nf=document.getElementById('nameField');if(nf)nf.style.display=nf.style.display==='none'?'block':'none';var isSignup=nf&&nf.style.display!=='none';var ab=document.getElementById('authBtn');if(ab){ab.textContent=isSignup?'Sign Up':'Login';ab.onclick=isSignup?doSignup:doLogin;}var tb=document.getElementById('toggleBtn');if(tb)tb.textContent=isSignup?'Already have account? Login':'No account? Sign up →';_showErr('');}
+function toggleAuthMode(){toggleMode();}
+function showToast(m){var t=document.createElement('div');t.textContent=m;t.style.cssText='position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.9);color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;';document.body.appendChild(t);setTimeout(function(){t.remove();},2500);}
+function updateClock(){var n=new Date(),h=n.getHours(),m=n.getMinutes();var s=(h<10?'0':'')+h+':'+(m<10?'0':'')+m;document.querySelectorAll('.clock').forEach(function(c){c.textContent=s;});}
+setInterval(updateClock,1000);updateClock();
+  <\/script>
+
+🏠 HOME SCREEN — REQUIRED FOR EVERY APP (CUSTOMER SIDE):
+
+The FIRST tab of every customer app MUST be a premium Home screen. This is non-negotiable.
+
+HOME SCREEN MUST INCLUDE:
+1. HERO BANNER — gradient background, app name, tagline, welcome message with user's name
+2. STATS ROW — 2-3 quick stat cards (e.g. total orders, wallet balance, active plan, points)
+3. FEATURED SECTION — top 3-4 products/items loaded from Firestore with image emoji, name, price, "Add" button
+4. CATEGORIES ROW — horizontal scrollable chips (e.g. All, Food, Drinks, Snacks)
+5. QUICK ACTIONS — 2-3 shortcut buttons (Browse Menu, My Orders, My Profile)
+
+HOME SCREEN UI RULES:
+- Use bold gradient header with user's first name: "Hey Palash 👋"
+- Stats cards: gradient background, large bold number, small label below
+- Product cards in a 2-column grid: emoji (60px), name, price, +Add button
+- Categories: horizontal scroll, pill-shaped chips, active chip highlighted in theme color
+- Quick action buttons: icon + label, card style, shadow
+- Everything loads from Firestore using onSnapshot — real-time updates
+- Home tab ID must be: id="homeTab" and it must be the ACTIVE tab by default
+
+OWNER HOME SCREEN:
+- Show dashboard stats: total products, total orders, today's revenue, pending orders
+- Recent orders list (last 5) with customer name, amount, status badge
+- Quick action buttons: Add Product, View All Orders
+
+ABSOLUTE RULES:
+✅ ALL UI written in HTML — onAuthStateChanged only shows/hides, never builds
+✅ Every button uses onclick="functionName()" — no exceptions
+✅ ALL functions use the function keyword at TOP LEVEL
+✅ _auth.onAuthStateChanged() goes IMMEDIATELY AFTER the var declarations — BEFORE all functions
+✅ Use EXACTLY id="authScreen", id="customerApp", id="ownerApp"
+✅ authScreen starts with style="display:flex"
+✅ customerApp and ownerApp start with style="display:none"
+✅ ALWAYS define _sd helper before onAuthStateChanged: function _sd(id,v){var e=document.getElementById(id);if(e)e.style.display=v;}
+✅ Use _sd('authScreen','flex') NOT document.getElementById('authScreen').style.display='flex' — avoids null crash
+✅ shopId in every product = owner's Firebase UID
+✅ shopId in every order = copied from product's shopId
+✅ Owner orders query: .where('shopId','==',user.uid).onSnapshot()
+❌ NEVER use const/let for function declarations — use function keyword only
+❌ NEVER use arrow functions => for onclick-called functions
+❌ NO innerHTML to build navigation, tabs, buttons, forms — only for data lists
+❌ NO addEventListener for buttons
+❌ NO wrapper div around all screens
+❌ NO async or defer on Firebase script tags
+❌ NEVER use .orderBy() with .where() in Firestore — sort in JavaScript instead
+
+Return complete HTML only. No markdown. No explanation. No code fences.
+FINAL REMINDER: If you are close to your token limit — STOP, close all open functions with }, close the script tag, then close body and html. An app with fewer features that runs is better than a broken app.`
+        }]
+    });
+
+    clearInterval(stepInterval);
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.error?.message || 'API returned status ' + response.status);
+    }
+
+    const data = await response.json();
+
+    // ── TOKEN USAGE LOG ──
+    if (data.usage) {
+      const inp = data.usage.input_tokens || 0;
+      const out = data.usage.output_tokens || 0;
+      const total = inp + out;
+      const cost = ((inp * 3 + out * 15) / 1000000).toFixed(4);
+      console.log(`🪙 Tokens — Input: ${inp} | Output: ${out} | Total: ${total} | Cost: $${cost}`);
+      const tokenEl = document.getElementById('tokenUsage');
+      if (tokenEl) tokenEl.textContent = `🪙 Tokens used: ${total.toLocaleString()} (Input: ${inp.toLocaleString()} + Output: ${out.toLocaleString()}) | Cost: $${cost}`;
+    }
+
+    // With extended thinking, content array has a thinking block then a text block
+    const textBlock = data.content && data.content.find(function(b){ return b.type === 'text'; });
+    let raw = textBlock ? textBlock.text.trim() : '';
+
+    // Strip markdown fences if present
+    if (raw.startsWith('```')) {
+      raw = raw.replace(/^```html?\n?/i, '').replace(/\n?```$/, '').trim();
+    }
+
+    // Validate it's actually HTML — lenient check, just need opening tag and reasonable length
+    if ((!raw.includes('<!DOCTYPE') && !raw.includes('<html')) || raw.length < 500) {
+      throw new Error('AI returned invalid content. Preview: ' + raw.slice(0, 120));
+    }
+
+    // Fix truncated output — Claude sometimes hits token limit mid-script
+    raw = fixTruncatedHTML(raw);
+
+    generatedCode = raw;
+    originalIdea = userIdea;
+
+    // Auto-save this fresh build to the cloud with a NEW app code
+    cloudSave(true);
+
+    // Swap modify buttons to match the app type — no extra API call needed
+    updateModifyButtons(detectAppType(userIdea));
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('result').style.display = 'block';
+    document.getElementById('previewFrame').srcdoc = prepareApp(generatedCode);
+    document.getElementById('buildBtn').disabled = false;
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+
+  } catch (err) {
+    clearInterval(stepInterval);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('buildBtn').disabled = false;
+    document.getElementById('buildBtn').textContent = '⚡ Build My App Now';
+    document.getElementById('buildBtn').style.background = '';
+    document.getElementById('buildError').style.display = 'block';
+    document.getElementById('buildErrorMsg').textContent = 'Build failed — ' + err.message;
+    document.getElementById('buildErrorDetail').textContent = 'Check your API key is valid, then try again. If it keeps failing, reload the page.';
+    document.getElementById('buildError').scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+// ── CLOUD SYNC — store app code in Firestore so Claude can fix it remotely ──
+var FS_DOC = 'https://firestore.googleapis.com/v1/projects/build-my-app-3c629/databases/(default)/documents/_tool_apps/';
+function _genAppCode(){ return 'APP-' + Date.now().toString(36).toUpperCase().slice(-6); }
+function getAppCode(){
+  var c=''; try{ c=localStorage.getItem('tool_current_app_code')||''; }catch(e){}
+  if(!c){ c=_genAppCode(); try{ localStorage.setItem('tool_current_app_code',c);}catch(e){} }
+  return c;
+}
+function setAppCode(c){ try{ localStorage.setItem('tool_current_app_code',c);}catch(e){} }
+function showCloudBar(code, status){
+  var bar=document.getElementById('cloudSyncBar'); if(bar) bar.style.display='block';
+  var el=document.getElementById('cloudAppCode'); if(el) el.textContent=code;
+  if(status){ var s=document.getElementById('cloudSyncStatus'); if(s) s.textContent=status; }
+}
+function copyAppCode(){ var c=(document.getElementById('cloudAppCode')||{}).textContent||''; try{ navigator.clipboard.writeText(c); }catch(e){} }
+
+async function cloudSave(forceNew){
+  if(!generatedCode) return;
+  var code = forceNew ? _genAppCode() : getAppCode();
+  if(forceNew) setAppCode(code);
+  showCloudBar(code, '☁️ Saving to cloud...');
+  try{
+    var body={fields:{code:{stringValue:generatedCode}, updatedAt:{timestampValue:new Date().toISOString()}}};
+    var r=await fetch(FS_DOC+encodeURIComponent(code), {method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    if(r.ok){ showCloudBar(code, '✅ Saved to cloud. To fix a glitch: tell Claude code "'+code+'" + the problem, then click Reload Fixed App.'); }
+    else { showCloudBar(code, '⚠️ Cloud save failed (app may exceed 1MB). Download still works.'); }
+  }catch(e){ showCloudBar(code, '⚠️ Cloud save failed: '+e.message); }
+}
+
+async function cloudLoad(code){
+  try{
+    var r=await fetch(FS_DOC+encodeURIComponent(code));
+    if(!r.ok) return false;
+    var d=await r.json();
+    var html=d && d.fields && d.fields.code && d.fields.code.stringValue;
+    if(!html) return false;
+    generatedCode=html;
+    var res=document.getElementById('result'); if(res) res.style.display='block';
+    document.getElementById('previewFrame').srcdoc=prepareApp(generatedCode);
+    if(isMobileView){ var mf=document.getElementById('mobileFrame'); if(mf) mf.srcdoc=prepareApp(generatedCode); }
+    showCloudBar(code, '✅ Loaded latest version from cloud.');
+    if(res) res.scrollIntoView({behavior:'smooth'});
+    return true;
+  }catch(e){ return false; }
+}
+
+function reloadFromCloud(){
+  var code=getAppCode();
+  var s=document.getElementById('cloudSyncStatus'); if(s) s.textContent='🔄 Loading latest from cloud...';
+  cloudLoad(code).then(function(ok){ if(!ok){ var s2=document.getElementById('cloudSyncStatus'); if(s2) s2.textContent='Could not load code "'+code+'" — has it been saved yet?'; } });
+}
+
+// Open the current app as a REAL page in a new tab (Safari-safe — Firebase login works there)
+function openInNewTab(){
+  var code=getAppCode();
+  if(!code){ alert('Build an app first.'); return; }
+  window.open('run.html?app='+encodeURIComponent(code), '_blank');
+}
+
+// Load any saved app by typing its code (reliable — does not depend on stored state)
+function loadByCode(){
+  var inp=document.getElementById('loadCodeInput');
+  var code=(inp&&inp.value||'').trim().toUpperCase();
+  if(!code){ if(inp) inp.focus(); return; }
+  setAppCode(code);
+  var s=document.getElementById('cloudSyncStatus'); if(s) s.textContent='🔄 Loading '+code+'...';
+  cloudLoad(code).then(function(ok){ if(!ok){ var s2=document.getElementById('cloudSyncStatus'); if(s2) s2.textContent='Could not find app "'+code+'". Check the code.'; } });
+}
+
+// On page load, ?app=CODE loads that app from the cloud
+window.addEventListener('load', function(){
+  try{
+    var code=new URLSearchParams(location.search).get('app');
+    if(code){ setAppCode(code); cloudLoad(code); }
+  }catch(e){}
+});
+
+function toggleMobile() {
+  isMobileView = !isMobileView;
+  const desktop = document.getElementById('desktopView');
+  const mobile = document.getElementById('mobileView');
+  const btn = document.querySelector('.btn-mobile');
+  if (isMobileView) {
+    desktop.style.display = 'none';
+    mobile.style.display = 'block';
+    document.getElementById('mobileFrame').srcdoc = prepareApp(generatedCode);
+    btn.textContent = '🖥️ Desktop View';
+  } else {
+    desktop.style.display = 'block';
+    mobile.style.display = 'none';
+    btn.textContent = '📱 Mobile View';
+  }
+}
+
+// Use current origin if served remotely (ngrok), else localhost
+const SERVER_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+  ? 'http://localhost:7823'
+  : location.origin;
+
+function updateCharCount(el) {
+  const count = el.value.length;
+  const display = document.getElementById('charCount');
+  if (!display) return;
+  display.textContent = count + ' / 800 characters';
+  display.style.color = count > 700 ? '#ff6b6b' : count > 500 ? '#F5A623' : 'rgba(255,255,255,0.4)';
+}
+
+async function checkServerStatus() {
+  try {
+    const r = await fetch(SERVER_BASE + '/', { method: 'GET', cache: 'no-store' });
+    return r.status < 500;
+  } catch (_e) {
+    return false;
+  }
+}
+
+function updateServerPill(online) {
+  const dot = document.getElementById('serverDot');
+  const txt = document.getElementById('serverPillText');
+  const box = document.getElementById('serverSetupBox');
+  const res = document.getElementById('serverCheckResult');
+  if (online) {
+    if (dot) { dot.style.background = '#28c864'; }
+    if (txt) { txt.style.color = '#28c864'; txt.textContent = 'Server: ON ✓'; }
+    if (box) box.style.display = 'none';
+    if (res) res.textContent = '✅ Server is running — apps will open as localhost!';
+  } else {
+    if (dot) { dot.style.background = '#F5A623'; }
+    if (txt) { txt.style.color = '#F5A623'; txt.textContent = 'Server: OFF'; }
+    if (res) res.textContent = '❌ Server not detected. Paste the command above in Terminal and keep that window open.';
+  }
+}
+
+async function openFullApp() {
+  if (!generatedCode) { alert('Build your app first!'); return; }
+
+  // ── MODE 1: LOCAL SERVER (best — real HTTP, Firebase works, all buttons work) ──
+  try {
+    const resp = await fetch(SERVER_BASE + '/save-preview', {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/html' },
+      body: prepareApp(generatedCode)
+    });
+    if (resp.ok) {
+      const data = await resp.json();
+      if (data.url) {
+        const bar = document.getElementById('serverModeBanner');
+        if (bar) { bar.style.display = 'flex'; bar.querySelector('a').href = data.url; }
+        updateServerPill(true);
+        window.open(data.url, '_blank');
+        return;
+      }
+    }
+  } catch (_e) {
+    // Server not running
+  }
+
+  // ── SERVER NOT RUNNING — show setup instructions clearly ─────────────────────
+  updateServerPill(false);
+  const box = document.getElementById('serverSetupBox');
+  if (box) {
+    box.style.display = 'block';
+    box.style.borderColor = 'rgba(255,95,87,0.6)';
+    box.style.background = 'rgba(255,95,87,0.08)';
+    box.scrollIntoView({ behavior: 'smooth' });
+    // Ask before opening blob fallback
+    const useFallback = confirm(
+      '⚠️ Local server is NOT running.\n\n' +
+      'Without the server, the app opens as a blob URL.\n' +
+      'Some features (Firebase login, buttons) may be less reliable.\n\n' +
+      'To fix: paste the terminal command shown on screen and keep that window open.\n\n' +
+      'Open as blob URL anyway?'
+    );
+    if (!useFallback) return;
+    // Restore box style
+    box.style.borderColor = 'rgba(var(--pr),0.5)';
+    box.style.background = 'rgba(var(--pr),0.08)';
+  }
+
+  // ── MODE 2: BLOB URL (fallback) ───────────────────────────────────────────────
+  const blob = new Blob([prepareApp(generatedCode)], { type: 'text/html' });
+  const blobUrl = URL.createObjectURL(blob);
+  window.open(blobUrl, '_blank');
+  setTimeout(() => URL.revokeObjectURL(blobUrl), 600000);
+}
+
+function downloadApp() {
+  if (!generatedCode) return;
+  const blob = new Blob([prepareDownload(generatedCode)], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'my-app.html';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function showModifyError(msg) {
+  const el = document.getElementById('modifyError');
+  if (el) { el.textContent = msg; el.style.display = 'block'; el.scrollIntoView({behavior:'smooth'}); }
+}
+
+function resetTool() {
+  document.getElementById('appPrompt').value = '';
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('buildBtn').disabled = false;
+  generatedCode = '';
+  originalIdea = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function fillModify(text) {
+  document.getElementById('modifyPrompt').value = text;
+}
+
+async function fixAllButtons() {
+  if (!generatedCode) { alert('Please build your app first!'); return; }
+  const apiKey = _getKey();
+  if (!apiKey) { alert('API key missing. Please add it at the top.'); return; }
+
+  const btn = document.getElementById('fixBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Finding and fixing all broken buttons...';
+  document.getElementById('modifyLoading').style.display = 'block';
+  document.getElementById('modifyError').style.display = 'none';
+
+  try {
+    const response = await _claudeFetch(apiKey, {
+        model: 'claude-sonnet-4-5',
+        max_tokens: 18000,
+        thinking: { type: 'enabled', budget_tokens: 5000 },
+        system: `You are an expert software engineer — you operate like Claude Code. You systematically read every line of code, trace exactly why each button is broken, then fix every single issue completely. You return the complete fixed HTML. Raw HTML only — no markdown, no explanation.`,
+        messages: [{
+          role: 'user',
+          content: `This is my app code. Find and fix EVERY broken thing — syntax errors, buttons, tabs, data flow, Firebase queries. Make it completely working end-to-end.
+
+CHECK AND FIX ALL OF THESE:
+
+0. SYNTAX ERRORS — MOST CRITICAL — fix first:
+   - Remove any extra or mismatched } ) ] brackets
+   - Fix any unclosed strings or template literals
+   - Fix any truncated function calls
+   - Every script block must be valid JavaScript with no SyntaxErrors
+   - ALL functions must use the function keyword at top level — NEVER const/let/arrow functions for onclick handlers
+   - NEVER use object methods { fn: function(){} } or class methods for onclick — only standalone function declarations
+
+1. NAVIGATION — bottom nav tabs must show correct screen and hide all others
+2. BUTTONS — every button onclick must call a real defined function
+3. FIREBASE DATA FLOW — owner adds items with their UID, members see data
+4. AUTH SCREEN — must be visible (display:flex) on load, not hidden
+5. ERROR DISPLAY — fbErr element must use style.display='block' when showing errors — NEVER leave errors hidden with display:none
+6. doSignup — must show "Creating account..." then show error if fails — never hang silently
+7. onAuthStateChanged — must show correct dashboard based on user role from Firestore
+
+Return the complete fully working HTML file now:
+
+${generatedCode}`
+        }]
+    });
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.error?.message || 'API error ' + response.status);
+    }
+
+    const data = await response.json();
+    const textBlock3 = data.content && data.content.find(function(b){ return b.type === 'text'; });
+    let fixed = (textBlock3 ? textBlock3.text : '').trim();
+    if (fixed.startsWith('```')) fixed = fixed.replace(/^```html?\n?/i, '').replace(/\n?```$/, '').trim();
+    if (!fixed.includes('<!DOCTYPE') && !fixed.includes('<html')) throw new Error('Invalid response. Try again.');
+
+    generatedCode = fixed;
+    cloudSave();
+
+    function reloadIframe(frameId) {
+      const old = document.getElementById(frameId);
+      if (!old) return;
+      const f = document.createElement('iframe');
+      f.id = frameId;
+      f.sandbox = 'allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-popups-to-escape-sandbox';
+      f.style.cssText = 'width:100%;height:' + (frameId === 'mobileFrame' ? '650' : '600') + 'px;border:none;display:block;';
+      old.parentNode.replaceChild(f, old);
+      setTimeout(() => { f.srcdoc = prepareApp(generatedCode); }, 80);
+    }
+    reloadIframe('previewFrame');
+    if (isMobileView) reloadIframe('mobileFrame');
+
+    document.getElementById('modifyLoading').style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = '🔧 Fix All Buttons — Make Everything Work';
+
+    const banner = document.getElementById('modifySuccess');
+    const bannerFirst = banner && banner.querySelector('div div:first-child');
+    const bannerLast = banner && banner.querySelector('div div:last-child');
+    if (bannerFirst) bannerFirst.textContent = '✅ All buttons fixed!';
+    if (bannerLast) bannerLast.textContent = 'Every button and tab is now working — scroll up to test';
+    banner.style.display = 'flex';
+    setTimeout(() => { banner.style.display = 'none'; }, 5000);
+    document.getElementById('previewFrame').scrollIntoView({ behavior: 'smooth' });
+
+  } catch (err) {
+    document.getElementById('modifyLoading').style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = '🔧 Fix All Buttons — Make Everything Work';
+    const errEl = document.getElementById('modifyError');
+    errEl.textContent = '❌ ' + err.message;
+    errEl.style.display = 'block';
+  }
+}
+
+async function modifyApp() {
+  const changes = document.getElementById('modifyPrompt').value.trim();
+  if (!changes) { alert('Please describe what you want to change!'); return; }
+  if (!generatedCode) { alert('Please build your app first!'); return; }
+
+  const apiKey = _getKey();
+  if (!apiKey) { alert('API key missing. Please add it at the top.'); return; }
+
+  const btn = document.getElementById('modifyBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Applying changes...';
+  document.getElementById('modifyLoading').style.display = 'block';
+  document.getElementById('modifyError').style.display = 'none';
+
+  try {
+    const response = await _claudeFetch(apiKey, {
+        model: 'claude-sonnet-4-5',
+        max_tokens: 18000,
+        thinking: { type: 'enabled', budget_tokens: 5000 },
+        system: `You are an expert software engineer. You carefully read the existing code, understand exactly how it works, then apply the requested change completely and correctly. You never break existing working Firebase code, auth flows, or Firestore operations. You never use placeholders or TODO comments. Every button works after your change.`,
+        messages: [{
+          role: 'user',
+          content: `Here is my Firebase app. The user says: "${changes}"
+
+Apply this change fully and correctly. Follow these rules:
+- Read the entire existing code before changing anything
+- Keep ALL existing Firebase config, auth code, onAuthStateChanged, onSnapshot listeners, and Firestore CRUD operations intact
+- Apply the visual or functional change the user asked for completely
+- Return the COMPLETE updated HTML file — raw HTML only, no markdown, no code fences
+
+CRITICAL — BUTTONS RULE (do not break this):
+- ALL buttons MUST use onclick="functionName()" directly on the element
+- ALL functions MUST be defined at TOP LEVEL of the script block — never inside DOMContentLoaded
+- If you add new buttons: write onclick="yourFunction()" on the button, define yourFunction at top level
+- NEVER use addEventListener for buttons — buttons added that way will stop working
+- NEVER put new functions inside DOMContentLoaded — they won't be reachable from onclick
+
+CURRENT APP CODE:
+${generatedCode}`
+        }]
+    });
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error((errData.error && errData.error.message) || 'API error ' + response.status);
+    }
+
+    const data = await response.json().catch(() => ({}));
+    const textBlock2 = data.content && data.content.find(function(b){ return b.type === 'text'; });
+    let updatedCode = textBlock2 ? textBlock2.text.trim() : '';
+
+    // Strip markdown code fences if present
+    if (updatedCode.startsWith('```')) {
+      updatedCode = updatedCode.replace(/^```html?\n?/i, '').replace(/\n?```$/, '');
+    }
+
+    // Validate it's real HTML — just check for basic structure
+    if (!updatedCode.includes('<html') || updatedCode.length < 500) {
+      throw new Error('AI returned incomplete response. Your previous app is unchanged — please try again.');
+    }
+    // Auto-fix truncated response — detect and repair cut-off HTML
+    updatedCode = fixTruncatedHTML(updatedCode);
+
+    // Save backup in case something looks wrong
+    const previousCode = generatedCode;
+    generatedCode = updatedCode;
+
+    // Reload iframe — if body looks empty, restore previous version
+    function reloadIframe(frameId) {
+      const old = document.getElementById(frameId);
+      if (!old) return;
+      const newFrame = document.createElement('iframe');
+      newFrame.id = frameId;
+      newFrame.sandbox = 'allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-popups-to-escape-sandbox';
+      newFrame.style.cssText = 'width:100%;height:' + (frameId === 'mobileFrame' ? '650' : '600') + 'px;border:none;display:block;';
+      old.parentNode.replaceChild(newFrame, old);
+      newFrame.srcdoc = prepareApp(generatedCode);
+      // Fallback: if iframe body is empty after 3s, restore previous working version
+      setTimeout(function() {
+        try {
+          const body = newFrame.contentDocument && newFrame.contentDocument.body;
+          if (body && body.innerHTML.trim().length < 100) {
+            generatedCode = previousCode;
+            newFrame.srcdoc = prepareApp(generatedCode);
+            showModifyError('Screen was blank — restored your previous working app. Please try the change again.');
+          }
+        } catch(e) {}
+      }, 3000);
+    }
+
+    reloadIframe('previewFrame');
+    if (isMobileView) reloadIframe('mobileFrame');
+
+    // Auto-save the modified/fixed app to the cloud (same app code)
+    setTimeout(function(){ cloudSave(); }, 3200);
+
+    document.getElementById('modifyLoading').style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = '✏️ Apply Change / Fix My App';
+    document.getElementById('modifyPrompt').value = '';
+
+    // Show success banner under the modify box
+    const banner = document.getElementById('modifySuccess');
+    banner.style.display = 'flex';
+    setTimeout(() => { banner.style.display = 'none'; }, 4000);
+
+    document.getElementById('previewFrame').scrollIntoView({ behavior: 'smooth' });
+
+  } catch (err) {
+    document.getElementById('modifyLoading').style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = '✏️ Apply Change / Fix My App';
+    const errEl = document.getElementById('modifyError');
+    errEl.textContent = '❌ Error: ' + err.message + ' — Please try again.';
+    errEl.style.display = 'block';
+  }
+}
+
+</script>
+</body>
+</html>
