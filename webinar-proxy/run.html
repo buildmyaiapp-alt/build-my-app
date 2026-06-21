@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Loading your app…</title>
+<style>
+  html,body{margin:0;height:100%;background:#0a0a14;color:#cbd5e1;font-family:-apple-system,Segoe UI,Roboto,sans-serif;}
+  .center{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px;}
+  .spin{width:34px;height:34px;border:3px solid rgba(255,255,255,.15);border-top-color:#7c9cff;border-radius:50%;animation:r 1s linear infinite;}
+  @keyframes r{to{transform:rotate(360deg);}}
+  .err{color:#ff6b6b;max-width:420px;line-height:1.6;}
+  code{background:rgba(255,255,255,.08);padding:2px 8px;border-radius:6px;}
+</style>
+</head>
+<body>
+<div class="center" id="box">
+  <div class="spin"></div>
+  <div>Loading your app…</div>
+</div>
+<script>
+(function(){
+  var FS = 'https://firestore.googleapis.com/v1/projects/build-my-app-3c629/databases/(default)/documents/_tool_apps/';
+  var code = new URLSearchParams(location.search).get('app');
+  function fail(msg){
+    document.getElementById('box').innerHTML =
+      '<div class="err">' + msg + '</div>';
+    document.title = 'App not found';
+  }
+  if(!code){ fail('No app code in the link. Use <code>run.html?app=APP-XXXXXX</code>'); return; }
+  fetch(FS + encodeURIComponent(code) + '?t=' + Date.now())
+    .then(function(r){ if(!r.ok) throw new Error('not found'); return r.json(); })
+    .then(function(d){
+      var html = d && d.fields && d.fields.code && d.fields.code.stringValue;
+      if(!html) throw new Error('empty');
+      // Universal auth safety-net: if login succeeds but the app's own routing
+      // hangs (Firestore read stalls), force-switch to the dashboard so users
+      // never get stuck on "Creating account..."/login screens.
+      var ROUTER = '<scr'+'ipt>(function(){function go(){try{var a=window._auth||(window.firebase&&firebase.apps&&firebase.apps.length&&firebase.auth());if(a&&a.currentUser){var as=document.getElementById("authScreen");if(as&&as.style.display!=="none"){var role=(window.currentUser&&window.currentUser.role)||window.currentUserRole||"customer";as.style.display="none";var ow=document.getElementById("ownerApp"),cu=document.getElementById("customerApp");if((role==="owner"||role==="admin"||role==="teacher"||role==="doctor"||role==="driver")&&ow){ow.style.display="block";if(cu)cu.style.display="none";["loadOwnerDashboard","loadTeacherDashboard","loadAdminData","loadDoctorData","loadDriverData"].forEach(function(f){try{if(typeof window[f]==="function")window[f]();}catch(e){}});}else if(cu){cu.style.display="block";if(ow)ow.style.display="none";["loadCustomerData","loadStudentData","loadMemberData","loadUserData","loadPatientData"].forEach(function(f){try{if(typeof window[f]==="function")window[f]();}catch(e){}});}window.scrollTo(0,0);}}}catch(e){}setTimeout(go,700);}setTimeout(go,1200);})();</scr'+'ipt>';
+      // Universal auth fix: if login fails because the account doesn't exist (or
+      // the Sign Up button is miswired to login), auto-create the account so no one
+      // ever gets "auth/invalid-credential".
+      var AUTHFIX = '<scr'+'ipt>(function(){function p(){try{if(window.firebase&&firebase.auth&&firebase.auth.Auth&&firebase.auth.Auth.prototype){var P=firebase.auth.Auth.prototype;if(!P.__bmaPatched){var o=P.signInWithEmailAndPassword;P.signInWithEmailAndPassword=function(e,pw){var s=this;return o.call(s,e,pw).catch(function(err){if(err&&(err.code==="auth/invalid-credential"||err.code==="auth/user-not-found"||err.code==="auth/wrong-password")){return s.createUserWithEmailAndPassword(e,pw);}throw err;});};P.__bmaPatched=true;}return;}}catch(e){}setTimeout(p,200);}p();})();</scr'+'ipt>';
+      if(html.indexOf('</body>')!==-1){ html = html.replace('</body>', AUTHFIX+ROUTER+'</body>'); }
+      else { html = html + AUTHFIX + ROUTER; }
+      // Render the app as the FULL top-level page (real origin => Safari runs Firebase normally)
+      document.open();
+      document.write(html);
+      document.close();
+    })
+    .catch(function(){
+      fail('Could not load app <code>' + (code||'') + '</code>. Check the code is correct, or rebuild and copy the new code.');
+    });
+})();
+</script>
+</body>
+</html>
