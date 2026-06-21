@@ -1,0 +1,8 @@
+{
+  "name": "webinar-server",
+  "version": "1.0.0",
+  "main": "webinar-server.js",
+  "scripts": {
+    "start": "node webinar-server.js"
+  }
+}
