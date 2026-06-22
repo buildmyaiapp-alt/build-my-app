@@ -885,22 +885,24 @@ function prepareApp(html) {
 })();
 <\/script>`;
 
-    // Auto-inject logout bar and wipe script before </body>
-    if (html.includes('</body>')) {
-      html = html.replace('</body>', AUTO_LOGOUT_SCRIPT + '\n' + WIPE_SCRIPT + '\n</body>');
-    } else {
-      html = html + AUTO_LOGOUT_SCRIPT + WIPE_SCRIPT;
-    }
-    return html;
+  } else {
+    // Rare non-Firebase fallback: inject CORE_JS
+    const C = String.fromCharCode;
+    const open  = C(60,115,99,114,105,112,116,62);
+    const close = C(60,47,115,99,114,105,112,116,62);
+    const bodyC = C(60,47,98,111,100,121,62);
+    const coreTag = open + CORE_JS + close;
+    html = html.includes(bodyC) ? html.replace(bodyC, coreTag + '\n' + bodyC) : html + coreTag;
   }
-  // Rare non-Firebase fallback: inject CORE_JS
-  const C = String.fromCharCode;
-  const open  = C(60,115,99,114,105,112,116,62);
-  const close = C(60,47,115,99,114,105,112,116,62);
-  const bodyC = C(60,47,98,111,100,121,62);
-  const coreTag = open + CORE_JS + close;
-  if (html.includes(bodyC)) return html.replace(bodyC, coreTag + '\n' + bodyC);
-  return html + coreTag;
+
+  // Auto-inject logout bar and wipe script before </body> — ALWAYS, regardless of
+  // which branch above ran, so no app is ever missing a working logout button.
+  if (html.includes('</body>')) {
+    html = html.replace('</body>', AUTO_LOGOUT_SCRIPT + '\n' + WIPE_SCRIPT + '\n</body>');
+  } else {
+    html = html + AUTO_LOGOUT_SCRIPT + WIPE_SCRIPT;
+  }
+  return html;
 }
 
 // DOWNLOAD: Apply all same fixes as prepareApp
