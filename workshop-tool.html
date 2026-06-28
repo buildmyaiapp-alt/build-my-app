@@ -738,6 +738,7 @@ function prepareApp(html) {
   html = fixTruncatedHTML(html);    // fix truncation first
   html = repairButtonScope(html);   // then repair button scope
   html = fixSyntaxErrors(html);     // then check/warn syntax errors
+  let WIPE_SCRIPT = '';             // only set for Firebase apps; stays empty otherwise
   // Firebase apps (all apps now) have their own complete JS — don't inject CORE_JS
   if (html.includes('firebase-app-compat') || html.includes('firebase.initializeApp')) {
 
@@ -859,7 +860,7 @@ function prepareApp(html) {
     // ── WIPE APP COLLECTIONS ON FIRST OPEN ─────────────────────────────────────
     // Deletes all docs in this app's Firestore collections when opened for first time
     // Prevents any stale data from appearing. Owner adds fresh data during workshop.
-    const WIPE_SCRIPT = `<script>
+    WIPE_SCRIPT = `<script>
 (function(){
   var _wipeKey='_wiped_'+( typeof APP_PREFIX!=='undefined'?APP_PREFIX:'x');
   if(sessionStorage.getItem(_wipeKey))return; // already wiped this session
