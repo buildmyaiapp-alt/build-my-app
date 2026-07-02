@@ -2289,11 +2289,9 @@
           style="width:100%;padding:14px 16px;border:2px solid #e0e0e0;border-radius:10px;font-size:15px;outline:none;font-family:inherit;"
           onfocus="this.style.borderColor='#0d1b6e'" onblur="this.style.borderColor='#e0e0e0'"/>
       </div>
-      <div style="margin-bottom:16px;">
-        <label style="font-size:13px;font-weight:700;color:#333;display:block;margin-bottom:6px;">Email Address *</label>
-        <input id="rzp-email" type="email" placeholder="Enter your email" required
-          style="width:100%;padding:14px 16px;border:2px solid #e0e0e0;border-radius:10px;font-size:15px;outline:none;font-family:inherit;"
-          onfocus="this.style.borderColor='#0d1b6e'" onblur="this.style.borderColor='#e0e0e0'"/>
+      <div style="display:none;">
+        <input id="rzp-email" type="email" placeholder="Enter your email"
+          style="width:100%;padding:14px 16px;border:2px solid #e0e0e0;border-radius:10px;font-size:15px;outline:none;font-family:inherit;"/>
       </div>
       <div style="margin-bottom:24px;">
         <label style="font-size:13px;font-weight:700;color:#333;display:block;margin-bottom:6px;">WhatsApp Number *</label>
@@ -2392,10 +2390,11 @@
   function startPayment(e) {
     e.preventDefault();
     const name  = document.getElementById('rzp-name').value.trim();
-    const email = document.getElementById('rzp-email').value.trim();
     const phone = '+91' + document.getElementById('rzp-phone').value.trim();
+    const email = phone.replace('+', '') + '@buildmyaiapp.in';
+    document.getElementById('rzp-email').value = email;
 
-    if (!name || !email || !phone || phone.length < 13) {
+    if (!name || !phone || phone.length < 13) {
       alert('Please fill all fields correctly.');
       return;
     }
@@ -2673,7 +2672,7 @@
   }
 </style>
 
-<div class="wa-float" id="waFloat">
+<div class="wa-float" id="waFloat" style="display:none;">
   <div style="position:relative;">
     <div class="wa-bubble" id="waBubble">
       Have a question? <span>Chat on WhatsApp</span> before enrolling 👇
@@ -2688,11 +2687,15 @@
 </div>
 
 <script>
-// Hide bubble after 8 seconds automatically
+// Show WhatsApp widget after 30 seconds, then hide bubble after 8 more seconds
 setTimeout(function() {
-  var b = document.getElementById('waBubble');
-  if(b) b.style.display = 'none';
-}, 8000);
+  var f = document.getElementById('waFloat');
+  if(f) f.style.display = '';
+  setTimeout(function() {
+    var b = document.getElementById('waBubble');
+    if(b) b.style.display = 'none';
+  }, 8000);
+}, 30000);
 </script>
 
 </body>
