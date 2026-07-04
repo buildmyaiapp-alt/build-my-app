@@ -1727,6 +1727,16 @@ OWNER HOME SCREEN:
 - Recent orders list (last 5) with customer name, amount, status badge
 - Quick action buttons: Add Product, View All Orders
 
+OWNER ORDERS TAB — CRITICAL:
+- The Orders tab MUST have its OWN onSnapshot listener separate from the Dashboard
+- Inside onAuthStateChanged (owner branch), set up TWO separate onSnapshot calls:
+  1. One for the Dashboard tab: renders recent 5 orders into the dashboard list
+  2. One for the Orders tab: renders ALL orders into the orders tab list
+- Both listeners use: _db.collection('orders').where('shopId','==',user.uid).onSnapshot()
+- The Orders tab list container must have a unique id (e.g. id="allOrdersList")
+- When an order comes in, BOTH the Dashboard AND the Orders tab must update in real-time automatically
+- NEVER rely on tab switching to trigger data loading — both listeners must be active from login
+
 ABSOLUTE RULES:
 ✅ ALL UI written in HTML — onAuthStateChanged only shows/hides, never builds
 ✅ Every button uses onclick="functionName()" — no exceptions
