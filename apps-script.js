@@ -9,7 +9,7 @@
 const CONFIG = {
   SHEET_ID:        '18c0VazYcBZtgdFDzJK6baFb4ZQieb0_mhfWzzkIcKRA',
   SENDER_NAME:     'Palash — AI App Workshop',
-  WORKSHOP_DATE:   '5th July 2026 (Sunday), 1:00 PM IST',
+  WORKSHOP_DATE:   '12th July 2026 (Sunday), 1:00 PM IST',
   WHATSAPP_API_KEY: '',
   WHATSAPP_NUMBER:  '',
 };
@@ -52,11 +52,22 @@ function doGet(e) {
         const isRecording = p.plan === 'recording';
         const paidAmount  = isRecording ? 19900 : (parseInt(p.amount) || 9900);
 
-        // Try to update existing row first (avoid duplicates)
-        const updated = updateLeadStatus(p.phone || p.email, p.paymentId, paidAmount, isRecording);
-        if (!updated) {
-          // No existing row found — add new paid row
-          saveLead(p.name, p.email, p.phone || '', p.paymentId, paidAmount, isRecording);
+        // LOCK: Razorpay's own webhook AND thankyou.html both call this endpoint
+        // for the same payment within milliseconds of each other. Without a lock,
+        // both read the sheet before either writes, both find "no Paid row yet",
+        // and both insert — creating duplicate rows. The lock forces them to run
+        // one after another so the second call sees the first's completed write.
+        const lock = LockService.getScriptLock();
+        let updated = false;
+        try {
+          lock.waitLock(15000);
+          updated = updateLeadStatus(p.phone || p.email, p.paymentId, paidAmount, isRecording);
+          if (!updated) {
+            // No existing row found — add new paid row
+            saveLead(p.name, p.email, p.phone || '', p.paymentId, paidAmount, isRecording);
+          }
+        } finally {
+          lock.releaseLock();
         }
         // Send confirmation email
         sendEmail(p.name, p.email, p.paymentId, isRecording);
