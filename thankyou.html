@@ -37,7 +37,7 @@
   (function() {
     var alreadyNotified = sessionStorage.getItem('sheet_notified');
     if (alreadyNotified) return;
-    var APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbxYRF3i6LijjVsaiVUYnO7l463kON3sOUPxCq-G0hmqkpRnL-NzGbgRyutD9SkY8XI9EA/exec';
+    var APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbxnlk_WZEGfvGf3rQrSmBINLLjjkBD-wmUO965FUQQMbS0fnDcO_wxan2dE9Bi-KISI/exec';
     try {
       // 1. Try sessionStorage first
       var pending = JSON.parse(sessionStorage.getItem('pending_lead') || '{}');
