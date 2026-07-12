@@ -1453,6 +1453,32 @@ This applies to ALL roles that are "added by admin" before they create their acc
 ❌ NEVER do this for pre-added users:
   _db.collection(PLANS_COL).doc(_auth.currentUser.uid)  // ← UID ≠ member doc ID, finds nothing
 
+⚠️ UNIVERSAL BOOKING/APPOINTMENT DATE+TIME RULE — MANDATORY FOR ANY FEATURE WITH A "BOOK" BUTTON
+(gym class booking, salon appointment, hospital appointment, hotel room booking, pet service booking, etc.):
+
+The #1 recurring bug: a Confirm/Book button always shows "Please enter date and time" even after the
+user fills the time field. This happens because the date input is missing, has the wrong id, or the
+validation checks an id that doesn't match the actual input. Copy this EXACT pattern — do not invent your own:
+
+HTML (both inputs MUST exist together, always use these exact ids):
+  <input type="date" id="bookDate" class="inp">
+  <input type="time" id="bookTime" class="inp">
+
+JS validation (use this exact id lookup, trim, and check — never assume default values):
+  function confirmBooking(){
+    var d=document.getElementById('bookDate').value;
+    var t=document.getElementById('bookTime').value;
+    if(!d||!t){alert('Please enter date and time');return;}
+    // proceed with booking using d and t
+  }
+
+Rules:
+- The date input and time input ids MUST be exactly "bookDate" and "bookTime" — never rename them, never validate a different id.
+- ALWAYS render both a date input AND a time input together in the same form — never a time-only or date-only booking form.
+- type="date" and type="time" inputs return empty string ('') until the user picks a value — never assume they default to today/now.
+- If you want a default value, set it explicitly in JS after render: document.getElementById('bookDate').value = new Date().toISOString().split('T')[0];
+- NEVER write validation that checks a variable/id different from the actual rendered input id — this mismatch is what causes the bug.
+
 DESIGN RULES — MAKE IT LOOK LIKE A REAL ₹10 LAKH APP:
 The app must look so impressive that students gasp. Use these exact patterns:
 

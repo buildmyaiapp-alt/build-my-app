@@ -9,7 +9,7 @@
 const CONFIG = {
   SHEET_ID:        '18c0VazYcBZtgdFDzJK6baFb4ZQieb0_mhfWzzkIcKRA',
   SENDER_NAME:     'Palash — AI App Workshop',
-  WORKSHOP_DATE:   '12th July 2026 (Sunday), 1:00 PM IST',
+  WORKSHOP_DATE:   '19th July 2026 (Sunday), 1:00 PM IST',
   WHATSAPP_API_KEY: '',
   WHATSAPP_NUMBER:  '',
 };
@@ -26,6 +26,12 @@ function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
     const { name, email, phone, paymentId, amount } = data;
+    // Reject webhooks with no user identity (Razorpay pings, bots, etc.)
+    if (!name && !email && !phone) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ success: false, error: 'no user data' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
     saveLead(name, email, phone, paymentId, amount);
     if (paymentId && paymentId !== 'PAYMENT_INITIATED' && paymentId !== 'LEAD') {
       sendEmail(name, email, paymentId);
@@ -48,9 +54,10 @@ function doGet(e) {
       const isPaid = p.paymentId && p.paymentId !== 'LEAD' && p.paymentId !== 'PAYMENT_INITIATED';
 
       if (isPaid) {
-        // Detect ₹199 recording plan
-        const isRecording = p.plan === 'recording';
-        const paidAmount  = isRecording ? 19900 : (parseInt(p.amount) || 9900);
+        // Detect ₹199 recording plan — check both plan param AND actual amount paid
+        const rawAmount   = parseInt(p.amount) || 0;
+        const isRecording = p.plan === 'recording' || rawAmount >= 19900;
+        const paidAmount  = rawAmount > 0 ? rawAmount : (isRecording ? 19900 : 9900);
 
         // LOCK: Razorpay's own webhook AND thankyou.html both call this endpoint
         // for the same payment within milliseconds of each other. Without a lock,
@@ -141,22 +148,31 @@ function updateLeadStatus(phoneOrEmail, paymentId, amount, isRecording) {
   const sheet = ss.getSheetByName(getActiveBatch());
   if (!sheet) return false;
 
+  // Strip non-digits for robust phone matching
+  const digitsOnly = String(phoneOrEmail).replace(/\D/g, '');
+  // Last 10 digits covers both 91XXXXXXXXXX and XXXXXXXXXX formats
+  const last10 = digitsOnly.slice(-10);
+
   const data = sheet.getDataRange().getValues();
   // Search from bottom (most recent) — columns: 0=date,1=name,2=email,3=phone,4=paymentId,5=amount,6=status
   for (let i = data.length - 1; i >= 1; i--) {
-    const rowPhone = String(data[i][3]);
+    const rowPhone = String(data[i][3]).replace(/\D/g, '');
     const rowEmail = String(data[i][2]);
     const rowStatus = String(data[i][6]);
 
-    if (rowPhone.includes(phoneOrEmail) || rowEmail === phoneOrEmail) {
+    const phoneMatch = rowPhone.slice(-10) === last10;
+    const emailMatch = rowEmail === phoneOrEmail;
+
+    if (phoneMatch || emailMatch) {
       // Already paid — return true to prevent duplicate entry
       if (rowStatus.includes('Paid')) return true;
       // Still initiated — update to Paid
       if (rowStatus.includes('Initiated')) {
-        const amtLabel  = isRecording ? '₹199' : (amount ? '₹' + (amount / 100) : '₹99');
-        const statusLbl = isRecording ? '✅ Paid ₹199 🎥' : '✅ Paid ₹99';
-        const notesLbl  = isRecording ? 'Paid ₹199 — Live + Recording 🎥' : 'Payment confirmed ✅';
-        const bgClr     = isRecording ? '#e3f2fd' : '#e8f5e9'; // blue for ₹199, green for ₹99
+        const isRec    = isRecording || amount >= 19900;
+        const amtLabel  = isRec ? '₹199' : '₹99';
+        const statusLbl = isRec ? '✅ Paid ₹199 🎥' : '✅ Paid ₹99';
+        const notesLbl  = isRec ? 'Paid ₹199 — Live + Recording 🎥' : 'Payment confirmed ✅';
+        const bgClr     = isRec ? '#e3f2fd' : '#e8f5e9';
         sheet.getRange(i + 1, 5).setValue(paymentId);
         sheet.getRange(i + 1, 6).setValue(amtLabel);
         sheet.getRange(i + 1, 7).setValue(statusLbl);
@@ -229,7 +245,7 @@ function sendEmail(name, email, paymentId) {
         <div style="background:linear-gradient(135deg,#e8f5e9,#d0f0da);border:2.5px solid #25D366;border-radius:16px;padding:20px;text-align:center;margin-bottom:24px;">
           <div style="font-size:13px;font-weight:800;color:#1a6b35;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">⚡ Step 1 — Join WhatsApp Group NOW</div>
           <div style="font-size:13px;color:#2e7d32;margin-bottom:14px;">Get the Zoom link, updates & reminders — all in the group</div>
-          <a href="https://chat.whatsapp.com/CC8RuyVTpDCEpKVFQ8et76?mode=gi_t" style="display:block;background:#25D366;color:#fff;text-decoration:none;padding:16px 24px;border-radius:12px;font-size:16px;font-weight:900;box-shadow:0 6px 24px rgba(37,211,102,0.4);">💬 Join WhatsApp Group →</a>
+          <a href="https://chat.whatsapp.com/IqiMtRtrB6l3540Kih0SU4?mode=gi_t" style="display:block;background:#25D366;color:#fff;text-decoration:none;padding:16px 24px;border-radius:12px;font-size:16px;font-weight:900;box-shadow:0 6px 24px rgba(37,211,102,0.4);">💬 Join WhatsApp Group →</a>
         </div>
 
         <div class="steps">

@@ -24,7 +24,7 @@ var TRACKER_SHEET_ID = "1l19zWjcmYxJ5EWda_uHDdMPJsjYqbxiHY9bzRG-ugWg";
 var TRACKER_TAB      = "Tracker";
 
 var LEADS_SHEET_ID   = "18c0VazYcBZtgdFDzJK6baFb4ZQieb0_mhfWzzkIcKRA";
-var LEADS_TAB        = "Batch 28 June";   // ← change when a new batch starts
+var LEADS_TAB        = "Batch 19 July";   // ← change when a new batch starts
 var LEADS_DATE_COL   = 1;           // column A = date/timestamp
 var LEADS_AMOUNT_COL = 6;           // column F = "₹99" / "₹199"
 
@@ -117,11 +117,20 @@ function countLeads(iso) {
   if (!sh) throw new Error("Leads tab not found: " + LEADS_TAB);
   var values = sh.getDataRange().getValues();
   var l99 = 0, l199 = 0;
+  // DEDUPE: each real payment can write 2 rows (Razorpay's own callback +
+  // thankyou.html both notify this sheet). Count each phone/email once per day
+  // so a single conversion is never counted as 2 leads.
+  var seen = {};
   for (var i = 1; i < values.length; i++) {        // skip header
     var dateCell = values[i][LEADS_DATE_COL - 1];
     if (!dateCell) continue;
     if (cellToISO(dateCell) !== iso) continue;
     var amt = String(values[i][LEADS_AMOUNT_COL - 1]);
+    var phone = String(values[i][3] || '').trim();   // column D = Phone
+    var email = String(values[i][2] || '').trim();   // column C = Email
+    var key = phone || email;
+    if (!key || seen[key]) continue;
+    seen[key] = true;
     if (amt.indexOf("199") !== -1) l199++;
     else if (amt.indexOf("99") !== -1) l99++;
   }
@@ -159,6 +168,48 @@ function writeRow(disp, day, newData) {
     sh.getRange(last, 2).setValue(day);
     sh.getRange(last, 4, 1, newData.length).setValues([newData]);
   }
+  updateSummaryRow(sh);
+}
+
+// ── SUMMARY ROW ───────────────────────────────────────────
+// Row 4 = Summary. Data rows start at row 5. Columns D–R (indices 4–18).
+// Col layout: D=spend E=l99 F=l199 G=total H=cpa I=clicks J=lpv K=cpm L=ctr M=cpc N=clpv O=rev P=eff Q=recover% R=cac
+function updateSummaryRow(sh) {
+  if (!sh) {
+    var ss = SpreadsheetApp.openById(TRACKER_SHEET_ID);
+    sh = ss.getSheetByName(TRACKER_TAB);
+  }
+  var lastRow = sh.getLastRow();
+  if (lastRow < 5) return;
+  var data = sh.getRange(5, 4, lastRow - 4, 15).getValues();
+
+  var spend = 0, l99 = 0, l199 = 0, total = 0;
+  var clicks = 0, lpv = 0, rev = 0, eff = 0;
+
+  for (var i = 0; i < data.length; i++) {
+    var r = data[i];
+    spend  += parseFloat(r[0])  || 0;   // D
+    l99    += parseInt(r[1])    || 0;   // E
+    l199   += parseInt(r[2])    || 0;   // F
+    total  += parseInt(r[3])    || 0;   // G
+    clicks += parseInt(r[5])   || 0;   // I
+    lpv    += parseInt(r[6])   || 0;   // J
+    rev    += parseFloat(r[11]) || 0;  // O
+    eff    += parseFloat(r[12]) || 0;  // P
+  }
+
+  spend = round2(spend);
+  rev   = round2(rev);
+  eff   = round2(eff);
+
+  var cpa     = total   ? round2(spend / total)   : "";
+  var cpc     = clicks  ? round2(spend / clicks)  : "";
+  var clpv    = lpv     ? round2(spend / lpv)     : "";
+  var recover = spend   ? round2(rev / spend * 100) + "%" : "";
+
+  // D4:R4 — 15 values
+  var summary = [spend, l99, l199, total, cpa, clicks, lpv, "", "", cpc, clpv, rev, eff, recover, cpa];
+  sh.getRange(4, 4, 1, 15).setValues([summary]);
 }
 
 // ── HELPERS ───────────────────────────────────────────────
