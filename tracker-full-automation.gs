@@ -24,7 +24,7 @@ var TRACKER_SHEET_ID = "1l19zWjcmYxJ5EWda_uHDdMPJsjYqbxiHY9bzRG-ugWg";
 var TRACKER_TAB      = "Tracker";
 
 var LEADS_SHEET_ID   = "18c0VazYcBZtgdFDzJK6baFb4ZQieb0_mhfWzzkIcKRA";
-var LEADS_TAB        = "Batch 19 July";   // ← change when a new batch starts
+var LEADS_TAB        = "Batch 26 July";   // ← change when a new batch starts
 var LEADS_DATE_COL   = 1;           // column A = date/timestamp
 var LEADS_AMOUNT_COL = 6;           // column F = "₹99" / "₹199"
 
