@@ -1,15 +1,15 @@
 // ============================================================
-// GOOGLE APPS SCRIPT — Paste this in script.google.com
+// GOOGLE APPS SCRIPT \u2014 Paste this in script.google.com
 // Handles: Google Sheet + Email + WhatsApp confirmation
 // ============================================================
 
-// ── CONFIG ───────────────────────────────────────────────────
+// -- CONFIG ---------------------------------------------------
 // SHEET_NAME is read from Sheet1!B1 in the spreadsheet.
-// To change the active batch: just update that ONE cell — no script edit needed.
+// To change the active batch: just update that ONE cell \u2014 no script edit needed.
 const CONFIG = {
   SHEET_ID:        '18c0VazYcBZtgdFDzJK6baFb4ZQieb0_mhfWzzkIcKRA',
-  SENDER_NAME:     'Palash — AI App Workshop',
-  WORKSHOP_DATE:   '16th August 2026 (Sunday), 1:00 PM IST',
+  SENDER_NAME:     'Palash \u2014 AI App Workshop',
+  WORKSHOP_DATE:   '16th August 2026 (Sunday), 11:00 AM IST',
   WHATSAPP_API_KEY: '',
   WHATSAPP_NUMBER:  '',
 };
@@ -20,7 +20,7 @@ function getActiveBatch() {
   if (!name) throw new Error('Active batch not set! Put the tab name in Sheet1 cell B1.');
   return name.toString().trim();
 }
-// ────────────────────────────────────────────────────────────
+// ------------------------------------------------------------
 
 function doPost(e) {
   try {
@@ -54,7 +54,7 @@ function doGet(e) {
       const isPaid = p.paymentId && p.paymentId !== 'LEAD' && p.paymentId !== 'PAYMENT_INITIATED';
 
       if (isPaid) {
-        // Detect ₹199 recording plan — check both plan param AND actual amount paid
+        // Detect \u20B9199 recording plan \u2014 check both plan param AND actual amount paid
         const rawAmount   = parseInt(p.amount) || 0;
         const isRecording = p.plan === 'recording' || rawAmount >= 19900;
         const paidAmount  = rawAmount > 0 ? rawAmount : (isRecording ? 19900 : 9900);
@@ -62,7 +62,7 @@ function doGet(e) {
         // LOCK: Razorpay's own webhook AND thankyou.html both call this endpoint
         // for the same payment within milliseconds of each other. Without a lock,
         // both read the sheet before either writes, both find "no Paid row yet",
-        // and both insert — creating duplicate rows. The lock forces them to run
+        // and both insert \u2014 creating duplicate rows. The lock forces them to run
         // one after another so the second call sees the first's completed write.
         const lock = LockService.getScriptLock();
         let updated = false;
@@ -70,7 +70,7 @@ function doGet(e) {
           lock.waitLock(15000);
           updated = updateLeadStatus(p.phone || p.email, p.paymentId, paidAmount, isRecording);
           if (!updated) {
-            // No existing row found — add new paid row
+            // No existing row found \u2014 add new paid row
             saveLead(p.name, p.email, p.phone || '', p.paymentId, paidAmount, isRecording);
           }
         } finally {
@@ -80,7 +80,7 @@ function doGet(e) {
         sendEmail(p.name, p.email, p.paymentId, isRecording);
         if (CONFIG.WHATSAPP_API_KEY) sendWhatsApp(p.name, p.phone);
       } else {
-        // Just initiated — save as Initiated (not Paid)
+        // Just initiated \u2014 save as Initiated (not Paid)
         saveLead(p.name, p.email, p.phone || '', 'INITIATED', null);
       }
     }
@@ -92,9 +92,9 @@ function doGet(e) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-// ────────────────────────────────────────────────────────────
+// ------------------------------------------------------------
 // 1. SAVE LEAD TO GOOGLE SHEET
-// ────────────────────────────────────────────────────────────
+// ------------------------------------------------------------
 function saveLead(name, email, phone, paymentId, amount, isRecording) {
   const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
   const batchName = getActiveBatch();
@@ -103,9 +103,9 @@ function saveLead(name, email, phone, paymentId, amount, isRecording) {
   if (!sheet) {
     sheet = ss.insertSheet(batchName);
     sheet.appendRow([
-      '📅 Date & Time', '👤 Name', '📧 Email',
-      '📱 WhatsApp', '💳 Payment ID', '💰 Amount',
-      '✅ Status', '📝 Notes'
+      '\uD83D\uDCC5 Date & Time', '\uD83D\uDC64 Name', '\uD83D\uDCE7 Email',
+      '\uD83D\uDCF1 WhatsApp', '\uD83D\uDCB3 Payment ID', '\uD83D\uDCB0 Amount',
+      '\u2705 Status', '\uD83D\uDCDD Notes'
     ]);
     const header = sheet.getRange(1, 1, 1, 8);
     header.setBackground('#0d1b6e');
@@ -121,8 +121,8 @@ function saveLead(name, email, phone, paymentId, amount, isRecording) {
 
   // Determine status based on paymentId
   const isPaid = paymentId && paymentId !== 'INITIATED' && paymentId !== 'PAYMENT_INITIATED' && paymentId !== 'LEAD';
-  const status = isPaid ? (isRecording ? '✅ Paid ₹199 🎥' : '✅ Paid ₹99') : '🔄 Initiated';
-  const bgColor = isPaid ? (isRecording ? '#e3f2fd' : '#e8f5e9') : '#fff9c4'; // blue=₹199, green=₹99, yellow=initiated
+  const status = isPaid ? (isRecording ? '\u2705 Paid \u20B9199 \uD83C\uDFA5' : '\u2705 Paid \u20B999') : '\uD83D\uDD04 Initiated';
+  const bgColor = isPaid ? (isRecording ? '#e3f2fd' : '#e8f5e9') : '#fff9c4'; // blue=\u20B9199, green=\u20B999, yellow=initiated
 
   const row = [
     new Date(),
@@ -130,9 +130,9 @@ function saveLead(name, email, phone, paymentId, amount, isRecording) {
     email,
     phone,
     paymentId || 'INITIATED',
-    amount ? '₹' + (amount / 100) : (isPaid ? (isRecording ? '₹199' : '₹99') : '—'),
+    amount ? '\u20B9' + (amount / 100) : (isPaid ? (isRecording ? '\u20B9199' : '\u20B999') : '\u2014'),
     status,
-    isPaid ? (isRecording ? 'Paid ₹199 — Live + Recording 🎥' : 'Payment confirmed ✅') : 'Form filled — awaiting payment'
+    isPaid ? (isRecording ? 'Paid \u20B9199 \u2014 Live + Recording \uD83C\uDFA5' : 'Payment confirmed \u2705') : 'Form filled \u2014 awaiting payment'
   ];
   sheet.appendRow(row);
 
@@ -140,9 +140,9 @@ function saveLead(name, email, phone, paymentId, amount, isRecording) {
   sheet.getRange(lastRow, 1, 1, 8).setBackground(bgColor);
 }
 
-// ────────────────────────────────────────────────────────────
-// 2. UPDATE EXISTING ROW FROM INITIATED → PAID
-// ────────────────────────────────────────────────────────────
+// ------------------------------------------------------------
+// 2. UPDATE EXISTING ROW FROM INITIATED \u2192 PAID
+// ------------------------------------------------------------
 function updateLeadStatus(phoneOrEmail, paymentId, amount, isRecording) {
   const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
   const sheet = ss.getSheetByName(getActiveBatch());
@@ -154,7 +154,7 @@ function updateLeadStatus(phoneOrEmail, paymentId, amount, isRecording) {
   const last10 = digitsOnly.slice(-10);
 
   const data = sheet.getDataRange().getValues();
-  // Search from bottom (most recent) — columns: 0=date,1=name,2=email,3=phone,4=paymentId,5=amount,6=status
+  // Search from bottom (most recent) \u2014 columns: 0=date,1=name,2=email,3=phone,4=paymentId,5=amount,6=status
   for (let i = data.length - 1; i >= 1; i--) {
     const rowPhone = String(data[i][3]).replace(/\D/g, '');
     const rowEmail = String(data[i][2]);
@@ -164,14 +164,14 @@ function updateLeadStatus(phoneOrEmail, paymentId, amount, isRecording) {
     const emailMatch = rowEmail === phoneOrEmail;
 
     if (phoneMatch || emailMatch) {
-      // Already paid — return true to prevent duplicate entry
+      // Already paid \u2014 return true to prevent duplicate entry
       if (rowStatus.includes('Paid')) return true;
-      // Still initiated — update to Paid
+      // Still initiated \u2014 update to Paid
       if (rowStatus.includes('Initiated')) {
         const isRec    = isRecording || amount >= 19900;
-        const amtLabel  = isRec ? '₹199' : '₹99';
-        const statusLbl = isRec ? '✅ Paid ₹199 🎥' : '✅ Paid ₹99';
-        const notesLbl  = isRec ? 'Paid ₹199 — Live + Recording 🎥' : 'Payment confirmed ✅';
+        const amtLabel  = isRec ? '\u20B9199' : '\u20B999';
+        const statusLbl = isRec ? '\u2705 Paid \u20B9199 \uD83C\uDFA5' : '\u2705 Paid \u20B999';
+        const notesLbl  = isRec ? 'Paid \u20B9199 \u2014 Live + Recording \uD83C\uDFA5' : 'Payment confirmed \u2705';
         const bgClr     = isRec ? '#e3f2fd' : '#e8f5e9';
         sheet.getRange(i + 1, 5).setValue(paymentId);
         sheet.getRange(i + 1, 6).setValue(amtLabel);
@@ -185,11 +185,11 @@ function updateLeadStatus(phoneOrEmail, paymentId, amount, isRecording) {
   return false;
 }
 
-// ────────────────────────────────────────────────────────────
+// ------------------------------------------------------------
 // 3. SEND CONFIRMATION EMAIL
-// ────────────────────────────────────────────────────────────
+// ------------------------------------------------------------
 function sendEmail(name, email, paymentId) {
-  const subject = '🎉 Payment Confirmed — Your Workshop Seat is Secured!';
+  const subject = '\uD83C\uDF89 Payment Confirmed \u2014 Your Workshop Seat is Secured!';
 
   const htmlBody = `
   <!DOCTYPE html>
@@ -224,43 +224,43 @@ function sendEmail(name, email, paymentId) {
   <body>
     <div class="wrap">
       <div class="header">
-        <div class="tick">🎉</div>
+        <div class="tick">\uD83C\uDF89</div>
         <h1>Payment Confirmed!</h1>
-        <p>AI App Building Workshop — Your seat is secured</p>
+        <p>AI App Building Workshop \u2014 Your seat is secured</p>
       </div>
       <div class="body">
-        <div class="greeting">Hey ${name}! 👋</div>
+        <div class="greeting">Hey ${name}! \uD83D\uDC4B</div>
         <p class="msg">
           You're officially in! Your payment has been received and your seat for the
           <strong>AI App Building Workshop</strong> is confirmed.
           <br/><br/>
-          In this workshop, you'll build your own professional app in just 30 minutes —
+          In this workshop, you'll build your own professional app in just 30 minutes \u2014
           no coding, no developer, no lakh rupees needed.
         </p>
         <div class="badge">
-          <div class="amount">₹99 Paid ✅</div>
+          <div class="amount">\u20B999 Paid \u2705</div>
           <div class="label">Payment ID: ${paymentId || 'CONFIRMED'}</div>
         </div>
         <!-- WhatsApp CTA -->
         <div style="background:linear-gradient(135deg,#e8f5e9,#d0f0da);border:2.5px solid #25D366;border-radius:16px;padding:20px;text-align:center;margin-bottom:24px;">
-          <div style="font-size:13px;font-weight:800;color:#1a6b35;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">⚡ Step 1 — Join WhatsApp Group NOW</div>
-          <div style="font-size:13px;color:#2e7d32;margin-bottom:14px;">Get the Zoom link, updates & reminders — all in the group</div>
-          <a href="https://chat.whatsapp.com/JjYBEoyhGa9IREzOcXRpER?s=cl&p=i&ilr=0" style="display:block;background:#25D366;color:#fff;text-decoration:none;padding:16px 24px;border-radius:12px;font-size:16px;font-weight:900;box-shadow:0 6px 24px rgba(37,211,102,0.4);">💬 Join WhatsApp Group →</a>
+          <div style="font-size:13px;font-weight:800;color:#1a6b35;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">\u26A1 Step 1 \u2014 Join WhatsApp Group NOW</div>
+          <div style="font-size:13px;color:#2e7d32;margin-bottom:14px;">Get the Zoom link, updates & reminders \u2014 all in the group</div>
+          <a href="https://chat.whatsapp.com/JjYBEoyhGa9IREzOcXRpER?s=cl&p=i&ilr=0" style="display:block;background:#25D366;color:#fff;text-decoration:none;padding:16px 24px;border-radius:12px;font-size:16px;font-weight:900;box-shadow:0 6px 24px rgba(37,211,102,0.4);">\uD83D\uDCAC Join WhatsApp Group \u2192</a>
         </div>
 
         <div class="steps">
-          <h3>📋 What Happens Next</h3>
+          <h3>\uD83D\uDCCB What Happens Next</h3>
           <div class="step">
             <div class="step-num">1</div>
-            <div class="step-text"><strong>Join the WhatsApp group</strong> above — tap the green button right now!</div>
+            <div class="step-text"><strong>Join the WhatsApp group</strong> above \u2014 tap the green button right now!</div>
           </div>
           <div class="step">
             <div class="step-num">2</div>
-            <div class="step-text"><strong>Workshop date:</strong> ${CONFIG.WORKSHOP_DATE} — Live on Zoom.</div>
+            <div class="step-text"><strong>Workshop date:</strong> ${CONFIG.WORKSHOP_DATE} \u2014 Live on Zoom.</div>
           </div>
           <div class="step">
             <div class="step-num">3</div>
-            <div class="step-text"><strong>Show up and build your app</strong> in 30 minutes — no coding needed! 🚀</div>
+            <div class="step-text"><strong>Show up and build your app</strong> in 30 minutes \u2014 no coding needed! \uD83D\uDE80</div>
           </div>
         </div>
         <p style="font-size:14px;color:#777;margin-bottom:8px;">Your Payment Reference:</p>
@@ -271,7 +271,7 @@ function sendEmail(name, email, paymentId) {
       </div>
       <div class="footer">
         <p>
-          © AI App Building Workshop by Palash<br/>
+          \u00A9 AI App Building Workshop by Palash<br/>
           110% Money Back Guarantee if you can't build your app in 30 minutes.
         </p>
       </div>
@@ -287,9 +287,9 @@ function sendEmail(name, email, paymentId) {
   });
 }
 
-// ────────────────────────────────────────────────────────────
+// ------------------------------------------------------------
 // 4. SEND WHATSAPP MESSAGE (via Interakt API)
-// ────────────────────────────────────────────────────────────
+// ------------------------------------------------------------
 function sendWhatsApp(name, phone) {
   const cleanPhone = phone.replace(/\D/g, '');
   const payload = {
@@ -300,7 +300,7 @@ function sendWhatsApp(name, phone) {
     "template": {
       "name": "workshop_confirmation",
       "languageCode": "en",
-      "bodyValues": [name, "AI App Building Workshop", "₹99", "30 minutes"]
+      "bodyValues": [name, "AI App Building Workshop", "\u20B999", "30 minutes"]
     }
   };
   const options = {
