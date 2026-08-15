@@ -9,7 +9,7 @@
 const CONFIG = {
   SHEET_ID:        '18c0VazYcBZtgdFDzJK6baFb4ZQieb0_mhfWzzkIcKRA',
   SENDER_NAME:     'Palash \u2014 AI App Workshop',
-  WORKSHOP_DATE:   '16th August 2026 (Sunday), 11:00 AM IST',
+  WORKSHOP_DATE:   '23rd August 2026 (Sunday), 11:00 AM IST',
   WHATSAPP_API_KEY: '',
   WHATSAPP_NUMBER:  '',
 };
