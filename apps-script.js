@@ -9,7 +9,7 @@
 const CONFIG = {
   SHEET_ID:        '18c0VazYcBZtgdFDzJK6baFb4ZQieb0_mhfWzzkIcKRA',
   SENDER_NAME:     'Palash \u2014 AI App Workshop',
-  WORKSHOP_DATE:   '23rd August 2026 (Sunday), 11:00 AM IST',
+  WORKSHOP_DATE:   '30th August 2026 (Sunday), 11:00 AM IST',
   WHATSAPP_API_KEY: '',
   WHATSAPP_NUMBER:  '',
 };
@@ -245,7 +245,7 @@ function sendEmail(name, email, paymentId) {
         <div style="background:linear-gradient(135deg,#e8f5e9,#d0f0da);border:2.5px solid #25D366;border-radius:16px;padding:20px;text-align:center;margin-bottom:24px;">
           <div style="font-size:13px;font-weight:800;color:#1a6b35;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">\u26A1 Step 1 \u2014 Join WhatsApp Group NOW</div>
           <div style="font-size:13px;color:#2e7d32;margin-bottom:14px;">Get the Zoom link, updates & reminders \u2014 all in the group</div>
-          <a href="https://chat.whatsapp.com/Eys8XESdoYG16u8XFyt6gB?s=cl&p=i&ilr=0" style="display:block;background:#25D366;color:#fff;text-decoration:none;padding:16px 24px;border-radius:12px;font-size:16px;font-weight:900;box-shadow:0 6px 24px rgba(37,211,102,0.4);">\uD83D\uDCAC Join WhatsApp Group \u2192</a>
+          <a href="https://chat.whatsapp.com/Kud9QNGBAnZ865IsHlmjdg?s=cl&p=a&mlu=4" style="display:block;background:#25D366;color:#fff;text-decoration:none;padding:16px 24px;border-radius:12px;font-size:16px;font-weight:900;box-shadow:0 6px 24px rgba(37,211,102,0.4);">\uD83D\uDCAC Join WhatsApp Group \u2192</a>
         </div>
 
         <div class="steps">
