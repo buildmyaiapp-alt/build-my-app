@@ -12,7 +12,30 @@
   n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
   t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
   document,'script','https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', '1489981779278274');
+
+  // Read buyer info (same lookup the sheet-notify script below uses) so the
+  // pixel can match Purchase events to a person instead of just IP/UA/fbc.
+  var pixelBuyerEmail = '', pixelBuyerPhone = '';
+  try {
+    var pixelPending = JSON.parse(sessionStorage.getItem('pending_lead') || '{}');
+    pixelBuyerEmail = pixelPending.email || '';
+    pixelBuyerPhone = pixelPending.phone || '';
+    if (!pixelBuyerEmail && !pixelBuyerPhone) {
+      var pixelLeads = JSON.parse(localStorage.getItem('rzp_leads') || '[]');
+      if (pixelLeads.length > 0) {
+        var pixelLast = pixelLeads[pixelLeads.length - 1];
+        pixelBuyerEmail = pixelLast.email || '';
+        pixelBuyerPhone = pixelLast.phone || '';
+      }
+    }
+  } catch(e) {}
+  pixelBuyerEmail = pixelBuyerEmail.trim().toLowerCase();
+  pixelBuyerPhone = pixelBuyerPhone.replace(/[^\d]/g, '');
+
+  fbq('init', '1489981779278274', {
+    em: pixelBuyerEmail || undefined,
+    ph: pixelBuyerPhone || undefined
+  });
   fbq('track', 'PageView');
 
   // Fire Purchase ONCE only
