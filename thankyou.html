@@ -138,7 +138,7 @@
 
   <script>
     var WA_GROUP = 'https://chat.whatsapp.com/E1N70Dp1u8y3vNFfsw1wG2?mode=gi_t';
-    var secs = 3;
+    var secs = 2;
 
     function tick() {
       var el = document.getElementById('countNum');
@@ -150,7 +150,7 @@
         return;
       }
       secs--;
-      setTimeout(tick, 1000);
+      setTimeout(tick, 850);
     }
 
     window.addEventListener('load', function() {
@@ -163,7 +163,7 @@
         document.getElementById('page-sub').innerHTML = '✅ ₹199 received. Live session + <strong>Recording included 🎥</strong><br/>Join the WhatsApp group below 👇';
       }
       // Start countdown immediately
-      setTimeout(tick, 500);
+      setTimeout(tick, 300);
     });
 
     function joinNow() {
@@ -180,7 +180,7 @@
     <p class="sub" id="page-sub">✅ ₹99 received. Your seat for <strong>6th September (Sunday), 11:00 AM</strong> is confirmed.<br/>One last step — join the WhatsApp group below 👇</p>
 
     <!-- COUNTDOWN STRIP -->
-    <div class="countdown-strip">⚡ Auto-joining in <span id="countNum">3</span> seconds...</div>
+    <div class="countdown-strip">⚡ Auto-joining in <span id="countNum">2</span> seconds...</div>
 
     <!-- BIG HERO WhatsApp Button -->
     <div class="wa-hero">
