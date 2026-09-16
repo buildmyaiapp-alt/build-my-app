@@ -67,6 +67,8 @@
       var name  = pending.name  || sessionStorage.getItem('buyer_name') || '';
       var email = pending.email || '';
       var phone = pending.phone || '';
+      var adset = pending.adset || '';
+      var ad    = pending.ad    || '';
 
       // 2. Fallback: read from localStorage backup (saved by index.html before redirect)
       if (!email && !phone) {
@@ -91,7 +93,9 @@
           paymentId: 'RAZORPAY_PAID_' + Date.now(),
           status:    'PAID',
           plan:      isRecording ? 'recording' : 'live',
-          amount:    isRecording ? '19900' : '9900'
+          amount:    isRecording ? '19900' : '9900',
+          adset:     adset,
+          ad:        ad
         });
         new Image().src = APPS_SCRIPT + '?' + params.toString();
         sessionStorage.setItem('sheet_notified', '1');

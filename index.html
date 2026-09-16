@@ -2409,7 +2409,8 @@
     btn.innerHTML = '⏳ Opening Payment...';
 
     const amount   = bumpSelected ? 19900 : 9900;
-    const leadData = { name, email, phone, paymentId: 'PAYMENT_INITIATED', amount };
+    const tracking = getTrackingParams();
+    const leadData = { name, email, phone, paymentId: 'PAYMENT_INITIATED', amount, adset: tracking.adset, ad: tracking.ad };
 
     // Save to sessionStorage
     try {
@@ -2441,6 +2442,16 @@
     window.location.href = finalLink;
   }
 
+  function getTrackingParams() {
+    try {
+      const p = new URLSearchParams(window.location.search);
+      return {
+        adset: p.get('utm_adset') || '',
+        ad:    p.get('utm_ad') || ''
+      };
+    } catch(err) { return { adset: '', ad: '' }; }
+  }
+
   function saveLead(data) {
     try {
       const payload = JSON.stringify({
@@ -2448,14 +2459,18 @@
         email:     data.email,
         phone:     data.phone,
         paymentId: data.paymentId || 'LEAD',
-        amount:    data.amount || null
+        amount:    data.amount || null,
+        adset:     data.adset || '',
+        ad:        data.ad || ''
       });
       // Use GET request — same method that works on thank you page for paid leads
       const params = new URLSearchParams({
         name:      data.name,
         email:     data.email,
         phone:     data.phone,
-        paymentId: data.paymentId || 'LEAD'
+        paymentId: data.paymentId || 'LEAD',
+        adset:     data.adset || '',
+        ad:        data.ad || ''
       });
       const url = APPS_SCRIPT + '?' + params.toString();
       // GET request that survives page navigation (the Apps Script only accepts GET;
