@@ -127,9 +127,6 @@
     @keyframes pulse{0%,100%{box-shadow:0 6px 24px rgba(0,0,0,0.2),0 0 0 0 rgba(255,255,255,0.4);}50%{box-shadow:0 6px 24px rgba(0,0,0,0.2),0 0 0 10px rgba(255,255,255,0);}}
     .whatsapp-btn{animation:pulse 2s infinite;}
 
-    /* Countdown strip */
-    .countdown-strip{background:#e8f5e9;border-radius:10px;padding:8px 14px;margin-bottom:14px;font-size:13px;color:#1a6b35;font-weight:700;}
-    .countdown-strip span{font-size:18px;font-weight:900;color:#128C4F;}
 
     .detail-box{background:#f5f5f7;border-radius:14px;padding:14px 16px;margin-bottom:14px;text-align:left;}
     .detail-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e5e5e5;font-size:13px;}
@@ -142,20 +139,6 @@
 
   <script>
     var WA_GROUP = 'https://chat.whatsapp.com/GciWHTVE0eK45cgvaWKEuX?mode=gi_t&p=a&mlu=4&ilr=4';
-    var secs = 2;
-
-    function tick() {
-      var el = document.getElementById('countNum');
-      if (!el) return;
-      el.textContent = secs;
-      if (secs <= 0) {
-        // Navigate entire page to WhatsApp group
-        window.location.href = WA_GROUP;
-        return;
-      }
-      secs--;
-      setTimeout(tick, 850);
-    }
 
     window.addEventListener('load', function() {
       // Detect ₹199 recording plan
@@ -166,13 +149,16 @@
         document.getElementById('recording-badge').style.display = 'block';
         document.getElementById('page-sub').innerHTML = '✅ ₹199 received. Live session + <strong>Recording included 🎥</strong><br/>Join the WhatsApp group below 👇';
       }
-      // Start countdown immediately
-      setTimeout(tick, 300);
     });
 
     function joinNow() {
-      // User tapped the button — open WhatsApp and stop countdown
-      secs = -1;
+      // User tapped the button — this is a real tap, so phones/in-app
+      // browsers actually hand off to the WhatsApp app. Do NOT trigger
+      // this navigation automatically (e.g. via setTimeout) — a
+      // script-triggered redirect isn't a "user gesture," so most phones
+      // (especially Instagram/Facebook's in-app browser) will refuse to
+      // open the WhatsApp app for it and silently strand the visitor on
+      // a dead web page instead.
       window.location.href = WA_GROUP;
     }
   </script>
@@ -182,9 +168,6 @@
     <div class="emoji">🎉</div>
     <h1>Payment Done! You're In!</h1>
     <p class="sub" id="page-sub">✅ ₹99 received. Your seat for <strong>4th October (Sunday), 11:00 AM</strong> is confirmed.<br/>One last step — join the WhatsApp group below 👇</p>
-
-    <!-- COUNTDOWN STRIP -->
-    <div class="countdown-strip">⚡ Auto-joining in <span id="countNum">2</span> seconds...</div>
 
     <!-- BIG HERO WhatsApp Button -->
     <div class="wa-hero">
