@@ -363,28 +363,24 @@
       font-size:12px;color:#444;font-style:italic;line-height:1.6;
       border-top:1px solid #f0f0f0;padding-top:10px;margin-top:auto;
     }
-    /* Video thumbnail — used in the App Showcase cards below; iframe loads
-       only on click so it stays page-speed safe */
-    .vt-video-thumb{position:relative;width:100%;aspect-ratio:16/9;background:#000;cursor:pointer;}
-    .vt-video-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-    .vt-video-play{
-      position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-      width:50px;height:50px;border-radius:50%;
-      background:rgba(255,255,255,.9);
+    /* Real student videos — stacked one-by-one, no thumbnail image (just a
+       plain play button on a solid background, since YouTube's own custom
+       thumbnail has a banner graphic baked in that we can't remove). */
+    .demo-video-stack{display:flex;flex-direction:column;align-items:center;gap:40px;}
+    .demo-video-big{width:100%;max-width:640px;}
+    .vt-video-thumb-clean{
+      position:relative;width:100%;aspect-ratio:16/9;
+      background:linear-gradient(135deg,#1a1a2e,#0d1b6e);
+      border-radius:16px;cursor:pointer;overflow:hidden;
+      box-shadow:0 16px 40px rgba(0,0,0,.45);
       display:flex;align-items:center;justify-content:center;
-      font-size:17px;color:var(--navy);
     }
-    /* Real student video rows. Explicit breakpoint instead of flex-wrap,
-       so it's always either a clean single row or a clean full stack —
-       never a half-wrapped mix. */
-    .demo-video-row{display:flex;align-items:center;justify-content:center;gap:26px;}
-    .demo-video-col{width:230px;flex-shrink:0;}
-    .demo-video-col-big{width:420px;}
-    .demo-video-phone{display:inline-block;position:relative;flex-shrink:0;}
-    @media(max-width:900px){
-      .demo-video-row{flex-direction:column;}
-      .demo-video-col{width:230px;}
-      .demo-video-col-big{width:100%;max-width:380px;}
+    .vt-video-play-big{
+      width:76px;height:76px;border-radius:50%;
+      background:rgba(255,255,255,.95);
+      display:flex;align-items:center;justify-content:center;
+      font-size:26px;color:var(--navy);
+      box-shadow:0 8px 24px rgba(0,0,0,.3);
     }
 
     /* Logo/company testimonial card */
@@ -1261,24 +1257,22 @@
     <h2 class="sec-title">See What <span class="hl">Our Students Are Creating</span> In The Workshop</h2>
     <p class="sec-sub">Real apps, built live, by real students — not actors or mockups</p>
     <div class="sec-divider"></div>
-    <div class="demo-video-row" style="margin-top:36px;">
+    <div class="demo-video-stack" style="margin-top:36px;">
 
       <!-- Real student video: Zomato-Style Food App -->
-      <div class="demo-video-col demo-video-col-big">
-        <div class="vt-video-thumb" style="border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.4);" onclick="this.innerHTML='<iframe src=\'https://www.youtube.com/embed/sn0vSfxfSEc?rel=0&autoplay=1&playsinline=1\' frameborder=\'0\' allow=\'autoplay;encrypted-media\' allowfullscreen style=\'width:100%;height:100%;position:absolute;top:0;left:0;border-radius:14px;\'></iframe>'">
-          <img loading="lazy" src="https://i.ytimg.com/vi/sn0vSfxfSEc/mqdefault.jpg" alt="Zomato-style food ordering app built in workshop" style="border-radius:14px;"/>
-          <div class="vt-video-play">▶</div>
+      <div class="demo-video-big">
+        <div class="vt-video-thumb-clean" onclick="this.innerHTML='<iframe src=\'https://www.youtube.com/embed/sn0vSfxfSEc?rel=0&autoplay=1&playsinline=1&controls=0&modestbranding=1\' frameborder=\'0\' allow=\'autoplay;encrypted-media\' allowfullscreen style=\'width:100%;height:100%;position:absolute;top:0;left:0;border-radius:16px;\'></iframe>'">
+          <div class="vt-video-play-big">▶</div>
         </div>
-        <p style="margin-top:12px;font-size:15px;color:#fff;font-weight:700;">🍽️ Zomato-Style Food App</p>
+        <p style="margin-top:14px;font-size:17px;color:#fff;font-weight:700;">🍽️ Zomato-Style Food App</p>
       </div>
 
       <!-- Real student video: Salon Booking App -->
-      <div class="demo-video-col demo-video-col-big">
-        <div class="vt-video-thumb" style="border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.4);" onclick="this.innerHTML='<iframe src=\'https://www.youtube.com/embed/cidJ0eHl-30?rel=0&autoplay=1&playsinline=1\' frameborder=\'0\' allow=\'autoplay;encrypted-media\' allowfullscreen style=\'width:100%;height:100%;position:absolute;top:0;left:0;border-radius:14px;\'></iframe>'">
-          <img loading="lazy" src="https://i.ytimg.com/vi/cidJ0eHl-30/mqdefault.jpg" alt="Salon booking app built in workshop" style="border-radius:14px;"/>
-          <div class="vt-video-play">▶</div>
+      <div class="demo-video-big">
+        <div class="vt-video-thumb-clean" onclick="this.innerHTML='<iframe src=\'https://www.youtube.com/embed/cidJ0eHl-30?rel=0&autoplay=1&playsinline=1&controls=0&modestbranding=1\' frameborder=\'0\' allow=\'autoplay;encrypted-media\' allowfullscreen style=\'width:100%;height:100%;position:absolute;top:0;left:0;border-radius:16px;\'></iframe>'">
+          <div class="vt-video-play-big">▶</div>
         </div>
-        <p style="margin-top:12px;font-size:15px;color:#fff;font-weight:700;">💇 Salon Booking App</p>
+        <p style="margin-top:14px;font-size:17px;color:#fff;font-weight:700;">💇 Salon Booking App</p>
       </div>
 
     </div>
