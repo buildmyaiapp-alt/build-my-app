@@ -2578,11 +2578,15 @@
     }, 250);
   });
 
-  // Run after page loads
+  // Run after page loads. Deferred one frame via requestAnimationFrame so
+  // the isMobile() width check doesn't force a synchronous layout
+  // recalculation while the browser is still settling initial layout
+  // (was costing ~195ms as a "forced reflow" per Lighthouse).
+  function start(){ requestAnimationFrame(init); }
   if (document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', start);
   } else {
-    init();
+    start();
   }
 })();
 </script>
