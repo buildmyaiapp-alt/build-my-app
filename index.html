@@ -12,37 +12,44 @@
   <!-- Load fonts async (non-blocking) -->
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Caveat:wght@600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'"/>
   <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Caveat:wght@600;700&display=swap" rel="stylesheet"/></noscript>
-  <!-- Facebook Pixel -->
-  <script>
-  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-  document,'script','https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', '1489981779278274');
-  fbq('track', 'PageView');
-  fbq('track', 'ViewContent', {
-    content_name: 'AI App Building Workshop - Oct 4',
-    content_category: 'Online Workshop',
-    content_type: 'product',
-    value: 99,
-    currency: 'INR'
-  });
-  </script>
   <!-- Pixel image fallbacks — fire even when JS is blocked -->
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1489981779278274&ev=PageView&noscript=1"/></noscript>
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1489981779278274&ev=ViewContent&noscript=1"/></noscript>
-  <!-- End Facebook Pixel -->
 
-  <!-- Microsoft Clarity -->
-  <script type="text/javascript">
+  <!-- Facebook Pixel + Microsoft Clarity — deferred until the browser is idle
+       (or after 3s at worst) so their ~425ms of main-thread cost doesn't
+       compete with painting the hero content. Attribution windows are
+       hours/days, so a sub-second delay here has no tracking impact. -->
+  <script>
+  function loadTrackers() {
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1489981779278274');
+    fbq('track', 'PageView');
+    fbq('track', 'ViewContent', {
+      content_name: 'AI App Building Workshop - Oct 4',
+      content_category: 'Online Workshop',
+      content_type: 'product',
+      value: 99,
+      currency: 'INR'
+    });
+
     (function(c,l,a,r,i,t,y){
         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
         t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
         y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
     })(window, document, "clarity", "script", "wlt3vnxb8v");
+  }
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(loadTrackers, { timeout: 3000 });
+  } else {
+    window.addEventListener('load', loadTrackers);
+  }
   </script>
-  <!-- End Microsoft Clarity -->
+  <!-- End Facebook Pixel + Microsoft Clarity -->
 
   <style>
     *{margin:0;padding:0;box-sizing:border-box;}
