@@ -149,16 +149,18 @@
         document.getElementById('recording-badge').style.display = 'block';
         document.getElementById('page-sub').innerHTML = '✅ ₹199 received. Live session + <strong>Recording included 🎥</strong><br/>Join the WhatsApp group below 👇';
       }
+
+      // Auto-redirect most visitors straight to WhatsApp. This is a
+      // script-triggered navigation, not a real tap, so some phones/in-app
+      // browsers (notably Instagram/Facebook's) may silently refuse the
+      // app handoff. The big "TAP HERE" button stays visible the whole
+      // time as a fallback for exactly that case, so nobody gets stranded.
+      setTimeout(function() {
+        window.location.href = WA_GROUP;
+      }, 2000);
     });
 
     function joinNow() {
-      // User tapped the button — this is a real tap, so phones/in-app
-      // browsers actually hand off to the WhatsApp app. Do NOT trigger
-      // this navigation automatically (e.g. via setTimeout) — a
-      // script-triggered redirect isn't a "user gesture," so most phones
-      // (especially Instagram/Facebook's in-app browser) will refuse to
-      // open the WhatsApp app for it and silently strand the visitor on
-      // a dead web page instead.
       window.location.href = WA_GROUP;
     }
   </script>
