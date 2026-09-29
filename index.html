@@ -363,25 +363,17 @@
       font-size:12px;color:#444;font-style:italic;line-height:1.6;
       border-top:1px solid #f0f0f0;padding-top:10px;margin-top:auto;
     }
-    /* Video testimonial card — thumbnail only, iframe loads on click (page-speed safe) */
-    .vt-video-card{
-      background:#fff;border:1px solid var(--border);border-radius:16px;
-      overflow:hidden;width:260px;flex-shrink:0;
-      box-shadow:0 4px 20px rgba(0,0,0,.08);
-      text-align:center;
-    }
+    /* Video thumbnail — used in the App Showcase cards below; iframe loads
+       only on click so it stays page-speed safe */
     .vt-video-thumb{position:relative;width:100%;aspect-ratio:16/9;background:#000;cursor:pointer;}
     .vt-video-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
     .vt-video-play{
       position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-      width:52px;height:52px;border-radius:50%;
+      width:44px;height:44px;border-radius:50%;
       background:rgba(255,255,255,.9);
       display:flex;align-items:center;justify-content:center;
-      font-size:18px;color:var(--navy);
+      font-size:15px;color:var(--navy);
     }
-    .vt-video-info{padding:14px 16px 18px;}
-    .vt-video-name{font-size:14px;font-weight:800;color:var(--navy);margin-bottom:4px;}
-    .vt-video-built{font-size:12px;color:#666;line-height:1.4;}
 
     /* Logo/company testimonial card */
     .vt-logo-card{
@@ -1405,30 +1397,6 @@
     </div>
     <div class="vt-grid">
 
-      <!-- Video Testimonial 1: Zomato-style food app built live in workshop -->
-      <div class="vt-video-card">
-        <div class="vt-video-thumb" onclick="this.innerHTML='<iframe src=\'https://www.youtube.com/embed/sn0vSfxfSEc?rel=0&autoplay=1&playsinline=1\' frameborder=\'0\' allow=\'autoplay;encrypted-media\' allowfullscreen style=\'width:100%;height:100%;position:absolute;top:0;left:0;\'></iframe>'">
-          <img loading="lazy" src="https://i.ytimg.com/vi/sn0vSfxfSEc/mqdefault.jpg" alt="Zomato-style food ordering app built in workshop"/>
-          <div class="vt-video-play">▶</div>
-        </div>
-        <div class="vt-video-info">
-          <div class="vt-video-name">🍽️ Zomato-Style Food App</div>
-          <div class="vt-video-built">Watch this student build a full food-ordering app live in the workshop</div>
-        </div>
-      </div>
-
-      <!-- Video Testimonial 2: Salon booking app built live in workshop -->
-      <div class="vt-video-card">
-        <div class="vt-video-thumb" onclick="this.innerHTML='<iframe src=\'https://www.youtube.com/embed/cidJ0eHl-30?rel=0&autoplay=1&playsinline=1\' frameborder=\'0\' allow=\'autoplay;encrypted-media\' allowfullscreen style=\'width:100%;height:100%;position:absolute;top:0;left:0;\'></iframe>'">
-          <img loading="lazy" src="https://i.ytimg.com/vi/cidJ0eHl-30/mqdefault.jpg" alt="Salon booking app built in workshop"/>
-          <div class="vt-video-play">▶</div>
-        </div>
-        <div class="vt-video-info">
-          <div class="vt-video-name">💇 Salon Booking App</div>
-          <div class="vt-video-built">Watch this student build a salon appointment booking app live in the workshop</div>
-        </div>
-      </div>
-
       <!-- Person 1: Abhishek -->
       <div class="vt-card">
         <div class="vt-avatar">
@@ -1492,6 +1460,32 @@
 
     <div class="showcase-wrap">
     <div class="showcase-scroll" id="showcaseScroll">
+
+      <!-- APP: Zomato-Style Food App (real student video) -->
+      <div class="sc-card">
+        <div class="vt-video-thumb" onclick="this.innerHTML='<iframe src=\'https://www.youtube.com/embed/sn0vSfxfSEc?rel=0&autoplay=1&playsinline=1\' frameborder=\'0\' allow=\'autoplay;encrypted-media\' allowfullscreen style=\'width:100%;height:100%;position:absolute;top:0;left:0;\'></iframe>'">
+          <img loading="lazy" src="https://i.ytimg.com/vi/sn0vSfxfSEc/mqdefault.jpg" alt="Zomato-style food ordering app built in workshop"/>
+          <div class="vt-video-play">▶</div>
+        </div>
+        <div class="sc-card-body">
+          <div class="sc-app-name">🍽️ Zomato-Style Food App</div>
+          <div class="sc-app-desc">Watch this student build a full food-ordering app live in the workshop</div>
+          <div class="sc-tags"><span class="sc-tag">Food Delivery</span><span class="sc-tag built">▶ Real Student Video</span></div>
+        </div>
+      </div>
+
+      <!-- APP: Salon Booking App (real student video) -->
+      <div class="sc-card">
+        <div class="vt-video-thumb" onclick="this.innerHTML='<iframe src=\'https://www.youtube.com/embed/cidJ0eHl-30?rel=0&autoplay=1&playsinline=1\' frameborder=\'0\' allow=\'autoplay;encrypted-media\' allowfullscreen style=\'width:100%;height:100%;position:absolute;top:0;left:0;\'></iframe>'">
+          <img loading="lazy" src="https://i.ytimg.com/vi/cidJ0eHl-30/mqdefault.jpg" alt="Salon booking app built in workshop"/>
+          <div class="vt-video-play">▶</div>
+        </div>
+        <div class="sc-card-body">
+          <div class="sc-app-name">💇 Salon Booking App</div>
+          <div class="sc-app-desc">Watch this student build a salon appointment booking app live in the workshop</div>
+          <div class="sc-tags"><span class="sc-tag">Salon</span><span class="sc-tag built">▶ Real Student Video</span></div>
+        </div>
+      </div>
 
       <!-- APP 1: GymPro -->
       <div class="sc-card">
