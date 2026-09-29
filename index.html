@@ -369,10 +369,22 @@
     .vt-video-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
     .vt-video-play{
       position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-      width:44px;height:44px;border-radius:50%;
+      width:50px;height:50px;border-radius:50%;
       background:rgba(255,255,255,.9);
       display:flex;align-items:center;justify-content:center;
-      font-size:15px;color:var(--navy);
+      font-size:17px;color:var(--navy);
+    }
+    /* Real student video rows. Explicit breakpoint instead of flex-wrap,
+       so it's always either a clean single row or a clean full stack —
+       never a half-wrapped mix. */
+    .demo-video-row{display:flex;align-items:center;justify-content:center;gap:26px;}
+    .demo-video-col{width:230px;flex-shrink:0;}
+    .demo-video-col-big{width:320px;}
+    .demo-video-phone{display:inline-block;position:relative;flex-shrink:0;}
+    @media(max-width:900px){
+      .demo-video-row{flex-direction:column;}
+      .demo-video-col{width:230px;}
+      .demo-video-col-big{width:280px;}
     }
 
     /* Logo/company testimonial card */
@@ -1216,51 +1228,59 @@
     <p class="sec-sub">This Is The Ultimate Method That TOP Business Owners Use (They Won't Tell You...)</p>
     <div class="sec-divider"></div>
     <div style="margin-top:36px;text-align:center;">
-      <div style="display:flex;align-items:center;justify-content:center;gap:28px;flex-wrap:wrap;">
-
-        <!-- Real student video: Zomato-Style Food App -->
-        <div style="width:190px;">
-          <div class="vt-video-thumb" style="border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.4);" onclick="this.innerHTML='<iframe src=\'https://www.youtube.com/embed/sn0vSfxfSEc?rel=0&autoplay=1&playsinline=1\' frameborder=\'0\' allow=\'autoplay;encrypted-media\' allowfullscreen style=\'width:100%;height:100%;position:absolute;top:0;left:0;border-radius:14px;\'></iframe>'">
-            <img loading="lazy" src="https://i.ytimg.com/vi/sn0vSfxfSEc/mqdefault.jpg" alt="Zomato-style food ordering app built in workshop" style="border-radius:14px;"/>
-            <div class="vt-video-play">▶</div>
+      <!-- Phone mockup with screen recording inside -->
+      <div style="display:inline-block;position:relative;">
+        <div style="
+          width:260px;
+          background:#1c1c1e;
+          border-radius:38px;
+          padding:12px;
+          box-shadow:0 24px 60px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.08);
+          display:inline-block;
+        ">
+          <!-- notch -->
+          <div style="position:absolute;top:22px;left:50%;transform:translateX(-50%);width:80px;height:20px;background:#1c1c1e;border-radius:0 0 14px 14px;z-index:10;"></div>
+          <!-- screen -->
+          <div style="border-radius:28px;overflow:hidden;background:#000;aspect-ratio:9/19.5;position:relative;">
+            <video preload="none" width="100%" height="100%" autoplay muted loop playsinline style="display:block;object-fit:cover;width:100%;height:100%;">
+              <source src="app-demo.mp4" type="video/mp4"/>
+            </video>
           </div>
-          <p style="margin-top:10px;font-size:13px;color:#fff;font-weight:700;">🍽️ Zomato-Style Food App</p>
+          <!-- home bar -->
+          <div style="margin-top:8px;width:80px;height:4px;background:rgba(255,255,255,.3);border-radius:4px;margin-left:auto;margin-right:auto;"></div>
         </div>
-
-        <!-- Phone mockup with screen recording inside -->
-        <div style="display:inline-block;position:relative;">
-          <div style="
-            width:260px;
-            background:#1c1c1e;
-            border-radius:38px;
-            padding:12px;
-            box-shadow:0 24px 60px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.08);
-            display:inline-block;
-          ">
-            <!-- notch -->
-            <div style="position:absolute;top:22px;left:50%;transform:translateX(-50%);width:80px;height:20px;background:#1c1c1e;border-radius:0 0 14px 14px;z-index:10;"></div>
-            <!-- screen -->
-            <div style="border-radius:28px;overflow:hidden;background:#000;aspect-ratio:9/19.5;position:relative;">
-              <video preload="none" width="100%" height="100%" autoplay muted loop playsinline style="display:block;object-fit:cover;width:100%;height:100%;">
-                <source src="app-demo.mp4" type="video/mp4"/>
-              </video>
-            </div>
-            <!-- home bar -->
-            <div style="margin-top:8px;width:80px;height:4px;background:rgba(255,255,255,.3);border-radius:4px;margin-left:auto;margin-right:auto;"></div>
-          </div>
-        </div>
-
-        <!-- Real student video: Salon Booking App -->
-        <div style="width:190px;">
-          <div class="vt-video-thumb" style="border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.4);" onclick="this.innerHTML='<iframe src=\'https://www.youtube.com/embed/cidJ0eHl-30?rel=0&autoplay=1&playsinline=1\' frameborder=\'0\' allow=\'autoplay;encrypted-media\' allowfullscreen style=\'width:100%;height:100%;position:absolute;top:0;left:0;border-radius:14px;\'></iframe>'">
-            <img loading="lazy" src="https://i.ytimg.com/vi/cidJ0eHl-30/mqdefault.jpg" alt="Salon booking app built in workshop" style="border-radius:14px;"/>
-            <div class="vt-video-play">▶</div>
-          </div>
-          <p style="margin-top:10px;font-size:13px;color:#fff;font-weight:700;">💇 Salon Booking App</p>
-        </div>
-
       </div>
       <p style="margin-top:20px;font-size:15px;color:#F5A623;font-style:italic;font-weight:700;">And when you follow this method... your app could be live same day! ⚡</p>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT OUR STUDENTS ARE CREATING (real workshop videos) -->
+<section class="sec-wrap">
+  <div class="sec-inner" style="text-align:center;">
+    <h2 class="sec-title">See What <span class="hl">Our Students Are Creating</span> In The Workshop</h2>
+    <p class="sec-sub">Real apps, built live, by real students — not actors or mockups</p>
+    <div class="sec-divider"></div>
+    <div class="demo-video-row" style="margin-top:36px;">
+
+      <!-- Real student video: Zomato-Style Food App -->
+      <div class="demo-video-col demo-video-col-big">
+        <div class="vt-video-thumb" style="border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.4);" onclick="this.innerHTML='<iframe src=\'https://www.youtube.com/embed/sn0vSfxfSEc?rel=0&autoplay=1&playsinline=1\' frameborder=\'0\' allow=\'autoplay;encrypted-media\' allowfullscreen style=\'width:100%;height:100%;position:absolute;top:0;left:0;border-radius:14px;\'></iframe>'">
+          <img loading="lazy" src="https://i.ytimg.com/vi/sn0vSfxfSEc/mqdefault.jpg" alt="Zomato-style food ordering app built in workshop" style="border-radius:14px;"/>
+          <div class="vt-video-play">▶</div>
+        </div>
+        <p style="margin-top:12px;font-size:15px;color:#fff;font-weight:700;">🍽️ Zomato-Style Food App</p>
+      </div>
+
+      <!-- Real student video: Salon Booking App -->
+      <div class="demo-video-col demo-video-col-big">
+        <div class="vt-video-thumb" style="border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.4);" onclick="this.innerHTML='<iframe src=\'https://www.youtube.com/embed/cidJ0eHl-30?rel=0&autoplay=1&playsinline=1\' frameborder=\'0\' allow=\'autoplay;encrypted-media\' allowfullscreen style=\'width:100%;height:100%;position:absolute;top:0;left:0;border-radius:14px;\'></iframe>'">
+          <img loading="lazy" src="https://i.ytimg.com/vi/cidJ0eHl-30/mqdefault.jpg" alt="Salon booking app built in workshop" style="border-radius:14px;"/>
+          <div class="vt-video-play">▶</div>
+        </div>
+        <p style="margin-top:12px;font-size:15px;color:#fff;font-weight:700;">💇 Salon Booking App</p>
+      </div>
+
     </div>
   </div>
 </section>
