@@ -2424,8 +2424,8 @@
   }
   const APPS_SCRIPT  = 'https://script.google.com/macros/s/AKfycbxnlk_WZEGfvGf3rQrSmBINLLjjkBD-wmUO965FUQQMbS0fnDcO_wxan2dE9Bi-KISI/exec';
 
-  // Open modal when any enroll button clicked
-  document.querySelectorAll('.enroll-btn, .sticky-btn').forEach(btn => {
+  // Open modal when any enroll button (or the app-store badges) clicked
+  document.querySelectorAll('.enroll-btn, .sticky-btn, .store-badge-link').forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
       openModal();
@@ -2436,6 +2436,14 @@
     const m = document.getElementById('rzp-modal');
     m.style.display = 'flex';
     document.body.style.overflow = 'hidden';
+    // Funnel tracking: record the first form-open per visit (analytics only)
+    try {
+      if (!sessionStorage.getItem('form_open_fired')) {
+        sessionStorage.setItem('form_open_fired', '1');
+        if (typeof fbq !== 'undefined') fbq('trackCustom', 'FormOpen');
+        if (typeof window.clarity === 'function') window.clarity('event', 'form_open');
+      }
+    } catch (err) {}
   }
 
   function closeModal() {
